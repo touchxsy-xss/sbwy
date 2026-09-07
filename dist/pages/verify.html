@@ -1,0 +1,354 @@
+<!DOCTYPE html><html lang="zh-CN" data-page="verify" data-group="mobile"><head><meta charset="utf-8"><meta content="width=device-width, initial-scale=1, viewport-fit=cover" name="viewport">
+<title>实名与房屋确权 | 声边物业</title><link rel="icon" href="data:,"><link rel="preload" href="/assets/fonts.css?v=mtr809ae" as="style"><link rel="preload" href="/pages/verify.css?v=mtr809ae" as="style"><link rel="stylesheet" href="/assets/fonts.css?v=mtr809ae"><link rel="stylesheet" href="/pages/verify.css?v=mtr809ae"><link rel="stylesheet" href="/app.css?v=mtr809ae"><script type="module" src="/app.js?v=mtr809ae"></script></head><body class="bg-surface font-body-md text-body-md text-on-surface min-h-screen flex flex-col antialiased selection:bg-secondary-container"><header class="fixed top-0 inset-x-0 z-50 bg-surface/85 backdrop-blur-xl shadow-[0_1px_8px_rgba(0,0,0,0.03)] pt-safe"><div class="h-16 px-screen-margin flex items-center justify-between"><div class="flex items-center gap-spacing-xs"><button aria-label="返回" class="w-11 h-11 -ml-spacing-xs rounded-full flex items-center justify-center text-on-surface hover:bg-surface-container active:scale-95 transition-all" type="button" data-original-onclick="history.back()"><span class="material-symbols-outlined text-[22px]">arrow_back_ios_new</span></button><div class="flex flex-col"><div class="flex items-center gap-spacing-2xs"><span class="inline-flex items-center px-1.5 py-0.5 rounded-full bg-primary/10 text-primary font-label-sm text-label-sm">声边物业</span></div><h1 class="font-headline-sm text-headline-sm text-on-surface font-semibold tracking-tight">Resident Identity Verification</h1></div></div><div class="flex items-center gap-spacing-xs"><button aria-label="联系管家客服" class="w-11 h-11 rounded-full flex items-center justify-center text-primary hover:bg-surface-container active:scale-95 transition-all" type="button"><span class="material-symbols-outlined text-[24px]">support_agent</span></button><div class="w-8 h-8 rounded-full bg-primary flex items-center justify-center shadow-[0_2px_8px_rgba(0,101,68,0.18)]"><span class="material-symbols-outlined text-on-primary text-[18px]">person</span></div></div></div></header><main class="flex-1 flex flex-col relative w-full px-screen-margin pt-16 pb-safe bg-surface"><div class="flex flex-col w-full pb-spacing-2xl space-y-spacing-md">
+<!-- Top Welcome & Status Banner -->
+<div class="relative overflow-hidden rounded-xl bg-surface-container-low p-spacing-card-padding shadow-sm">
+<div class="absolute -right-8 -top-8 w-36 h-36 rounded-full bg-primary/10 blur-2xl pointer-events-none"></div>
+<div class="relative z-10 flex flex-col space-y-spacing-xs">
+<div class="flex items-center justify-between">
+<span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-surface-container-highest text-primary font-label-sm text-label-sm">
+<span class="material-symbols-outlined text-[14px]">verified_user</span>
+          声边智慧社区 · 居民认证
+        </span>
+<span class="flex items-center gap-1 text-tertiary font-label-sm text-label-sm">
+<span class="w-1.5 h-1.5 rounded-full bg-tertiary-container animate-pulse"></span>
+          静安区彭浦新村街道
+        </span>
+</div>
+<div>
+<h2 class="font-headline-md text-headline-md text-on-surface font-semibold">欢迎入住 彭一小区</h2>
+<p class="font-body-sm text-body-sm text-on-surface-variant mt-1">
+          完成实名与房屋确权，即可畅享在线报修、门禁通行与社区声边融媒体广播服务。
+        </p>
+</div>
+<!-- Step Indicator Flow -->
+<div class="pt-spacing-xs">
+<div class="grid grid-cols-3 gap-2 text-center">
+<div class="flex flex-col items-center gap-1 opacity-70">
+<div class="w-6 h-6 rounded-full bg-surface-container-highest text-primary flex items-center justify-center">
+<span class="material-symbols-outlined text-[14px]">check</span>
+</div>
+<span class="font-label-sm text-label-sm text-on-surface-variant">1. 微信授权</span>
+</div>
+<div class="flex flex-col items-center gap-1">
+<div class="w-6 h-6 rounded-full bg-primary text-on-primary flex items-center justify-center shadow-[0_2px_6px_rgba(0,101,68,0.25)]">
+<span class="font-label-sm text-label-sm font-bold">2</span>
+</div>
+<span class="font-label-sm text-label-sm text-primary font-semibold">2. 实名与确权</span>
+</div>
+<div class="flex flex-col items-center gap-1 opacity-45">
+<div class="w-6 h-6 rounded-full bg-surface-container-highest text-on-surface flex items-center justify-center">
+<span class="font-label-sm text-label-sm">3</span>
+</div>
+<span class="font-label-sm text-label-sm text-on-surface-variant">3. 畅享智慧家</span>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- Real-name Identity Verification Card -->
+<div class="bg-surface-container-lowest rounded-xl p-spacing-card-padding shadow-sm space-y-spacing-sm">
+<div class="flex items-center justify-between pb-1">
+<div class="flex items-center gap-spacing-xs">
+<div class="w-8 h-8 rounded-lg bg-surface-container flex items-center justify-center text-primary">
+<span class="material-symbols-outlined text-[18px]">badge</span>
+</div>
+<div>
+<h3 class="font-headline-sm text-headline-sm text-on-surface">实名信息核验</h3>
+<p class="font-label-sm text-label-sm text-on-surface-variant">对接上海市一网通办可信认证</p>
+</div>
+</div>
+<span class="px-2 py-0.5 rounded-full bg-surface-container text-primary font-label-sm text-label-sm">必填</span>
+</div>
+<div class="space-y-3">
+<div>
+<label class="block font-label-md text-label-md text-on-surface-variant mb-1.5">真实姓名</label>
+<div class="relative">
+<input class="w-full h-11 px-3.5 rounded-lg bg-surface-container-low text-on-surface font-body-md text-body-md focus:outline-none focus:bg-surface-container transition-colors" placeholder="请输入您的真实姓名（与身份证一致）" type="text" value="李雅欣">
+<span class="material-symbols-outlined text-primary text-[18px] absolute right-3 top-3">check_circle</span>
+</div>
+</div>
+<div>
+<label class="block font-label-md text-label-md text-on-surface-variant mb-1.5">身份证号码</label>
+<div class="relative">
+<input class="w-full h-11 px-3.5 pr-11 rounded-lg bg-surface-container-low text-on-surface font-body-md text-body-md focus:outline-none focus:bg-surface-container transition-colors" data-masked="310108************28" id="idCardInput" type="text" value="310108199205182428">
+<button class="absolute right-2 top-2 w-7 h-7 flex items-center justify-center text-outline hover:text-on-surface" id="toggleIdMask" type="button">
+<span class="material-symbols-outlined text-[18px]" id="eyeIcon">visibility</span>
+</button>
+</div>
+</div>
+<div>
+<label class="block font-label-md text-label-md text-on-surface-variant mb-1.5">联系电话</label>
+<div class="flex items-center justify-between h-11 px-3.5 rounded-lg bg-surface-container-low">
+<span class="font-body-md text-body-md text-on-surface font-medium">138****6688</span>
+<span class="inline-flex items-center gap-1 text-primary font-label-sm text-label-sm bg-primary/10 px-2 py-0.5 rounded-full">
+<span class="material-symbols-outlined text-[13px]">lock</span>
+            微信快速授权
+          </span>
+</div>
+</div>
+</div>
+</div>
+<!-- Real Property Selection Module -->
+<div class="bg-surface-container-lowest rounded-xl p-spacing-card-padding shadow-sm space-y-spacing-sm">
+<div class="flex items-center justify-between pb-1">
+<div class="flex items-center gap-spacing-xs">
+<div class="w-8 h-8 rounded-lg bg-surface-container flex items-center justify-center text-primary">
+<span class="material-symbols-outlined text-[18px]">holiday_village</span>
+</div>
+<div>
+<h3 class="font-headline-sm text-headline-sm text-on-surface">房产信息匹配</h3>
+<p class="font-label-sm text-label-sm text-on-surface-variant">非成套改造示范区数字化网格</p>
+</div>
+</div>
+<span class="text-primary font-label-sm text-label-sm flex items-center">
+<span class="material-symbols-outlined text-[15px] mr-0.5">location_on</span>
+        静安彭浦
+      </span>
+</div>
+<div class="space-y-3">
+<div>
+<label class="block font-label-md text-label-md text-on-surface-variant mb-1.5">所属社区</label>
+<div class="flex items-center justify-between h-11 px-3.5 rounded-lg bg-surface-container-low text-on-surface">
+<span class="font-body-md text-body-md font-medium">彭一小区（旧住房成套改造新街坊）</span>
+<span class="material-symbols-outlined text-outline text-[20px]">keyboard_arrow_down</span>
+</div>
+</div>
+<div>
+<label class="block font-label-md text-label-md text-on-surface-variant mb-1.5">房屋坐落定位</label>
+<div class="grid grid-cols-3 gap-2">
+<div class="flex items-center justify-between h-11 px-3 rounded-lg bg-surface-container-low">
+<span class="font-body-md text-body-md text-on-surface font-medium">16号楼</span>
+<span class="material-symbols-outlined text-outline text-[16px]">expand_more</span>
+</div>
+<div class="flex items-center justify-between h-11 px-3 rounded-lg bg-surface-container-low">
+<span class="font-body-md text-body-md text-on-surface font-medium">2单元</span>
+<span class="material-symbols-outlined text-outline text-[16px]">expand_more</span>
+</div>
+<div class="flex items-center justify-between h-11 px-3 rounded-lg bg-surface-container-low">
+<span class="font-body-md text-body-md text-on-surface font-medium">502室</span>
+<span class="material-symbols-outlined text-outline text-[16px]">expand_more</span>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- Resident Identity Type Switcher -->
+<div class="bg-surface-container-lowest rounded-xl p-spacing-card-padding shadow-sm space-y-spacing-sm">
+<div class="flex items-center justify-between">
+<div class="flex items-center gap-spacing-xs">
+<div class="w-8 h-8 rounded-lg bg-surface-container flex items-center justify-center text-primary">
+<span class="material-symbols-outlined text-[18px]">family_restroom</span>
+</div>
+<div>
+<h3 class="font-headline-sm text-headline-sm text-on-surface">居住身份类型</h3>
+<p class="font-label-sm text-label-sm text-on-surface-variant">身份决定物业管理系统权限与门禁下发</p>
+</div>
+</div>
+</div>
+<div class="grid grid-cols-2 gap-2.5 pt-1">
+<!-- Owner option (Active) -->
+<button class="flex flex-col text-left p-3 rounded-xl bg-primary/10 transition-all relative" id="roleOwnerBtn" type="button">
+<div class="flex items-center justify-between w-full mb-1">
+<span class="font-headline-sm text-headline-sm text-primary font-semibold">自有房产</span>
+<span class="w-4 h-4 rounded-full bg-primary text-on-primary flex items-center justify-center">
+<span class="material-symbols-outlined text-[12px]">check</span>
+</span>
+</div>
+<p class="font-label-sm text-label-sm text-on-surface-variant">业主 / 直系家属</p>
+<div class="mt-2 inline-flex items-center gap-1 font-label-sm text-label-sm text-primary">
+<span class="material-symbols-outlined text-[12px]">gavel</span>
+          需产权法定确权
+        </div>
+</button>
+<!-- Tenant option -->
+<button class="flex flex-col text-left p-3 rounded-xl bg-surface-container-low transition-all" id="roleTenantBtn" type="button">
+<div class="flex items-center justify-between w-full mb-1">
+<span class="font-headline-sm text-headline-sm text-on-surface font-medium">租房居住</span>
+<span class="w-4 h-4 rounded-full bg-surface-container-highest"></span>
+</div>
+<p class="font-label-sm text-label-sm text-on-surface-variant">租客 / 长期租户</p>
+<div class="mt-2 inline-flex items-center gap-1 font-label-sm text-label-sm text-outline">
+<span class="material-symbols-outlined text-[12px]">assignment</span>
+          需租约与房东授权
+        </div>
+</button>
+</div>
+</div>
+<!-- CRITICAL: Strict Property Ownership Verification Module -->
+<div class="bg-surface-container-lowest rounded-xl p-spacing-card-padding shadow-sm space-y-spacing-md" id="ownerVerificationCard">
+<div class="flex items-start justify-between">
+<div class="flex items-center gap-spacing-xs">
+<div class="w-8 h-8 rounded-lg bg-primary text-on-primary flex items-center justify-center shadow-[0_2px_8px_rgba(0,101,68,0.2)]">
+<span class="material-symbols-outlined text-[18px]">verified</span>
+</div>
+<div>
+<h3 class="font-headline-sm text-headline-sm text-on-surface">权威房产权属确权</h3>
+<p class="font-label-sm text-label-sm text-primary font-medium">选择以下任一方式完成业主身份直验</p>
+</div>
+</div>
+<span class="px-2 py-0.5 rounded-full bg-secondary-container text-on-secondary-container font-label-sm text-label-sm">
+        高权威
+      </span>
+</div>
+<!-- Verification Selector Pills -->
+<div class="flex rounded-xl bg-surface-container p-1 gap-1">
+<button class="flex-1 py-1.5 px-2 rounded-lg bg-surface-container-lowest text-primary font-label-sm text-label-sm font-semibold shadow-sm transition-all text-center" id="tabMethod1" type="button" data-original-onclick="switchMethod('method1')">
+        不动产权证
+      </button>
+<button class="flex-1 py-1.5 px-2 rounded-lg text-on-surface-variant font-label-sm text-label-sm transition-all text-center" id="tabMethod2" type="button" data-original-onclick="switchMethod('method2')">
+        网签/完税
+      </button>
+<button class="flex-1 py-1.5 px-2 rounded-lg text-on-surface-variant font-label-sm text-label-sm transition-all text-center" id="tabMethod3" type="button" data-original-onclick="switchMethod('method3')">
+        物业预留对账
+      </button>
+</div>
+<!-- Method 1: Real Estate Deed Certificate -->
+<div class="space-y-spacing-sm" id="methodContent1">
+<div>
+<label class="block font-label-md text-label-md text-on-surface-variant mb-1.5">不动产权证书 / 房产证编号</label>
+<div class="relative">
+<input class="w-full h-11 px-3.5 rounded-lg bg-surface-container-low text-on-surface font-body-md text-body-md focus:outline-none focus:bg-surface-container" placeholder="如：沪(202X)静字第XXXX号" type="text" value="沪(2022)静字不动产权第039841号">
+<span class="absolute right-3 top-3 text-primary text-[12px] font-label-sm font-semibold">格式校验通过</span>
+</div>
+<span class="block font-label-sm text-label-sm text-on-surface-variant mt-1">证书编号位于不动产权证书第二页右上角条形码下方</span>
+</div>
+<div>
+<div class="flex items-center justify-between mb-1.5">
+<label class="font-label-md text-label-md text-on-surface-variant">上传不动产权证关键页（权利人与附记）</label>
+<span class="font-label-sm text-label-sm text-primary flex items-center gap-1">
+<span class="material-symbols-outlined text-[14px]">document_scanner</span>
+            已开启AI OCR
+          </span>
+</div>
+<div class="grid grid-cols-2 gap-2.5">
+<!-- Upload 1 (Mock uploaded) -->
+<div class="relative rounded-xl overflow-hidden bg-surface-container-low aspect-[4/3] flex flex-col items-center justify-center p-2 text-center group">
+<img class="w-full h-full object-cover rounded-lg absolute inset-0 opacity-85" data-alt="Close-up photograph of Chinese real estate ownership certificate title deed booklet cover with green embossed emblem, lying on a clean wooden desk under warm morning lighting, architectural documentary photography." src="/assets/d0d1114a9eaa87fdba21.jpg" alt="Close-up photograph of Chinese real estate ownership certificate title deed booklet cover with green embossed emblem, lying on a clean wooden desk under warm morning lighting, architectural documentary photography." decoding="async">
+<div class="absolute inset-0 bg-gradient-to-t from-on-surface/80 via-transparent to-transparent"></div>
+<span class="material-symbols-outlined text-primary-fixed text-[24px] z-10">check_circle</span>
+<span class="z-10 font-label-sm text-label-sm text-surface-lowest font-medium mt-1">产权证书封面已核准</span>
+<button class="absolute top-1.5 right-1.5 z-20 w-5 h-5 rounded-full bg-surface-container-highest/80 text-on-surface flex items-center justify-center" type="button">
+<span class="material-symbols-outlined text-[12px]">refresh</span>
+</button>
+</div>
+<!-- Upload 2 (Pending or uploaded detail) -->
+<div class="relative rounded-xl overflow-hidden bg-surface-container-low aspect-[4/3] flex flex-col items-center justify-center p-2 text-center group cursor-pointer hover:bg-surface-container">
+<img class="w-full h-full object-cover rounded-lg absolute inset-0 opacity-80" data-alt="Macro macro detailed view of Chinese official property deed interior registration page showing official red seal stamp and clear property registry table, soft ambient office light." src="/assets/9984cbb09a4ed950b78d.jpg" alt="Macro macro detailed view of Chinese official property deed interior registration page showing official red seal stamp and clear property registry table, soft ambient office light." decoding="async">
+<div class="absolute inset-0 bg-gradient-to-t from-on-surface/80 via-transparent to-transparent"></div>
+<span class="material-symbols-outlined text-secondary-fixed text-[24px] z-10">task_alt</span>
+<span class="z-10 font-label-sm text-label-sm text-surface-lowest font-medium mt-1">权利人页 (匹配 李雅欣)</span>
+<span class="z-10 text-[10px] text-primary-fixed font-label-sm">坐落地址一致性 99.4%</span>
+</div>
+</div>
+</div>
+</div>
+<!-- Method 2: Contract & Deed Tax Receipt (Hidden default) -->
+<div class="space-y-spacing-sm hidden" id="methodContent2">
+<div>
+<label class="block font-label-md text-label-md text-on-surface-variant mb-1.5">商品房网签合同备案编号</label>
+<input class="w-full h-11 px-3.5 rounded-lg bg-surface-container-low text-on-surface font-body-md text-body-md focus:outline-none" placeholder="输入20位电子网签合同号" type="text">
+</div>
+<div>
+<label class="block font-label-md text-label-md text-on-surface-variant mb-1.5">契税完税电子凭证上传</label>
+<div class="rounded-xl border-dashed border-2 border-outline-variant bg-surface-container-low p-4 flex flex-col items-center justify-center gap-1">
+<span class="material-symbols-outlined text-primary text-[28px]">receipt_long</span>
+<span class="font-label-md text-label-md text-on-surface font-medium">点击上传契税凭证照片</span>
+<span class="font-label-sm text-label-sm text-on-surface-variant">用于产证办理期间业主过渡期认证</span>
+</div>
+</div>
+</div>
+<!-- Method 3: Property System Ledger Cross Check (Hidden default) -->
+<div class="space-y-spacing-sm hidden" id="methodContent3">
+<div class="rounded-lg bg-surface-container p-3 space-y-1">
+<span class="font-label-md text-label-md text-primary font-semibold flex items-center gap-1">
+<span class="material-symbols-outlined text-[16px]">bolt</span>
+          彭一物业系统即时对账
+        </span>
+<p class="font-label-sm text-label-sm text-on-surface-variant">
+          根据物业历史档案，16号楼2单元502室业主预留手机号段为 138****6688。
+        </p>
+</div>
+<div>
+<label class="block font-label-md text-label-md text-on-surface-variant mb-1.5">请输入该房屋历史水费/物业费对账单户号</label>
+<input class="w-full h-11 px-3.5 rounded-lg bg-surface-container-low text-on-surface font-body-md text-body-md focus:outline-none" placeholder="如：PY2023-502-A" type="text">
+</div>
+</div>
+<!-- Security & Legal Notice Banner -->
+<div class="flex items-start gap-2 p-3 rounded-lg bg-surface-container-low text-on-surface-variant">
+<span class="material-symbols-outlined text-primary text-[18px] shrink-0 mt-0.5">security</span>
+<p class="font-label-sm text-label-sm leading-relaxed">
+        根据《中华人民共和国民法典》及《上海市物业管理条例》，所填信息仅用于静安彭一新村业主权限校验与社区电子表决开通，采用国密SM4链路加密存储。
+      </p>
+</div>
+</div>
+<!-- Tenant Instruction Preview (Conditional / Supplementary) -->
+<div class="hidden rounded-xl bg-surface-container-low p-spacing-card-padding text-on-surface-variant space-y-2" id="tenantHintCard">
+<div class="flex items-center gap-2 text-primary font-headline-sm text-headline-sm font-semibold">
+<span class="material-symbols-outlined text-[20px]">info</span>
+      租客入住登记须知
+    </div>
+<p class="font-body-sm text-body-sm leading-relaxed">
+      您选择作为租客入住，后续需上传《上海市住房租赁合同备案通知书》或租约凭证，并由业主李雅欣在微信管家小程序内确认签署。
+    </p>
+</div>
+<!-- Audio Assistance Micro-capsule (Brand Touch) -->
+<div class="flex items-center justify-between px-3.5 py-2.5 rounded-full bg-surface-container-lowest shadow-sm">
+<div class="flex items-center gap-2">
+<div class="w-7 h-7 rounded-full bg-primary text-on-primary flex items-center justify-center">
+<span class="material-symbols-outlined text-[16px]">volume_up</span>
+</div>
+<div class="flex flex-col">
+<span class="font-label-sm text-label-sm font-semibold text-on-surface">声边语音核验指引</span>
+<span class="font-label-sm text-label-sm text-on-surface-variant">听彭一社区管家语音播报产证填写技巧 (0:48)</span>
+</div>
+</div>
+<div class="flex items-center gap-1">
+<div class="flex items-end gap-0.5 h-3.5 mr-2">
+<span class="w-0.5 h-2 bg-primary rounded-full"></span>
+<span class="w-0.5 h-3.5 bg-primary rounded-full animate-pulse"></span>
+<span class="w-0.5 h-1.5 bg-primary rounded-full"></span>
+<span class="w-0.5 h-2.5 bg-primary rounded-full"></span>
+</div>
+<span class="material-symbols-outlined text-primary text-[20px]">play_circle</span>
+</div>
+</div>
+<!-- Agreement Checkbox -->
+<div class="flex items-start gap-2 pt-1 px-1">
+<input checked="" class="mt-0.5 rounded text-primary focus:ring-0 w-4 h-4 accent-primary" id="agreementCheck" type="checkbox">
+<label class="font-label-sm text-label-sm text-on-surface-variant leading-relaxed" for="agreementCheck">
+      我已如实核对并确认房屋产权信息，同意遵守
+      <a class="text-primary font-medium underline" href="#">《彭一智慧物业服务公约》</a>、
+      <a class="text-primary font-medium underline" href="#">《业主数字权限管理细则》</a>
+      并授权声边物业加密调阅静安区大数据中心房产验证接口。
+    </label>
+</div>
+<!-- Main Sticky / Primary CTA Action -->
+<div class="pt-2 space-y-2.5">
+<button class="w-full h-12 rounded-full bg-primary text-on-primary font-headline-sm text-headline-sm font-semibold flex items-center justify-center gap-2 shadow-[0_8px_20px_-4px_rgba(0,101,68,0.35)] active:scale-[0.98] transition-transform" id="submitBtn" type="button">
+<span class="material-symbols-outlined text-[20px]">shield_with_heart</span>
+      提交确权并绑定房屋 (502室)
+    </button>
+<div class="flex items-center justify-center gap-1.5 text-on-surface-variant font-label-sm text-label-sm">
+<span class="material-symbols-outlined text-primary text-[14px]">lock</span>
+<span>公安部可信身份网络认证 (CTID) 直连加密核查</span>
+</div>
+</div>
+<!-- Footer Service & Offline Support -->
+<div class="text-center pt-2 pb-spacing-xl space-y-1">
+<p class="font-label-sm text-label-sm text-on-surface-variant">
+      核验遇到困难？欢迎联系彭一智慧管家
+    </p>
+<div class="flex items-center justify-center gap-4 text-primary font-label-sm text-label-sm font-semibold">
+<a class="flex items-center gap-1" href="tel:4008806899">
+<span class="material-symbols-outlined text-[15px]">call</span>
+        400-880-6899
+      </a>
+<span class="text-outline-variant">|</span>
+<span class="flex items-center gap-1">
+<span class="material-symbols-outlined text-[15px]">store</span>
+        彭一物业综合服务中心 (平顺路180号)
+      </span>
+</div>
+</div>
+</div>
+</main></body></html>

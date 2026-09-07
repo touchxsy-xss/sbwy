@@ -1,0 +1,793 @@
+<!DOCTYPE html><html lang="zh-CN"><head><meta charset="utf-8"><meta content="width=device-width, initial-scale=1.0" name="viewport"><link href="https://fonts.googleapis.com" rel="preconnect"><link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"><link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&amp;display=swap" rel="stylesheet"><link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"><style>@layer base { html, body { margin: 0; padding: 0; } body { overscroll-behavior: none; } main > :first-child { margin-top: 0 !important; } main > :last-child { margin-bottom: 0 !important; } } ::-webkit-scrollbar { display: none; }</style><script src="https://cdn.tailwindcss.com"></script><script id="tailwind-config">tailwind.config = { darkMode: "class", theme: { extend: { colors: { "surface-container": "#dff2e7", "background": "#ebfef2", "secondary-container": "#6cf8bb", "surface": "#ebfef2", "primary-fixed": "#94f6c5", "surface-container-low": "#e5f8ed", "inverse-on-surface": "#e2f5ea", "primary-container": "#0e8058", "on-secondary-container": "#00714d", "surface-dim": "#ccdfd3", "surface-container-high": "#daede1", "on-surface": "#0f1f18", "on-surface-variant": "#3e4942", "secondary-fixed": "#6ffbbe", "on-error-container": "#93000a", "on-secondary": "#ffffff", "primary": "#006544", "tertiary-container": "#9d6300", "on-secondary-fixed": "#002113", "secondary": "#006c49", "error-container": "#ffdad6", "surface-bright": "#ebfef2", "tertiary-fixed-dim": "#ffb95f", "inverse-surface": "#24342c", "on-tertiary-container": "#fff3e9", "on-background": "#0f1f18", "on-tertiary-fixed-variant": "#653e00", "surface-container-highest": "#d4e7dc", "outline-variant": "#bdc9c0", "surface-variant": "#d4e7dc", "tertiary-fixed": "#ffddb8", "primary-fixed-dim": "#78d9aa", "inverse-primary": "#78d9aa", "outline": "#6e7a72", "tertiary": "#7c4d00", "surface-container-lowest": "#ffffff", "secondary-fixed-dim": "#4edea3", "error": "#ba1a1a", "on-primary": "#ffffff", "on-secondary-fixed-variant": "#005236", "surface-tint": "#006c49", "on-error": "#ffffff", "on-primary-fixed": "#002113", "on-tertiary": "#ffffff", "on-primary-fixed-variant": "#005236", "on-primary-container": "#d6ffe6", "on-tertiary-fixed": "#2a1700" }, borderRadius: { "DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px" }, spacing: { "screen-margin": "16px", "spacing-sm": "12px", "spacing-xs": "8px", "spacing-lg": "20px", "spacing-3xl": "40px", "spacing-2xl": "32px", "card-padding": "18px", "spacing-md": "16px", "spacing-xl": "24px", "grid-gutter": "12px", "spacing-2xs": "4px" }, fontFamily: { "body-md": ["Plus Jakarta Sans"], "label-md": ["Plus Jakarta Sans"], "body-sm": ["Plus Jakarta Sans"], "body-lg": ["Plus Jakarta Sans"], "headline-md": ["Plus Jakarta Sans"], "display-lg": ["Plus Jakarta Sans"], "headline-sm": ["Plus Jakarta Sans"], "label-sm": ["Plus Jakarta Sans"], "headline-lg": ["Plus Jakarta Sans"] }, fontSize: { "body-md": ["14px", { lineHeight: "22px", fontWeight: "400" }], "label-md": ["12px", { lineHeight: "16px", letterSpacing: "0.02em", fontWeight: "600" }], "body-sm": ["13px", { lineHeight: "18px", fontWeight: "400" }], "body-lg": ["16px", { lineHeight: "24px", fontWeight: "400" }], "headline-md": ["20px", { lineHeight: "28px", letterSpacing: "-0.01em", fontWeight: "600" }], "display-lg": ["34px", { lineHeight: "42px", letterSpacing: "-0.02em", fontWeight: "700" }], "headline-sm": ["17px", { lineHeight: "24px", fontWeight: "600" }], "label-sm": ["10px", { lineHeight: "14px", letterSpacing: "0.03em", fontWeight: "500" }], "headline-lg": ["26px", { lineHeight: "34px", letterSpacing: "-0.015em", fontWeight: "700" }] } } } };</script></head><body class="bg-surface font-body-md text-body-md text-on-surface"><aside class="fixed left-0 top-0 h-full w-72 bg-surface-container-lowest z-50 flex flex-col shadow-[0_4px_24px_rgba(14,128,88,0.06)]"><div class="h-16 px-spacing-lg flex items-center gap-spacing-xs bg-surface-container-lowest"><div class="w-9 h-9 rounded-xl bg-gradient-to-br from-secondary-container to-primary-container flex items-center justify-center shadow-[0_2px_8px_rgba(14,128,88,0.2)]"><span class="material-symbols-outlined text-on-primary text-[20px]">sound_detection_dog_barking</span></div><div class="flex flex-col"><span class="font-headline-sm text-headline-sm text-on-surface leading-tight">声边智慧物业</span><span class="font-label-sm text-label-sm text-primary tracking-wide">集团控股 · 运营中枢</span></div></div><div class="px-spacing-md py-spacing-xs"><div class="p-spacing-xs rounded-xl bg-surface-container-low flex items-center justify-between"><div class="flex items-center gap-spacing-2xs"><span class="material-symbols-outlined text-primary text-[18px]">corporate_fare</span><span class="font-label-md text-label-md text-on-surface-variant">在管资产节点</span></div><span class="px-spacing-xs py-spacing-2xs rounded-full bg-surface-container-highest font-label-sm text-label-sm text-on-surface font-semibold">12 个活跃小区</span></div></div><nav class="flex-1 px-spacing-md py-spacing-xs overflow-y-auto space-y-spacing-2xs" data-active-classes="bg-primary-container text-on-primary-container font-semibold shadow-[0_4px_12px_rgba(14,128,88,0.18)]"><div class="px-spacing-xs py-spacing-2xs font-label-sm text-label-sm text-outline uppercase tracking-wider">财务与营收监管</div><a aria-current="page" class="flex items-center gap-spacing-sm px-spacing-md py-spacing-xs rounded-xl transition-all bg-primary-container text-on-primary-container font-semibold shadow-[0_4px_12px_rgba(14,128,88,0.18)]" data-path="financial-overview" href="#"><span class="material-symbols-outlined text-[20px]">account_balance</span><span>多小区财务总览</span></a><a class="flex items-center gap-spacing-sm px-spacing-md py-spacing-xs rounded-xl text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-all" data-path="collection-comparison" href="#"><span class="material-symbols-outlined text-[20px]">compare_arrows</span><span>收缴率横向对比</span></a><a class="flex items-center gap-spacing-sm px-spacing-md py-spacing-xs rounded-xl text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-all" data-path="expenditure-reconciliation" href="#"><span class="material-symbols-outlined text-[20px]">receipt_long</span><span>项目支出对账</span></a><a class="flex items-center gap-spacing-sm px-spacing-md py-spacing-xs rounded-xl text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-all" data-path="capital-pool" href="#"><span class="material-symbols-outlined text-[20px]">savings</span><span>资金归集池监控</span></a><div class="pt-spacing-sm px-spacing-xs py-spacing-2xs font-label-sm text-label-sm text-outline uppercase tracking-wider">综合运营治理</div><a class="flex items-center gap-spacing-sm px-spacing-md py-spacing-xs rounded-xl text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-all" data-path="project-matrix" href="#"><span class="material-symbols-outlined text-[20px]">hub</span><span>项目运营矩阵</span></a><a class="flex items-center gap-spacing-sm px-spacing-md py-spacing-xs rounded-xl text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-all" data-path="work-order-kanban" href="#"><span class="material-symbols-outlined text-[20px]">assignment</span><span>多小区工单看板</span></a><a class="flex items-center gap-spacing-sm px-spacing-md py-spacing-xs rounded-xl text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-all" data-path="converged-media" href="#"><span class="material-symbols-outlined text-[20px]">podcasts</span><span>融媒体声边矩阵</span></a><div class="pt-spacing-sm px-spacing-xs py-spacing-2xs font-label-sm text-label-sm text-outline uppercase tracking-wider">集团管控体系</div><a class="flex items-center gap-spacing-sm px-spacing-md py-spacing-xs rounded-xl text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-all" data-path="organization-permissions" href="#"><span class="material-symbols-outlined text-[20px]">shield_person</span><span>组织与权限配置</span></a></nav><div class="p-spacing-md bg-surface-container-lowest"><div class="p-spacing-sm rounded-xl bg-surface-container-low flex flex-col gap-spacing-xs"><div class="flex items-center justify-between"><span class="font-label-sm text-label-sm text-on-surface-variant">集团资金监管池</span><span class="font-label-sm text-label-sm text-primary font-bold">实时同步</span></div><div class="font-headline-sm text-headline-sm text-primary font-bold tracking-tight">¥ 84,920,430</div><div class="w-full bg-surface-container-highest rounded-full h-1.5 overflow-hidden"><div class="bg-primary h-full rounded-full w-4/5"></div></div><div class="flex justify-between font-label-sm text-label-sm text-outline"><span>本月归集目标</span><span>80%</span></div></div></div></aside><div class="pl-72 min-h-screen flex flex-col bg-background"><header class="fixed top-0 left-72 right-0 h-16 bg-surface-container-lowest/90 backdrop-blur-xl shadow-[0_1px_12px_rgba(14,128,88,0.05)] z-40 px-spacing-xl flex items-center justify-between gap-spacing-md"><div class="flex items-center gap-spacing-md"><div class="relative flex items-center"><span class="material-symbols-outlined absolute left-spacing-sm text-primary text-[18px]">apartment</span><select class="appearance-none pl-9 pr-9 py-spacing-xs rounded-xl bg-surface-container-low text-on-surface font-body-sm text-body-sm font-semibold cursor-pointer outline-none hover:bg-surface-container-high transition-colors"><option>全部管理小区 (12个资产单元)</option><option>彭一智慧示范区</option><option>彭二新村</option><option>锦绣华庭</option><option>绿岛阳光家园</option></select><span class="material-symbols-outlined absolute right-spacing-xs pointer-events-none text-on-surface-variant text-[18px]">expand_more</span></div><div class="hidden xl:flex items-center gap-spacing-xs px-spacing-sm py-spacing-2xs rounded-full bg-surface-container-low"><span class="w-2 h-2 rounded-full bg-tertiary-container animate-pulse"></span><span class="font-label-sm text-label-sm text-on-surface-variant">当日收缴:</span><span class="font-label-sm text-label-sm text-primary font-bold">¥ 386,400</span><span class="font-label-sm text-label-sm text-outline">|</span><span class="font-label-sm text-label-sm text-on-surface-variant">支出审核:</span><span class="font-label-sm text-label-sm text-tertiary font-bold">¥ 42,150</span></div></div><div class="flex items-center gap-spacing-md"><button class="relative p-spacing-xs rounded-xl text-on-surface-variant hover:bg-surface-container-low hover:text-on-surface transition-colors"><span class="material-symbols-outlined text-[20px]">notifications</span><span class="absolute top-1.5 right-1.5 w-2 h-2 rounded-full bg-error ring-2 ring-surface-container-lowest"></span></button><button class="relative p-spacing-xs rounded-xl text-on-surface-variant hover:bg-surface-container-low hover:text-on-surface transition-colors"><span class="material-symbols-outlined text-[20px]">warning</span><span class="absolute top-1 right-1 px-1 rounded-full bg-tertiary-container text-on-tertiary-container font-label-sm text-[9px]">3</span></button><div class="h-6 w-px bg-surface-container-highest"></div><div class="flex items-center gap-spacing-sm pl-spacing-xs"><div class="flex flex-col text-right"><span class="font-label-md text-label-md text-on-surface">陈铭远</span><span class="font-label-sm text-label-sm text-primary">集团财务总监</span></div><div class="w-8 h-8 rounded-full bg-primary flex items-center justify-center shadow-sm"><span class="material-symbols-outlined text-on-primary text-[18px]">person</span></div></div></div></header><main class="w-full pt-16 px-spacing-xl py-spacing-lg bg-background flex-1"><div class="flex flex-col w-full space-y-spacing-lg">
+<!-- 顶部面包屑与标题控制枢纽 -->
+<div class="flex flex-col lg:flex-row lg:items-end justify-between gap-spacing-md">
+<div>
+<div class="flex items-center gap-spacing-xs text-on-surface-variant font-label-md text-label-md mb-spacing-2xs">
+<span class="material-symbols-outlined text-primary text-[16px]">domain</span>
+<span>集团控股运营总部</span>
+<span class="text-outline-variant">/</span>
+<span>财务资产清算部</span>
+<span class="text-outline-variant">/</span>
+<span class="text-primary font-semibold">资金监管中枢</span>
+</div>
+<div class="flex items-center gap-spacing-sm">
+<h1 class="font-display-lg text-display-lg text-on-surface tracking-tight">物业集团多项目实时财务监控与资金中枢</h1>
+<span class="hidden sm:inline-flex items-center gap-1.5 px-spacing-sm py-0.5 rounded-full bg-surface-container-high text-primary font-label-sm text-label-sm font-semibold">
+<span class="w-2 h-2 rounded-full bg-primary animate-ping"></span>
+          网关实时对账中
+        </span>
+</div>
+</div>
+<!-- 顶栏快捷操作与时间维度切换 -->
+<div class="flex flex-wrap items-center gap-spacing-xs">
+<div class="inline-flex p-1 rounded-xl bg-surface-container-high">
+<button class="px-spacing-sm py-1 rounded-lg bg-surface-container-lowest text-primary font-label-sm text-label-sm font-bold shadow-sm transition-all">今日实时</button>
+<button class="px-spacing-sm py-1 rounded-lg text-on-surface-variant font-label-sm text-label-sm hover:text-on-surface transition-colors">本周</button>
+<button class="px-spacing-sm py-1 rounded-lg text-on-surface-variant font-label-sm text-label-sm hover:text-on-surface transition-colors">本月</button>
+<button class="px-spacing-sm py-1 rounded-lg text-on-surface-variant font-label-sm text-label-sm hover:text-on-surface transition-colors">本季度</button>
+<button class="px-spacing-sm py-1 rounded-lg text-on-surface-variant font-label-sm text-label-sm hover:text-on-surface transition-colors">年度</button>
+</div>
+<button class="flex items-center gap-spacing-2xs px-spacing-sm py-2 rounded-xl bg-surface-container-lowest text-primary hover:bg-surface-container transition-colors shadow-sm font-label-sm text-label-sm font-semibold" id="btn-reconcile">
+<span class="material-symbols-outlined text-[18px]">account_balance</span>
+<span>银行一键对账</span>
+</button>
+<button class="flex items-center gap-spacing-2xs px-spacing-md py-2 rounded-xl bg-primary text-on-primary hover:bg-secondary transition-all shadow-[0_4px_16px_rgba(0,101,68,0.2)] font-label-sm text-label-sm font-bold active:scale-95">
+<span class="material-symbols-outlined text-[18px]">download</span>
+<span>导出集团合并底表</span>
+</button>
+</div>
+</div>
+<!-- 核心全局财务大指标条 (5大卡片网格) -->
+<div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-5 gap-spacing-md">
+<!-- 指标 1 -->
+<div class="p-spacing-md rounded-2xl bg-surface-container-lowest shadow-[0_4px_16px_rgba(14,128,88,0.05)] flex flex-col justify-between relative overflow-hidden group">
+<div class="absolute -right-4 -bottom-4 w-24 h-24 rounded-full bg-surface-container opacity-40 pointer-events-none group-hover:scale-110 transition-transform"></div>
+<div class="flex items-center justify-between">
+<span class="font-label-md text-label-md text-on-surface-variant">集团今日实时总收款</span>
+<span class="p-1.5 rounded-lg bg-surface-container text-primary">
+<span class="material-symbols-outlined text-[18px]">payments</span>
+</span>
+</div>
+<div class="mt-spacing-sm">
+<div class="font-headline-lg text-headline-lg text-on-surface tracking-tight font-bold">¥386,520.80</div>
+<div class="mt-spacing-2xs flex items-center gap-1 font-label-sm text-label-sm text-primary">
+<span class="material-symbols-outlined text-[14px]">trending_up</span>
+<span class="font-bold">+14.2%</span>
+<span class="text-outline">对比昨日</span>
+</div>
+</div>
+<div class="mt-spacing-sm pt-spacing-xs bg-surface-container-low/50 rounded-lg px-2 py-1 flex items-center justify-between font-label-sm text-label-sm text-outline">
+<span>微信/招银网关直连</span>
+<span class="text-primary font-semibold">1,412笔入账</span>
+</div>
+</div>
+<!-- 指标 2 -->
+<div class="p-spacing-md rounded-2xl bg-surface-container-lowest shadow-[0_4px_16px_rgba(14,128,88,0.05)] flex flex-col justify-between relative overflow-hidden group">
+<div class="flex items-center justify-between">
+<span class="font-label-md text-label-md text-on-surface-variant">本月累计收缴总额</span>
+<span class="p-1.5 rounded-lg bg-surface-container text-primary">
+<span class="material-symbols-outlined text-[18px]">price_check</span>
+</span>
+</div>
+<div class="mt-spacing-sm">
+<div class="font-headline-lg text-headline-lg text-primary tracking-tight font-bold">¥4,821,490.00</div>
+<div class="mt-spacing-2xs flex items-center justify-between font-label-sm text-label-sm">
+<span class="text-on-surface-variant">预算达成率</span>
+<span class="font-bold text-primary">89.4%</span>
+</div>
+</div>
+<div class="mt-spacing-sm w-full bg-surface-container-highest rounded-full h-2 overflow-hidden">
+<div class="bg-primary h-full rounded-full transition-all duration-700" style="width: 89.4%"></div>
+</div>
+</div>
+<!-- 指标 3 -->
+<div class="p-spacing-md rounded-2xl bg-surface-container-lowest shadow-[0_4px_16px_rgba(14,128,88,0.05)] flex flex-col justify-between relative overflow-hidden group">
+<div class="flex items-center justify-between">
+<span class="font-label-md text-label-md text-on-surface-variant">今日总支出审批额</span>
+<span class="p-1.5 rounded-lg bg-surface-container-high text-tertiary">
+<span class="material-symbols-outlined text-[18px]">output</span>
+</span>
+</div>
+<div class="mt-spacing-sm">
+<div class="font-headline-lg text-headline-lg text-tertiary tracking-tight font-bold">¥92,430.00</div>
+<div class="mt-spacing-2xs flex items-center gap-1 font-label-sm text-label-sm text-on-surface-variant">
+<span class="text-tertiary font-bold">18笔</span>
+<span>已过审支出单</span>
+</div>
+</div>
+<div class="mt-spacing-sm pt-spacing-xs bg-surface-container-low/50 rounded-lg px-2 py-1 flex items-center justify-between font-label-sm text-label-sm text-outline">
+<span>急修采购占 31%</span>
+<span class="text-on-surface-variant">待清算3笔</span>
+</div>
+</div>
+<!-- 指标 4 -->
+<div class="p-spacing-md rounded-2xl bg-surface-container-lowest shadow-[0_4px_16px_rgba(14,128,88,0.05)] flex flex-col justify-between relative overflow-hidden group">
+<div class="flex items-center justify-between">
+<span class="font-label-md text-label-md text-on-surface-variant">资金归集池沉淀结余</span>
+<span class="p-1.5 rounded-lg bg-surface-container text-primary">
+<span class="material-symbols-outlined text-[18px]">savings</span>
+</span>
+</div>
+<div class="mt-spacing-sm">
+<div class="font-headline-lg text-headline-lg text-on-surface tracking-tight font-bold">¥18,920,340.50</div>
+<div class="mt-spacing-2xs flex items-center gap-1 font-label-sm text-label-sm text-primary font-semibold">
+<span class="w-1.5 h-1.5 rounded-full bg-primary"></span>
+<span>招行+浦发直连专户</span>
+</div>
+</div>
+<div class="mt-spacing-sm pt-spacing-xs bg-surface-container-low/50 rounded-lg px-2 py-1 flex items-center justify-between font-label-sm text-label-sm text-outline">
+<span>日留存利息预估</span>
+<span class="text-primary font-semibold">¥1,142.20/日</span>
+</div>
+</div>
+<!-- 指标 5 -->
+<div class="p-spacing-md rounded-2xl bg-surface-container-lowest shadow-[0_4px_16px_rgba(14,128,88,0.05)] flex flex-col justify-between relative overflow-hidden group">
+<div class="flex items-center justify-between">
+<span class="font-label-md text-label-md text-on-surface-variant">风控与欠费预警</span>
+<span class="p-1.5 rounded-lg bg-error-container text-error">
+<span class="material-symbols-outlined text-[18px]">report_problem</span>
+</span>
+</div>
+<div class="mt-spacing-sm">
+<div class="flex items-baseline gap-2">
+<span class="font-headline-lg text-headline-lg text-error tracking-tight font-bold">3 项</span>
+<span class="font-label-sm text-label-sm text-error font-semibold">重点跟进</span>
+</div>
+<div class="mt-spacing-2xs font-label-sm text-label-sm text-outline line-clamp-1">
+          绿洲康城收缴低 | 彭二抢修超预算
+        </div>
+</div>
+<div class="mt-spacing-sm">
+<a class="inline-flex items-center justify-between w-full px-2 py-1 rounded-lg bg-error-container/40 text-on-error-container font-label-sm text-label-sm font-semibold hover:bg-error-container transition-colors" href="#matrix-table">
+<span>穿透核查明细</span>
+<span class="material-symbols-outlined text-[14px]">arrow_forward</span>
+</a>
+</div>
+</div>
+</div>
+<!-- 多小区实时财务横向管理与穿透对比矩阵表格 -->
+<div class="rounded-2xl bg-surface-container-lowest shadow-[0_4px_16px_rgba(14,128,88,0.05)] p-spacing-lg space-y-spacing-md" id="matrix-table">
+<div class="flex flex-col md:flex-row md:items-center justify-between gap-spacing-sm">
+<div class="flex items-center gap-spacing-xs">
+<div class="w-8 h-8 rounded-xl bg-surface-container flex items-center justify-center text-primary">
+<span class="material-symbols-outlined text-[20px]">table_chart_view</span>
+</div>
+<div>
+<h2 class="font-headline-md text-headline-md text-on-surface font-bold leading-tight">各管辖项目实时财务横向矩阵</h2>
+<p class="font-label-sm text-label-sm text-on-surface-variant">覆盖集团直管 6 大典型居住组团，支持单小区穿透管理与集团资金实时下拨</p>
+</div>
+</div>
+<div class="flex items-center gap-spacing-xs">
+<div class="relative">
+<span class="material-symbols-outlined absolute left-2.5 top-2 text-outline text-[18px]">search</span>
+<input class="pl-8 pr-3 py-1.5 rounded-xl bg-surface-container-low text-body-sm font-body-sm text-on-surface placeholder:text-outline outline-none focus:bg-surface-container-high transition-colors w-56" placeholder="搜索小区名称/楼栋主管..." type="text">
+</div>
+<button class="px-spacing-sm py-1.5 rounded-xl bg-surface-container text-primary font-label-sm text-label-sm font-semibold hover:bg-surface-container-high transition-colors">
+          过滤状态: 全部 (6)
+        </button>
+</div>
+</div>
+<!-- 表格视图 -->
+<div class="overflow-x-auto">
+<table class="w-full text-left font-body-sm text-body-sm">
+<thead>
+<tr class="text-outline font-label-sm text-label-sm uppercase bg-surface-container-low/60 rounded-xl">
+<th class="py-3 px-spacing-sm rounded-l-xl">项目名称 / 定位</th>
+<th class="py-3 px-spacing-sm">管理体量</th>
+<th class="py-3 px-spacing-sm">今日实时收款</th>
+<th class="py-3 px-spacing-sm">本月综合收缴率</th>
+<th class="py-3 px-spacing-sm">今日支出审批</th>
+<th class="py-3 px-spacing-sm">当日净现金流</th>
+<th class="py-3 px-spacing-sm">维修金专户结余</th>
+<th class="py-3 px-spacing-sm">风控健康度</th>
+<th class="py-3 px-spacing-sm text-right rounded-r-xl">集团穿透管控</th>
+</tr>
+</thead>
+<tbody class="divide-y divide-transparent">
+<!-- 行 1: 彭一智慧社区 -->
+<tr class="hover:bg-surface-container-low transition-colors group">
+<td class="py-spacing-sm px-spacing-sm">
+<div class="flex items-center gap-spacing-xs">
+<div class="w-9 h-9 rounded-xl bg-surface-container flex items-center justify-center text-primary font-bold">
+                  彭一
+                </div>
+<div class="flex flex-col">
+<div class="flex items-center gap-1.5">
+<span class="font-headline-sm text-headline-sm text-on-surface font-semibold">彭一智慧社区</span>
+<span class="px-1.5 py-0.5 rounded bg-primary-container text-on-primary-container font-label-sm text-[10px] font-bold">标杆示范</span>
+</div>
+<span class="font-label-sm text-label-sm text-outline">静安彭浦 · 智慧数字改造示范区</span>
+</div>
+</div>
+</td>
+<td class="py-spacing-sm px-spacing-sm text-on-surface">
+<div class="font-semibold">2,480 户</div>
+<span class="text-outline font-label-sm text-label-sm">入驻率 98.4%</span>
+</td>
+<td class="py-spacing-sm px-spacing-sm">
+<span class="font-bold text-primary">¥84,210.00</span>
+<div class="font-label-sm text-label-sm text-outline">320笔 / 秒级清算</div>
+</td>
+<td class="py-spacing-sm px-spacing-sm">
+<div class="flex items-center gap-2">
+<div class="w-16 bg-surface-container-highest rounded-full h-1.5">
+<div class="bg-primary h-full rounded-full" style="width: 94.2%"></div>
+</div>
+<span class="font-bold text-primary">94.2%</span>
+</div>
+<span class="font-label-sm text-label-sm text-primary">超集团指标 4.2%</span>
+</td>
+<td class="py-spacing-sm px-spacing-sm text-tertiary font-semibold">¥12,400.00</td>
+<td class="py-spacing-sm px-spacing-sm">
+<span class="font-bold text-primary">+¥71,810.00</span>
+</td>
+<td class="py-spacing-sm px-spacing-sm text-on-surface font-medium">¥2,340,000</td>
+<td class="py-spacing-sm px-spacing-sm">
+<span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-surface-container text-primary font-label-sm text-label-sm font-semibold">
+<span class="w-1.5 h-1.5 rounded-full bg-primary"></span>
+                正常运营
+              </span>
+</td>
+<td class="py-spacing-sm px-spacing-sm text-right">
+<div class="flex items-center justify-end gap-1">
+<button class="p-1.5 rounded-lg text-on-surface-variant hover:bg-surface-container hover:text-primary transition-colors" title="穿透查看收缴明细">
+<span class="material-symbols-outlined text-[18px]">visibility</span>
+</button>
+<button class="p-1.5 rounded-lg text-on-surface-variant hover:bg-surface-container hover:text-primary transition-colors" title="进入独立小区后台">
+<span class="material-symbols-outlined text-[18px]">open_in_new</span>
+</button>
+<button class="p-1.5 rounded-lg bg-surface-container text-primary hover:bg-primary hover:text-on-primary transition-all" title="发起资金归集/调拨">
+<span class="material-symbols-outlined text-[18px]">swap_horiz</span>
+</button>
+</div>
+</td>
+</tr>
+<!-- 行 2: 彭二新村 -->
+<tr class="hover:bg-surface-container-low transition-colors group">
+<td class="py-spacing-sm px-spacing-sm">
+<div class="flex items-center gap-spacing-xs">
+<div class="w-9 h-9 rounded-xl bg-surface-container-high flex items-center justify-center text-on-surface-variant font-bold">
+                  彭二
+                </div>
+<div class="flex flex-col">
+<div class="flex items-center gap-1.5">
+<span class="font-headline-sm text-headline-sm text-on-surface font-semibold">彭二新村</span>
+<span class="px-1.5 py-0.5 rounded bg-surface-container-high text-on-surface-variant font-label-sm text-[10px]">老旧改造</span>
+</div>
+<span class="font-label-sm text-label-sm text-outline">老龄化高 / 维修单密集</span>
+</div>
+</div>
+</td>
+<td class="py-spacing-sm px-spacing-sm text-on-surface">
+<div class="font-semibold">1,860 户</div>
+<span class="text-outline font-label-sm text-label-sm">入驻率 91.2%</span>
+</td>
+<td class="py-spacing-sm px-spacing-sm">
+<span class="font-bold text-on-surface">¥32,150.00</span>
+<div class="font-label-sm text-label-sm text-outline">线下居委收缴转接</div>
+</td>
+<td class="py-spacing-sm px-spacing-sm">
+<div class="flex items-center gap-2">
+<div class="w-16 bg-surface-container-highest rounded-full h-1.5">
+<div class="bg-secondary h-full rounded-full" style="width: 81.5%"></div>
+</div>
+<span class="font-bold text-on-surface">81.5%</span>
+</div>
+<span class="font-label-sm text-label-sm text-outline">距目标差 3.5%</span>
+</td>
+<td class="py-spacing-sm px-spacing-sm text-error font-semibold">
+<div>¥28,600.00</div>
+<span class="text-error font-label-sm text-[10px]">主供水管抢修出账</span>
+</td>
+<td class="py-spacing-sm px-spacing-sm">
+<span class="font-bold text-tertiary">+¥3,550.00</span>
+</td>
+<td class="py-spacing-sm px-spacing-sm text-on-surface font-medium">¥820,000</td>
+<td class="py-spacing-sm px-spacing-sm">
+<span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-error-container text-on-error-container font-label-sm text-label-sm font-semibold">
+<span class="w-1.5 h-1.5 rounded-full bg-error"></span>
+                抢修支出偏高
+              </span>
+</td>
+<td class="py-spacing-sm px-spacing-sm text-right">
+<div class="flex items-center justify-end gap-1">
+<button class="p-1.5 rounded-lg text-on-surface-variant hover:bg-surface-container hover:text-primary transition-colors" title="穿透查看收缴明细">
+<span class="material-symbols-outlined text-[18px]">visibility</span>
+</button>
+<button class="p-1.5 rounded-lg text-on-surface-variant hover:bg-surface-container hover:text-primary transition-colors" title="进入独立小区后台">
+<span class="material-symbols-outlined text-[18px]">open_in_new</span>
+</button>
+<button class="p-1.5 rounded-lg bg-surface-container text-primary hover:bg-primary hover:text-on-primary transition-all" title="发起资金归集/调拨">
+<span class="material-symbols-outlined text-[18px]">swap_horiz</span>
+</button>
+</div>
+</td>
+</tr>
+<!-- 行 3: 锦绣华庭 -->
+<tr class="hover:bg-surface-container-low transition-colors group">
+<td class="py-spacing-sm px-spacing-sm">
+<div class="flex items-center gap-spacing-xs">
+<div class="w-9 h-9 rounded-xl bg-surface-container flex items-center justify-center text-primary font-bold">
+                  锦绣
+                </div>
+<div class="flex flex-col">
+<div class="flex items-center gap-1.5">
+<span class="font-headline-sm text-headline-sm text-on-surface font-semibold">锦绣华庭</span>
+<span class="px-1.5 py-0.5 rounded bg-tertiary-fixed text-on-tertiary-fixed font-label-sm text-[10px] font-bold">高端商业住宅</span>
+</div>
+<span class="font-label-sm text-label-sm text-outline">高层双会所 · 车位比 1:1.6</span>
+</div>
+</div>
+</td>
+<td class="py-spacing-sm px-spacing-sm text-on-surface">
+<div class="font-semibold">3,200 户</div>
+<span class="text-outline font-label-sm text-label-sm">入驻率 99.1%</span>
+</td>
+<td class="py-spacing-sm px-spacing-sm">
+<span class="font-bold text-primary">¥142,800.00</span>
+<div class="font-label-sm text-label-sm text-outline">年缴业主集中返现</div>
+</td>
+<td class="py-spacing-sm px-spacing-sm">
+<div class="flex items-center gap-2">
+<div class="w-16 bg-surface-container-highest rounded-full h-1.5">
+<div class="bg-primary h-full rounded-full" style="width: 96.8%"></div>
+</div>
+<span class="font-bold text-primary">96.8%</span>
+</div>
+<span class="font-label-sm text-label-sm text-primary">全集团第一</span>
+</td>
+<td class="py-spacing-sm px-spacing-sm text-tertiary font-semibold">¥18,900.00</td>
+<td class="py-spacing-sm px-spacing-sm">
+<span class="font-bold text-primary">+¥123,900.00</span>
+</td>
+<td class="py-spacing-sm px-spacing-sm text-on-surface font-medium">¥5,180,000</td>
+<td class="py-spacing-sm px-spacing-sm">
+<span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-surface-container text-primary font-label-sm text-label-sm font-semibold">
+<span class="w-1.5 h-1.5 rounded-full bg-primary"></span>
+                极优资金流
+              </span>
+</td>
+<td class="py-spacing-sm px-spacing-sm text-right">
+<div class="flex items-center justify-end gap-1">
+<button class="p-1.5 rounded-lg text-on-surface-variant hover:bg-surface-container hover:text-primary transition-colors" title="穿透查看收缴明细">
+<span class="material-symbols-outlined text-[18px]">visibility</span>
+</button>
+<button class="p-1.5 rounded-lg text-on-surface-variant hover:bg-surface-container hover:text-primary transition-colors" title="进入独立小区后台">
+<span class="material-symbols-outlined text-[18px]">open_in_new</span>
+</button>
+<button class="p-1.5 rounded-lg bg-surface-container text-primary hover:bg-primary hover:text-on-primary transition-all" title="发起资金归集/调拨">
+<span class="material-symbols-outlined text-[18px]">swap_horiz</span>
+</button>
+</div>
+</td>
+</tr>
+<!-- 行 4: 绿洲康城 -->
+<tr class="hover:bg-surface-container-low transition-colors group bg-error-container/10">
+<td class="py-spacing-sm px-spacing-sm">
+<div class="flex items-center gap-spacing-xs">
+<div class="w-9 h-9 rounded-xl bg-error-container text-on-error-container flex items-center justify-center font-bold">
+                  绿洲
+                </div>
+<div class="flex flex-col">
+<div class="flex items-center gap-1.5">
+<span class="font-headline-sm text-headline-sm text-on-surface font-semibold">绿洲康城</span>
+<span class="px-1.5 py-0.5 rounded bg-error-container text-error font-label-sm text-[10px] font-bold">欠费风险</span>
+</div>
+<span class="font-label-sm text-label-sm text-error">连续两季度低于 75% 警戒线</span>
+</div>
+</div>
+</td>
+<td class="py-spacing-sm px-spacing-sm text-on-surface">
+<div class="font-semibold">1,420 户</div>
+<span class="text-outline font-label-sm text-label-sm">空置率 14%</span>
+</td>
+<td class="py-spacing-sm px-spacing-sm">
+<span class="font-bold text-on-surface">¥28,940.00</span>
+<div class="font-label-sm text-label-sm text-outline">小额催缴入账</div>
+</td>
+<td class="py-spacing-sm px-spacing-sm">
+<div class="flex items-center gap-2">
+<div class="w-16 bg-surface-container-highest rounded-full h-1.5">
+<div class="bg-error h-full rounded-full" style="width: 73.2%"></div>
+</div>
+<span class="font-bold text-error">73.2%</span>
+</div>
+<span class="font-label-sm text-label-sm text-error">黄牌催缴整改</span>
+</td>
+<td class="py-spacing-sm px-spacing-sm text-tertiary font-semibold">¥14,500.00</td>
+<td class="py-spacing-sm px-spacing-sm">
+<span class="font-bold text-on-surface">+¥14,440.00</span>
+</td>
+<td class="py-spacing-sm px-spacing-sm text-error font-medium">¥410,000 (近预警)</td>
+<td class="py-spacing-sm px-spacing-sm">
+<span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-error-container text-error font-label-sm text-label-sm font-bold">
+<span class="w-1.5 h-1.5 rounded-full bg-error animate-pulse"></span>
+                催缴预警
+              </span>
+</td>
+<td class="py-spacing-sm px-spacing-sm text-right">
+<div class="flex items-center justify-end gap-1">
+<button class="p-1.5 rounded-lg text-error hover:bg-error-container transition-colors" title="穿透查看收缴明细">
+<span class="material-symbols-outlined text-[18px]">priority_high</span>
+</button>
+<button class="p-1.5 rounded-lg text-on-surface-variant hover:bg-surface-container hover:text-primary transition-colors" title="进入独立小区后台">
+<span class="material-symbols-outlined text-[18px]">open_in_new</span>
+</button>
+<button class="px-2 py-1 rounded-lg bg-error-container text-on-error-container hover:bg-error hover:text-on-error transition-all font-label-sm text-label-sm font-semibold" title="发起催缴督办">
+                  督办整改
+                </button>
+</div>
+</td>
+</tr>
+<!-- 行 5: 滨江雅苑 -->
+<tr class="hover:bg-surface-container-low transition-colors group">
+<td class="py-spacing-sm px-spacing-sm">
+<div class="flex items-center gap-spacing-xs">
+<div class="w-9 h-9 rounded-xl bg-surface-container-high flex items-center justify-center text-on-surface font-bold">
+                  滨江
+                </div>
+<div class="flex flex-col">
+<span class="font-headline-sm text-headline-sm text-on-surface font-semibold">滨江雅苑</span>
+<span class="font-label-sm text-label-sm text-outline">徐汇沿江 · 中型品质盘</span>
+</div>
+</div>
+</td>
+<td class="py-spacing-sm px-spacing-sm text-on-surface">
+<div class="font-semibold">980 户</div>
+<span class="text-outline font-label-sm text-label-sm">入驻率 96.5%</span>
+</td>
+<td class="py-spacing-sm px-spacing-sm">
+<span class="font-bold text-on-surface">¥41,200.00</span>
+<div class="font-label-sm text-label-sm text-outline">微信即时清缴</div>
+</td>
+<td class="py-spacing-sm px-spacing-sm">
+<div class="flex items-center gap-2">
+<div class="w-16 bg-surface-container-highest rounded-full h-1.5">
+<div class="bg-primary h-full rounded-full" style="width: 88%"></div>
+</div>
+<span class="font-bold text-on-surface">88.0%</span>
+</div>
+<span class="font-label-sm text-label-sm text-primary">达标稳健</span>
+</td>
+<td class="py-spacing-sm px-spacing-sm text-tertiary font-semibold">¥8,300.00</td>
+<td class="py-spacing-sm px-spacing-sm">
+<span class="font-bold text-primary">+¥32,900.00</span>
+</td>
+<td class="py-spacing-sm px-spacing-sm text-on-surface font-medium">¥1,920,000</td>
+<td class="py-spacing-sm px-spacing-sm">
+<span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-surface-container text-primary font-label-sm text-label-sm font-semibold">
+<span class="w-1.5 h-1.5 rounded-full bg-primary"></span>
+                运行平稳
+              </span>
+</td>
+<td class="py-spacing-sm px-spacing-sm text-right">
+<div class="flex items-center justify-end gap-1">
+<button class="p-1.5 rounded-lg text-on-surface-variant hover:bg-surface-container hover:text-primary transition-colors" title="穿透查看收缴明细">
+<span class="material-symbols-outlined text-[18px]">visibility</span>
+</button>
+<button class="p-1.5 rounded-lg text-on-surface-variant hover:bg-surface-container hover:text-primary transition-colors" title="进入独立小区后台">
+<span class="material-symbols-outlined text-[18px]">open_in_new</span>
+</button>
+<button class="p-1.5 rounded-lg bg-surface-container text-primary hover:bg-primary hover:text-on-primary transition-all" title="发起资金归集/调拨">
+<span class="material-symbols-outlined text-[18px]">swap_horiz</span>
+</button>
+</div>
+</td>
+</tr>
+<!-- 行 6: 望江府 -->
+<tr class="hover:bg-surface-container-low transition-colors group">
+<td class="py-spacing-sm px-spacing-sm">
+<div class="flex items-center gap-spacing-xs">
+<div class="w-9 h-9 rounded-xl bg-surface-container flex items-center justify-center text-primary font-bold">
+                  望江
+                </div>
+<div class="flex flex-col">
+<div class="flex items-center gap-1.5">
+<span class="font-headline-sm text-headline-sm text-on-surface font-semibold">望江府</span>
+<span class="px-1.5 py-0.5 rounded bg-surface-container-high text-primary font-label-sm text-[10px]">新交付期</span>
+</div>
+<span class="font-label-sm text-label-sm text-outline">交付首年预缴收缴顺畅</span>
+</div>
+</div>
+</td>
+<td class="py-spacing-sm px-spacing-sm text-on-surface">
+<div class="font-semibold">1,600 户</div>
+<span class="text-outline font-label-sm text-label-sm">交付率 94.0%</span>
+</td>
+<td class="py-spacing-sm px-spacing-sm">
+<span class="font-bold text-primary">¥57,220.80</span>
+<div class="font-label-sm text-label-sm text-outline">装修押金与车位管费</div>
+</td>
+<td class="py-spacing-sm px-spacing-sm">
+<div class="flex items-center gap-2">
+<div class="w-16 bg-surface-container-highest rounded-full h-1.5">
+<div class="bg-primary h-full rounded-full" style="width: 92.4%"></div>
+</div>
+<span class="font-bold text-primary">92.4%</span>
+</div>
+<span class="font-label-sm text-label-sm text-primary">首期达标</span>
+</td>
+<td class="py-spacing-sm px-spacing-sm text-tertiary font-semibold">¥9,730.00</td>
+<td class="py-spacing-sm px-spacing-sm">
+<span class="font-bold text-primary">+¥47,490.80</span>
+</td>
+<td class="py-spacing-sm px-spacing-sm text-on-surface font-medium">¥3,100,000</td>
+<td class="py-spacing-sm px-spacing-sm">
+<span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-surface-container text-primary font-label-sm text-label-sm font-semibold">
+<span class="w-1.5 h-1.5 rounded-full bg-primary"></span>
+                良好推进
+              </span>
+</td>
+<td class="py-spacing-sm px-spacing-sm text-right">
+<div class="flex items-center justify-end gap-1">
+<button class="p-1.5 rounded-lg text-on-surface-variant hover:bg-surface-container hover:text-primary transition-colors" title="穿透查看收缴明细">
+<span class="material-symbols-outlined text-[18px]">visibility</span>
+</button>
+<button class="p-1.5 rounded-lg text-on-surface-variant hover:bg-surface-container hover:text-primary transition-colors" title="进入独立小区后台">
+<span class="material-symbols-outlined text-[18px]">open_in_new</span>
+</button>
+<button class="p-1.5 rounded-lg bg-surface-container text-primary hover:bg-primary hover:text-on-primary transition-all" title="发起资金归集/调拨">
+<span class="material-symbols-outlined text-[18px]">swap_horiz</span>
+</button>
+</div>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+<!-- 表格底部数据聚合注脚 -->
+<div class="p-spacing-sm rounded-xl bg-surface-container-low flex flex-wrap items-center justify-between gap-spacing-sm font-label-sm text-label-sm text-on-surface-variant">
+<div class="flex items-center gap-spacing-md">
+<span>统计辖区：<strong>6 个核心矩阵小区</strong>（全集团在管共计 12 个）</span>
+<span>总管理户数：<strong>11,540 户</strong></span>
+<span>今日收支合并盈余：<strong class="text-primary font-bold">+¥294,090.80</strong></span>
+</div>
+<div class="flex items-center gap-spacing-xs">
+<span class="text-outline">数据自动刷新频率：30秒</span>
+<button class="p-1 hover:bg-surface-container rounded-lg text-primary transition-colors">
+<span class="material-symbols-outlined text-[16px]">sync</span>
+</button>
+</div>
+</div>
+</div>
+<!-- 左右联动模块：实时流水动态大单预警流 VS 集团费用结构多小区聚合透视 -->
+<div class="grid grid-cols-1 lg:grid-cols-12 gap-spacing-lg">
+<!-- 左栏：多小区实时流水动态与大单预警流 (7/12) -->
+<div class="lg:col-span-7 rounded-2xl bg-surface-container-lowest shadow-[0_4px_16px_rgba(14,128,88,0.05)] p-spacing-lg space-y-spacing-md flex flex-col justify-between">
+<div>
+<div class="flex items-center justify-between mb-spacing-sm">
+<div class="flex items-center gap-spacing-xs">
+<div class="w-8 h-8 rounded-xl bg-surface-container flex items-center justify-center text-primary">
+<span class="material-symbols-outlined text-[20px]">rss_feed</span>
+</div>
+<div>
+<h3 class="font-headline-sm text-headline-sm text-on-surface font-bold">全域小区实时流水与风控预警流</h3>
+<p class="font-label-sm text-label-sm text-on-surface-variant">微信直连账单、住户工单扫码、集团审批专户实时出入动态</p>
+</div>
+</div>
+<span class="px-2.5 py-1 rounded-full bg-surface-container-high text-primary font-label-sm text-label-sm font-bold flex items-center gap-1">
+<span class="w-2 h-2 rounded-full bg-primary animate-pulse"></span>
+            实时推送
+          </span>
+</div>
+<!-- 流水列表 -->
+<div class="space-y-spacing-xs">
+<!-- 流水条目 1 -->
+<div class="p-spacing-sm rounded-xl bg-surface-container-low hover:bg-surface-container transition-all flex items-center justify-between gap-spacing-sm">
+<div class="flex items-center gap-spacing-sm">
+<div class="w-10 h-10 rounded-xl bg-surface-container flex items-center justify-center text-primary shrink-0">
+<span class="material-symbols-outlined text-[20px]">add_circle</span>
+</div>
+<div>
+<div class="flex items-center gap-1.5">
+<span class="font-label-md text-label-md text-primary font-bold">14:48:12</span>
+<span class="px-1.5 py-0.5 rounded bg-surface-container-highest text-on-surface font-label-sm text-[11px] font-semibold">锦绣华庭 12-2-1601</span>
+</div>
+<div class="font-body-sm text-body-sm text-on-surface mt-0.5">业主微信预缴全年物业费 (线上直联即时到账)</div>
+</div>
+</div>
+<div class="text-right shrink-0">
+<div class="font-headline-sm text-headline-sm text-primary font-bold">+¥4,280.00</div>
+<span class="font-label-sm text-label-sm text-outline">微信支付商户直入</span>
+</div>
+</div>
+<!-- 流水条目 2 -->
+<div class="p-spacing-sm rounded-xl bg-surface-container-low hover:bg-surface-container transition-all flex items-center justify-between gap-spacing-sm">
+<div class="flex items-center gap-spacing-sm">
+<div class="w-10 h-10 rounded-xl bg-surface-container flex items-center justify-center text-primary shrink-0">
+<span class="material-symbols-outlined text-[20px]">build_circle</span>
+</div>
+<div>
+<div class="flex items-center gap-1.5">
+<span class="font-label-md text-label-md text-primary font-bold">14:45:03</span>
+<span class="px-1.5 py-0.5 rounded bg-surface-container-highest text-on-surface font-label-sm text-[11px] font-semibold">彭一社区 16-2-502</span>
+</div>
+<div class="font-body-sm text-body-sm text-on-surface mt-0.5">上门自来水管抢修配件材料及工时结算</div>
+</div>
+</div>
+<div class="text-right shrink-0">
+<div class="font-headline-sm text-headline-sm text-primary font-bold">+¥68.00</div>
+<span class="font-label-sm text-label-sm text-outline">居民扫师傅收款码</span>
+</div>
+</div>
+<!-- 流水条目 3 (大单支出预警) -->
+<div class="p-spacing-sm rounded-xl bg-error-container/20 border-l-4 border-error hover:bg-error-container/30 transition-all flex items-center justify-between gap-spacing-sm">
+<div class="flex items-center gap-spacing-sm">
+<div class="w-10 h-10 rounded-xl bg-error-container text-error flex items-center justify-center shrink-0">
+<span class="material-symbols-outlined text-[20px]">warning</span>
+</div>
+<div>
+<div class="flex items-center gap-1.5">
+<span class="font-label-md text-label-md text-error font-bold">14:40:22</span>
+<span class="px-1.5 py-0.5 rounded bg-error-container text-error font-label-sm text-[11px] font-bold">彭二新村 8号泵房</span>
+<span class="px-1 py-0.5 rounded bg-error text-on-error font-label-sm text-[9px] uppercase">超预算大单</span>
+</div>
+<div class="font-body-sm text-body-sm text-on-surface mt-0.5 font-medium">紧急采购加压不锈钢法兰止回阀审批出账</div>
+</div>
+</div>
+<div class="text-right shrink-0">
+<div class="font-headline-sm text-headline-sm text-error font-bold">-¥3,850.00</div>
+<span class="font-label-sm text-label-sm text-outline">集团应急公户扣划</span>
+</div>
+</div>
+<!-- 流水条目 4 -->
+<div class="p-spacing-sm rounded-xl bg-surface-container-low hover:bg-surface-container transition-all flex items-center justify-between gap-spacing-sm">
+<div class="flex items-center gap-spacing-sm">
+<div class="w-10 h-10 rounded-xl bg-surface-container flex items-center justify-center text-primary shrink-0">
+<span class="material-symbols-outlined text-[20px]">assignment_turned_in</span>
+</div>
+<div>
+<div class="flex items-center gap-1.5">
+<span class="font-label-md text-label-md text-primary font-bold">14:36:19</span>
+<span class="px-1.5 py-0.5 rounded bg-surface-container-highest text-on-surface font-label-sm text-[11px] font-semibold">绿洲康城 3-1-302</span>
+</div>
+<div class="font-body-sm text-body-sm text-on-surface mt-0.5">管家电话督导，业主补缴2023年Q3/Q4欠缴费</div>
+</div>
+</div>
+<div class="text-right shrink-0">
+<div class="font-headline-sm text-headline-sm text-primary font-bold">+¥1,960.00</div>
+<span class="font-label-sm text-label-sm text-outline">滞纳金已减免处理</span>
+</div>
+</div>
+</div>
+</div>
+<div class="pt-spacing-sm flex items-center justify-between font-label-sm text-label-sm text-outline">
+<span>今日已归集 1,412 笔流水账目 (无挂账差异)</span>
+<button class="text-primary font-semibold hover:underline flex items-center gap-0.5">
+<span>进入集团收支流水明细台账</span>
+<span class="material-symbols-outlined text-[14px]">chevron_right</span>
+</button>
+</div>
+</div>
+<!-- 右栏：集团财务结构与费用类型分布（多小区聚合） (5/12) -->
+<div class="lg:col-span-5 rounded-2xl bg-surface-container-lowest shadow-[0_4px_16px_rgba(14,128,88,0.05)] p-spacing-lg flex flex-col justify-between space-y-spacing-md">
+<div>
+<div class="flex items-center justify-between mb-spacing-sm">
+<div class="flex items-center gap-spacing-xs">
+<div class="w-8 h-8 rounded-xl bg-surface-container flex items-center justify-center text-primary">
+<span class="material-symbols-outlined text-[20px]">pie_chart</span>
+</div>
+<div>
+<h3 class="font-headline-sm text-headline-sm text-on-surface font-bold">多项目聚合收入与支出构成</h3>
+<p class="font-label-sm text-label-sm text-on-surface-variant">多小区业态资金来源与主营成本分析</p>
+</div>
+</div>
+<span class="font-label-sm text-label-sm text-outline">本月度累积</span>
+</div>
+<!-- 收入端占比分析 -->
+<div class="space-y-spacing-sm">
+<div class="font-label-sm text-label-sm text-outline uppercase tracking-wider font-bold">营收端占比 (总额 ¥4,821,490)</div>
+<!-- 分布项目 1 -->
+<div>
+<div class="flex items-center justify-between font-body-sm text-body-sm mb-1">
+<span class="text-on-surface font-medium">住宅与商业基础物业费</span>
+<span class="font-bold text-primary">68.5% <span class="font-normal text-outline text-[12px]">(¥3,302,720)</span></span>
+</div>
+<div class="w-full bg-surface-container-highest rounded-full h-2">
+<div class="bg-primary h-full rounded-full" style="width: 68.5%"></div>
+</div>
+</div>
+<!-- 分布项目 2 -->
+<div>
+<div class="flex items-center justify-between font-body-sm text-body-sm mb-1">
+<span class="text-on-surface font-medium">停车管理费及产权车位维保</span>
+<span class="font-bold text-primary">18.2% <span class="font-normal text-outline text-[12px]">(¥877,511)</span></span>
+</div>
+<div class="w-full bg-surface-container-highest rounded-full h-2">
+<div class="bg-secondary-container h-full rounded-full" style="width: 18.2%"></div>
+</div>
+</div>
+<!-- 分布项目 3 -->
+<div>
+<div class="flex items-center justify-between font-body-sm text-body-sm mb-1">
+<span class="text-on-surface font-medium">增值服务 (家政代办/声边闪铺分成)</span>
+<span class="font-bold text-on-surface">7.8% <span class="font-normal text-outline text-[12px]">(¥376,076)</span></span>
+</div>
+<div class="w-full bg-surface-container-highest rounded-full h-2">
+<div class="bg-primary-fixed-dim h-full rounded-full" style="width: 7.8%"></div>
+</div>
+</div>
+<!-- 分布项目 4 -->
+<div>
+<div class="flex items-center justify-between font-body-sm text-body-sm mb-1">
+<span class="text-on-surface font-medium">公共电梯广告位与公区场地租赁</span>
+<span class="font-bold text-on-surface">5.5% <span class="font-normal text-outline text-[12px]">(¥265,183)</span></span>
+</div>
+<div class="w-full bg-surface-container-highest rounded-full h-2">
+<div class="bg-surface-container-high h-full rounded-full" style="width: 5.5%"></div>
+</div>
+</div>
+</div>
+<!-- 支出端占比条形图 -->
+<div class="mt-spacing-md pt-spacing-sm bg-surface-container-low/50 rounded-xl p-spacing-sm">
+<div class="font-label-sm text-label-sm text-outline uppercase tracking-wider font-bold mb-spacing-xs">本月主营支出成本结构</div>
+<div class="w-full h-3 rounded-full flex overflow-hidden">
+<div class="bg-primary h-full" style="width: 52%" title="人工外包 52%"></div>
+<div class="bg-tertiary-container h-full" style="width: 24%" title="设备维保 24%"></div>
+<div class="bg-surface-tint h-full" style="width: 16%" title="水电能耗 16%"></div>
+<div class="bg-outline h-full" style="width: 8%" title="税费行政 8%"></div>
+</div>
+<div class="mt-spacing-xs grid grid-cols-2 gap-y-1 font-label-sm text-label-sm text-on-surface-variant">
+<div class="flex items-center gap-1.5"><span class="w-2 h-2 rounded-full bg-primary"></span>保安保洁外包 52%</div>
+<div class="flex items-center gap-1.5"><span class="w-2 h-2 rounded-full bg-tertiary-container"></span>设施抢修耗材 24%</div>
+<div class="flex items-center gap-1.5"><span class="w-2 h-2 rounded-full bg-surface-tint"></span>公区水电气能耗 16%</div>
+<div class="flex items-center gap-1.5"><span class="w-2 h-2 rounded-full bg-outline"></span>综合税费行政 8%</div>
+</div>
+</div>
+</div>
+<div class="flex items-center justify-between font-label-sm text-label-sm text-outline mt-spacing-sm">
+<span>多项目间支出偏离度预警：<strong class="text-tertiary font-bold">彭二新村高于均值22%</strong></span>
+</div>
+</div>
+</div>
+<script>
+  // 简易交互逻辑：银行对账与资金调拨弹窗
+  const reconcileBtn = document.getElementById('btn-reconcile');
+  if (reconcileBtn) {
+    reconcileBtn.addEventListener('click', () => {
+      const originalText = reconcileBtn.innerHTML;
+      reconcileBtn.innerHTML = '<span class="material-symbols-outlined text-[18px] animate-spin">progress_activity</span><span>直连对账中...</span>';
+      reconcileBtn.classList.add('opacity-75');
+      setTimeout(() => {
+        reconcileBtn.innerHTML = '<span class="material-symbols-outlined text-[18px] text-primary">done_all</span><span>全行账目核对无差错</span>';
+        setTimeout(() => {
+          reconcileBtn.innerHTML = originalText;
+          reconcileBtn.classList.remove('opacity-75');
+        }, 2500);
+      }, 900);
+    });
+  }
+
+  const modal = document.getElementById('transfer-dialog');
+  const openModalBtn = document.getElementById('btn-transfer-modal');
+  const closeModalBtn = document.getElementById('btn-close-modal');
+  const cancelModalBtn = document.getElementById('btn-cancel-modal');
+  const confirmBtn = document.getElementById('btn-confirm-transfer');
+
+  function toggleModal(show) {
+    if (modal) {
+      if (show) {
+        modal.classList.remove('hidden');
+        modal.classList.add('flex');
+      } else {
+        modal.classList.add('hidden');
+        modal.classList.remove('flex');
+      }
+    }
+  }
+
+  if (openModalBtn) openModalBtn.addEventListener('click', () => toggleModal(true));
+  if (closeModalBtn) closeModalBtn.addEventListener('click', () => toggleModal(false));
+  if (cancelModalBtn) cancelModalBtn.addEventListener('click', () => toggleModal(false));
+  if (confirmBtn) {
+    confirmBtn.addEventListener('click', () => {
+      confirmBtn.innerText = '指令已向银行下发...';
+      setTimeout(() => {
+        toggleModal(false);
+        confirmBtn.innerText = '确认授权并发送银企直联指令';
+        alert('跨项目资金调拨成功！银行网关已受理划转回执。');
+      }, 800);
+    });
+  }
+</script></main></div></body></html>

@@ -1,0 +1,328 @@
+<!DOCTYPE html><html lang="zh-CN" data-page="bills" data-group="mobile"><head><meta charset="utf-8"><meta content="width=device-width, initial-scale=1, viewport-fit=cover" name="viewport"><title>声边物业</title>
+<title>合并缴费账单 | 声边物业</title><link rel="icon" href="data:,"><link rel="preload" href="/assets/fonts.css?v=mtr809ae" as="style"><link rel="preload" href="/pages/bills.css?v=mtr809ae" as="style"><link rel="stylesheet" href="/assets/fonts.css?v=mtr809ae"><link rel="stylesheet" href="/pages/bills.css?v=mtr809ae"><link rel="stylesheet" href="/app.css?v=mtr809ae"><script type="module" src="/app.js?v=mtr809ae"></script></head><body class="bg-surface font-body-md text-body-md text-on-surface min-h-screen flex flex-col antialiased selection:bg-secondary-container"><header class="fixed top-0 inset-x-0 z-50 bg-surface/85 backdrop-blur-xl pt-safe shadow-[0_1px_8px_rgba(0,0,0,0.03)]"><div class="h-16 px-screen-margin flex items-center justify-between"><div class="flex items-center gap-spacing-xs"><div class="w-9 h-9 rounded-xl bg-gradient-to-br from-primary-fixed to-primary-container flex items-center justify-center shadow-[0_4px_12px_rgba(14,128,88,0.18)]"><span class="material-symbols-outlined text-surface-container-lowest text-[20px]">graphic_eq</span></div><div class="flex flex-col"><h1 class="font-headline-sm text-headline-sm text-on-surface leading-tight">Services Profile</h1><span class="font-label-sm text-label-sm text-on-surface-variant flex items-center gap-spacing-2xs"><span class="w-1.5 h-1.5 rounded-full bg-primary-container animate-pulse"></span>声边智慧社区</span></div></div><div class="flex items-center gap-spacing-xs"><button class="w-11 h-11 flex items-center justify-center rounded-full text-on-surface-variant hover:text-primary transition-colors active:scale-95"><span class="material-symbols-outlined text-[22px]">notifications</span></button><div class="w-8 h-8 rounded-full bg-primary flex items-center justify-center shadow-sm"><span class="material-symbols-outlined text-on-primary text-[18px]">person</span></div></div></div></header><main class="flex-1 w-full bg-surface pt-16 pb-28 min-h-screen"><div class="flex flex-col w-full px-screen-margin space-y-spacing-md">
+<!-- House Selection & Overview Capsule -->
+<div class="relative overflow-hidden rounded-xl bg-surface-container-lowest shadow-sm p-card-padding">
+<div class="absolute -right-10 -top-10 w-36 h-36 rounded-full bg-secondary-container/20 blur-2xl pointer-events-none"></div>
+<div class="relative flex flex-col space-y-spacing-sm">
+<!-- House Switcher & Resident Badge -->
+<div class="flex items-center justify-between">
+<button class="flex items-center space-x-spacing-2xs bg-surface-container-low px-spacing-sm py-1.5 rounded-full active:scale-95 transition-transform text-left" id="houseDropdownBtn">
+<span class="material-symbols-outlined text-primary text-[18px]">home_pin</span>
+<span class="font-headline-sm text-headline-sm text-on-surface truncate max-w-[170px]">彭一小区 16-2-502</span>
+<span class="material-symbols-outlined text-outline text-[18px]">expand_more</span>
+</button>
+<div class="flex items-center space-x-1.5 bg-primary/10 px-spacing-xs py-1 rounded-full">
+<span class="font-label-sm text-label-sm text-primary font-semibold">李女士</span>
+<span class="w-1 h-1 rounded-full bg-primary"></span>
+<span class="font-label-sm text-label-sm text-primary flex items-center">
+<span class="material-symbols-outlined text-[12px] mr-0.5" style="font-variation-settings: 'FILL' 1;">verified</span>
+            已认证
+          </span>
+</div>
+</div>
+<!-- House Dropdown Menu (Hidden by default) -->
+<div class="hidden flex-col space-y-spacing-xs bg-surface-container-low p-spacing-xs rounded-lg transition-all" id="houseDropdownMenu">
+<div class="p-spacing-xs bg-surface-container-lowest rounded-md flex items-center justify-between cursor-pointer">
+<div class="flex flex-col">
+<span class="font-headline-sm text-body-sm text-primary font-medium">彭一小区 16号楼2单元502室</span>
+<span class="font-label-sm text-label-sm text-on-surface-variant">住宅 · 98㎡</span>
+</div>
+<span class="material-symbols-outlined text-primary text-[18px]">check_circle</span>
+</div>
+<div class="p-spacing-xs hover:bg-surface-container-lowest rounded-md flex items-center justify-between cursor-pointer text-on-surface-variant">
+<div class="flex flex-col">
+<span class="font-headline-sm text-body-sm text-on-surface">彭一小区 地下车位 B1-108</span>
+<span class="font-label-sm text-label-sm text-on-surface-variant">地下产权车位 · 沪A·8899K</span>
+</div>
+<span class="material-symbols-outlined text-outline-variant text-[18px]">radio_button_unchecked</span>
+</div>
+</div>
+<!-- Total Outstanding Banner -->
+<div class="pt-spacing-xs flex items-end justify-between">
+<div class="flex flex-col">
+<span class="font-label-sm text-label-sm text-on-surface-variant">当前待缴总额 (含物业与车位)</span>
+<div class="flex items-baseline space-x-1 mt-0.5">
+<span class="font-headline-sm text-headline-sm text-primary font-bold">¥</span>
+<span class="font-display-lg text-display-lg text-primary font-bold tracking-tight">983.20</span>
+</div>
+</div>
+<button class="flex items-center space-x-1 bg-gradient-to-r from-primary-container to-primary text-on-primary px-spacing-md py-2.5 rounded-full shadow-md active:scale-95 transition-all" id="payAllBtn">
+<span class="material-symbols-outlined text-[18px]">receipt_long</span>
+<span class="font-headline-sm text-body-sm font-semibold">合并缴费</span>
+</button>
+</div>
+</div>
+</div>
+<!-- Category Nav Tabs -->
+<div class="grid grid-cols-3 gap-spacing-xs bg-surface-container-high/60 p-1 rounded-full">
+<button class="tab-btn py-2 text-center rounded-full font-headline-sm text-body-sm transition-all duration-200 bg-surface-container-lowest text-primary shadow-sm font-semibold flex items-center justify-center space-x-1" id="tab-property" data-original-onclick="switchTab('property')">
+<span>我的物业费</span>
+<span class="w-1.5 h-1.5 rounded-full bg-error"></span>
+</button>
+<button class="tab-btn py-2 text-center rounded-full font-headline-sm text-body-sm transition-all duration-200 text-on-surface-variant hover:text-on-surface flex items-center justify-center space-x-1" id="tab-parking" data-original-onclick="switchTab('parking')">
+<span>我的停车费</span>
+<span class="w-1.5 h-1.5 rounded-full bg-error"></span>
+</button>
+<button class="tab-btn py-2 text-center rounded-full font-headline-sm text-body-sm transition-all duration-200 text-on-surface-variant hover:text-on-surface flex items-center justify-center space-x-1" id="tab-others" data-original-onclick="switchTab('others')">
+<span>其他费用</span>
+</button>
+</div>
+<!-- TAB 1: PROPERTY FEE -->
+<div class="tab-content flex flex-col space-y-spacing-md" id="content-property">
+<!-- Unpaid Card -->
+<div class="rounded-xl bg-surface-container-lowest p-card-padding shadow-sm relative overflow-hidden">
+<div class="flex items-center justify-between pb-spacing-xs">
+<div class="flex items-center space-x-1.5">
+<span class="w-2 h-2 rounded-full bg-tertiary-fixed-dim"></span>
+<span class="font-headline-sm text-headline-sm text-on-surface">2024年第二季度物业服务费</span>
+</div>
+<span class="bg-error-container text-on-error-container font-label-sm text-label-sm px-spacing-xs py-0.5 rounded-full">待缴账单</span>
+</div>
+<!-- Detail Specs -->
+<div class="bg-surface-container-low/70 rounded-lg p-spacing-sm my-spacing-sm space-y-spacing-2xs">
+<div class="flex justify-between text-body-sm">
+<span class="text-on-surface-variant">计费周期</span>
+<span class="text-on-surface font-medium">2024.04.01 - 2024.06.30 (3个月)</span>
+</div>
+<div class="flex justify-between text-body-sm">
+<span class="text-on-surface-variant">计费标准</span>
+<span class="text-on-surface font-medium">2.80 元/㎡/月 (建筑面积 98.00㎡)</span>
+</div>
+<div class="flex justify-between text-body-sm">
+<span class="text-on-surface-variant">服务细项分摊</span>
+<span class="text-on-surface-variant">公摊照明 · 保洁绿化 · 电梯维保</span>
+</div>
+</div>
+<!-- Pre-pay Promotion Incentive -->
+<div class="bg-secondary-container/20 rounded-lg p-spacing-xs flex items-center justify-between mb-spacing-md">
+<div class="flex items-center space-x-1.5">
+<span class="material-symbols-outlined text-primary text-[18px]">card_giftcard</span>
+<span class="font-label-sm text-body-sm text-primary font-medium">预缴全年立减50元，赠200积分</span>
+</div>
+<span class="font-label-sm text-label-sm text-primary underline cursor-pointer">预缴政策</span>
+</div>
+<!-- Price & Action -->
+<div class="flex items-center justify-between pt-spacing-2xs">
+<div>
+<span class="font-label-sm text-label-sm text-on-surface-variant">本期应缴</span>
+<div class="flex items-baseline text-primary">
+<span class="font-headline-sm text-headline-sm font-bold">¥</span>
+<span class="font-headline-lg text-headline-lg font-bold ml-0.5">823.20</span>
+</div>
+</div>
+<button class="bg-gradient-to-r from-primary to-primary-container text-on-primary px-spacing-xl py-2.5 rounded-full font-headline-sm text-body-sm shadow-md active:scale-95 transition-transform flex items-center space-x-1">
+<span>立即缴费</span>
+<span class="material-symbols-outlined text-[16px]">arrow_forward</span>
+</button>
+</div>
+</div>
+<!-- Payment History Section -->
+<div class="flex flex-col space-y-spacing-xs">
+<div class="flex items-center justify-between px-1">
+<span class="font-headline-sm text-headline-sm text-on-surface">历史交费记录</span>
+<span class="font-label-sm text-label-sm text-on-surface-variant">共2笔已结清</span>
+</div>
+<!-- Item 1 -->
+<div class="bg-surface-container-lowest rounded-xl p-card-padding shadow-sm space-y-spacing-xs">
+<div class="flex items-start justify-between">
+<div class="flex flex-col">
+<span class="font-headline-sm text-body-md text-on-surface font-medium">2024年第一季度物业服务费</span>
+<span class="font-label-sm text-label-sm text-on-surface-variant">缴费时间：2024-01-05 14:23 · 微信支付</span>
+</div>
+<span class="font-headline-sm text-body-lg text-on-surface font-bold">¥823.20</span>
+</div>
+<div class="flex items-center justify-between pt-spacing-xs bg-surface-container-low/40 rounded-lg p-2 mt-1">
+<span class="font-label-sm text-label-sm text-secondary flex items-center">
+<span class="material-symbols-outlined text-[16px] mr-1">task_alt</span> 已结清
+          </span>
+<button class="flex items-center space-x-1 text-primary text-body-sm font-label-sm active:opacity-75">
+<span class="material-symbols-outlined text-[16px]">receipt</span>
+<span>查看电子发票</span>
+</button>
+</div>
+</div>
+<!-- Item 2 -->
+<div class="bg-surface-container-lowest rounded-xl p-card-padding shadow-sm space-y-spacing-xs">
+<div class="flex items-start justify-between">
+<div class="flex flex-col">
+<span class="font-headline-sm text-body-md text-on-surface font-medium">2023年第四季度物业服务费</span>
+<span class="font-label-sm text-label-sm text-on-surface-variant">缴费时间：2023-10-12 09:15 · 微信支付</span>
+</div>
+<span class="font-headline-sm text-body-lg text-on-surface font-bold">¥823.20</span>
+</div>
+<div class="flex items-center justify-between pt-spacing-xs bg-surface-container-low/40 rounded-lg p-2 mt-1">
+<span class="font-label-sm text-label-sm text-secondary flex items-center">
+<span class="material-symbols-outlined text-[16px] mr-1">task_alt</span> 已结清
+          </span>
+<button class="flex items-center space-x-1 text-primary text-body-sm font-label-sm active:opacity-75">
+<span class="material-symbols-outlined text-[16px]">receipt</span>
+<span>查看电子发票</span>
+</button>
+</div>
+</div>
+</div>
+</div>
+<!-- TAB 2: PARKING FEE (Hidden by default) -->
+<div class="tab-content hidden flex-col space-y-spacing-md" id="content-parking">
+<!-- Unpaid Parking Card -->
+<div class="rounded-xl bg-surface-container-lowest p-card-padding shadow-sm relative overflow-hidden">
+<div class="flex items-center justify-between pb-spacing-xs">
+<div class="flex items-center space-x-1.5">
+<span class="material-symbols-outlined text-primary text-[20px]">local_parking</span>
+<span class="font-headline-sm text-headline-sm text-on-surface">地下负一层 B1-108</span>
+</div>
+<span class="bg-error-container text-on-error-container font-label-sm text-label-sm px-spacing-xs py-0.5 rounded-full">待缴车位费</span>
+</div>
+<div class="bg-surface-container-low/70 rounded-lg p-spacing-sm my-spacing-sm space-y-spacing-2xs">
+<div class="flex justify-between text-body-sm">
+<span class="text-on-surface-variant">绑定车牌</span>
+<span class="bg-surface-container-highest px-2 py-0.5 rounded text-on-surface font-semibold font-label-md">沪A·8899K</span>
+</div>
+<div class="flex justify-between text-body-sm">
+<span class="text-on-surface-variant">计费周期</span>
+<span class="text-on-surface font-medium">2024.05.01 - 2024.06.30 (2个月)</span>
+</div>
+<div class="flex justify-between text-body-sm">
+<span class="text-on-surface-variant">车位类型</span>
+<span class="text-on-surface">地下专属产权车位 · 80元/月</span>
+</div>
+</div>
+<!-- Price & Action -->
+<div class="flex items-center justify-between pt-spacing-2xs">
+<div>
+<span class="font-label-sm text-label-sm text-on-surface-variant">本期应缴管理费</span>
+<div class="flex items-baseline text-primary">
+<span class="font-headline-sm text-headline-sm font-bold">¥</span>
+<span class="font-headline-lg text-headline-lg font-bold ml-0.5">160.00</span>
+</div>
+</div>
+<button class="bg-gradient-to-r from-primary to-primary-container text-on-primary px-spacing-xl py-2.5 rounded-full font-headline-sm text-body-sm shadow-md active:scale-95 transition-transform flex items-center space-x-1">
+<span>缴车位费</span>
+<span class="material-symbols-outlined text-[16px]">arrow_forward</span>
+</button>
+</div>
+</div>
+<!-- Parking History List -->
+<div class="flex flex-col space-y-spacing-xs">
+<div class="flex items-center justify-between px-1">
+<span class="font-headline-sm text-headline-sm text-on-surface">车位缴费记录</span>
+<span class="font-label-sm text-label-sm text-on-surface-variant">已缴记录</span>
+</div>
+<div class="bg-surface-container-lowest rounded-xl p-card-padding shadow-sm space-y-spacing-xs">
+<div class="flex items-start justify-between">
+<div class="flex flex-col">
+<span class="font-headline-sm text-body-md text-on-surface font-medium">2024年3月-4月 车位管理费</span>
+<span class="font-label-sm text-label-sm text-on-surface-variant">缴费时间：2024-03-02 11:08 · 微信支付</span>
+</div>
+<span class="font-headline-sm text-body-lg text-on-surface font-bold">¥160.00</span>
+</div>
+<div class="flex items-center justify-between pt-spacing-xs bg-surface-container-low/40 rounded-lg p-2 mt-1">
+<span class="font-label-sm text-label-sm text-secondary flex items-center">
+<span class="material-symbols-outlined text-[16px] mr-1">task_alt</span> 结清并已开票
+          </span>
+<button class="flex items-center space-x-1 text-primary text-body-sm font-label-sm active:opacity-75">
+<span class="material-symbols-outlined text-[16px]">receipt</span>
+<span>发票凭据</span>
+</button>
+</div>
+</div>
+</div>
+</div>
+<!-- TAB 3: OTHER FEES (Hidden by default) -->
+<div class="tab-content hidden flex-col space-y-spacing-md" id="content-others">
+<!-- Clean Zero-Balance State -->
+<div class="bg-surface-container-lowest rounded-xl p-spacing-xl shadow-sm flex flex-col items-center justify-center text-center space-y-spacing-xs">
+<div class="w-14 h-14 rounded-full bg-secondary-container/30 flex items-center justify-center text-primary">
+<span class="material-symbols-outlined text-[32px]" style="font-variation-settings: 'FILL' 1;">check_circle</span>
+</div>
+<span class="font-headline-sm text-headline-sm text-on-surface">本期各项公摊杂项均已结清</span>
+<p class="font-body-sm text-body-sm text-on-surface-variant max-w-[240px]">
+        二次加压能耗、公摊水电及垃圾清运等暂无待缴账单。
+      </p>
+</div>
+<!-- Other Fees History -->
+<div class="flex flex-col space-y-spacing-xs">
+<div class="flex items-center justify-between px-1">
+<span class="font-headline-sm text-headline-sm text-on-surface">历史分摊与杂项凭证</span>
+<span class="font-label-sm text-label-sm text-on-surface-variant">2条记录</span>
+</div>
+<div class="bg-surface-container-lowest rounded-xl p-card-padding shadow-sm space-y-spacing-xs">
+<div class="flex items-start justify-between">
+<div class="flex flex-col">
+<span class="font-headline-sm text-body-md text-on-surface font-medium">2024年3月 公共能耗水电分摊</span>
+<span class="font-label-sm text-label-sm text-on-surface-variant">缴费时间：2024-04-10 16:42 · 自动代扣</span>
+</div>
+<span class="font-headline-sm text-body-lg text-on-surface font-bold">¥42.50</span>
+</div>
+<div class="flex items-center justify-between pt-spacing-xs bg-surface-container-low/40 rounded-lg p-2 mt-1">
+<span class="font-label-sm text-label-sm text-secondary flex items-center">
+<span class="material-symbols-outlined text-[16px] mr-1">task_alt</span> 扣缴成功
+          </span>
+<button class="flex items-center space-x-1 text-primary text-body-sm font-label-sm active:opacity-75">
+<span class="material-symbols-outlined text-[16px]">receipt</span>
+<span>电子回单</span>
+</button>
+</div>
+</div>
+<div class="bg-surface-container-lowest rounded-xl p-card-padding shadow-sm space-y-spacing-xs">
+<div class="flex items-start justify-between">
+<div class="flex flex-col">
+<span class="font-headline-sm text-body-md text-on-surface font-medium">大件垃圾定点清运服务费</span>
+<span class="font-label-sm text-label-sm text-on-surface-variant">缴费时间：2024-02-18 10:20 · 扫码支付</span>
+</div>
+<span class="font-headline-sm text-body-lg text-on-surface font-bold">¥50.00</span>
+</div>
+<div class="flex items-center justify-between pt-spacing-xs bg-surface-container-low/40 rounded-lg p-2 mt-1">
+<span class="font-label-sm text-label-sm text-secondary flex items-center">
+<span class="material-symbols-outlined text-[16px] mr-1">task_alt</span> 已办结
+          </span>
+<button class="flex items-center space-x-1 text-primary text-body-sm font-label-sm active:opacity-75">
+<span class="material-symbols-outlined text-[16px]">receipt</span>
+<span>电子回单</span>
+</button>
+</div>
+</div>
+</div>
+</div>
+<!-- Benefits & Security Care Module -->
+<div class="rounded-xl bg-surface-container-low/60 p-card-padding space-y-spacing-sm">
+<div class="flex items-center space-x-spacing-xs">
+<div class="w-8 h-8 rounded-lg bg-primary-container/20 flex items-center justify-center text-primary">
+<span class="material-symbols-outlined text-[18px]">verified_user</span>
+</div>
+<div class="flex flex-col">
+<span class="font-headline-sm text-body-md text-on-surface font-semibold">声边缴费关怀与保障</span>
+<span class="font-label-sm text-label-sm text-on-surface-variant">阳光物业 · 规范开票 · 贴心到家</span>
+</div>
+</div>
+<div class="grid grid-cols-2 gap-spacing-xs pt-1">
+<div class="bg-surface-container-lowest p-spacing-sm rounded-lg flex items-start space-x-2">
+<span class="material-symbols-outlined text-primary text-[20px]">receipt</span>
+<div class="flex flex-col">
+<span class="font-headline-sm text-body-sm font-medium text-on-surface">电子发票</span>
+<span class="font-label-sm text-label-sm text-on-surface-variant mt-0.5">支持秒开增值税普票</span>
+</div>
+</div>
+<div class="bg-surface-container-lowest p-spacing-sm rounded-lg flex items-start space-x-2">
+<span class="material-symbols-outlined text-tertiary text-[20px]">stars</span>
+<div class="flex flex-col">
+<span class="font-headline-sm text-body-sm font-medium text-on-surface">1元积1分</span>
+<span class="font-label-sm text-label-sm text-on-surface-variant mt-0.5">可在声边圈兑换好礼</span>
+</div>
+</div>
+</div>
+<!-- Customer Service Hotline Callout -->
+<div class="flex items-center justify-between pt-spacing-xs text-on-surface-variant text-body-sm">
+<div class="flex items-center space-x-1">
+<span class="material-symbols-outlined text-[16px] text-outline">support_agent</span>
+<span class="font-body-sm text-body-sm">财务咨询：400-880-6899</span>
+</div>
+<a class="text-primary font-headline-sm text-body-sm flex items-center" href="tel:4008806899">
+<span>一键拨打</span>
+<span class="material-symbols-outlined text-[14px]">chevron_right</span>
+</a>
+</div>
+</div>
+<!-- Micro-interactions Script -->
+
+</div></main><nav class="fixed bottom-0 inset-x-0 z-50 pb-safe px-screen-margin pointer-events-none" data-active-classes="text-primary-container font-headline-sm font-semibold"><div class="pointer-events-auto mx-auto max-w-md h-16 bg-surface-container-lowest/90 backdrop-blur-2xl rounded-full shadow-[0_16px_36px_-6px_rgba(14,128,88,0.18),0_4px_12px_rgba(0,0,0,0.03)] px-spacing-sm flex items-center justify-between"><a class="flex-1 flex flex-col items-center justify-center py-1 min-h-[44px] text-on-surface-variant hover:text-on-surface transition-all duration-200 active:scale-95" data-path="home" href="/mobile/home"><span class="material-symbols-outlined text-[22px]">cottage</span><span class="font-label-sm text-label-sm mt-0.5">首页</span></a><a class="flex-1 flex flex-col items-center justify-center py-1 min-h-[44px] text-on-surface-variant hover:text-on-surface transition-all duration-200 active:scale-95" data-path="media-audio" href="/mobile/media"><div class="relative flex items-center justify-center"><span class="material-symbols-outlined text-[22px]">podcasts</span><span class="absolute -top-1 -right-2 w-2 h-2 rounded-full bg-tertiary-fixed-dim animate-ping"></span></div><span class="font-label-sm text-label-sm mt-0.5">融媒专区</span></a><a class="flex-1 flex flex-col items-center justify-center py-1 min-h-[44px] text-on-surface-variant hover:text-on-surface transition-all duration-200 active:scale-95" data-path="neighborhood-community" href="/mobile/services"><span class="material-symbols-outlined text-[22px]">forum</span><span class="font-label-sm text-label-sm mt-0.5">邻里圈</span></a><a aria-current="page" class="flex-1 flex flex-col items-center justify-center py-1 min-h-[44px] transition-all duration-200 active:scale-95 text-primary-container font-headline-sm font-semibold" data-path="services-profile" href="/mobile/profile"><span class="material-symbols-outlined text-[22px]">manage_accounts</span><span class="font-label-sm text-label-sm mt-0.5">服务与我的</span></a></div></nav></body></html>

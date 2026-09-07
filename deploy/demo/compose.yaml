@@ -1,0 +1,8 @@
+services:
+  shengbian-demo:
+    build:
+      context: ../..
+      dockerfile: deploy/demo/Dockerfile
+    restart: unless-stopped
+    ports:
+      - "5180:80"

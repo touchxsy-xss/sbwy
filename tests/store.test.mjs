@@ -1,0 +1,101 @@
+import { test } from 'node:test';
+import assert from 'node:assert/strict';
+import { createStore } from '../src/services/store.js';
+
+const make = () => { const values = new Map(); return createStore({ getItem: key => values.get(key), setItem: (key, value) => values.set(key, value) }); };
+test('repair lifecycle and invalid transitions', () => {
+  const s = make();
+  assert.throws(() => s.createOrder({ description: '短' }));
+  const o = s.createOrder({ description: '厨房角阀持续漏水', room: '16-2-502', phone: '13800006688', appointment: '2026-09-07 下午' });
+  assert.throws(() => s.transition(o.id, 'completed', { photos: [{}], amount: 68 }));
+  s.transition(o.id, 'assigned', { technician: '张建国' });
+  s.transition(o.id, 'accepted');
+  s.transition(o.id, 'arrived');
+  assert.throws(() => s.transition(o.id, 'completed', { photos: [], amount: 68 }));
+  s.transition(o.id, 'completed', { photos: [{ src: 'demo' }], amount: 68 });
+  assert.equal(s.read().bills.find(b => b.orderId === o.id).amount, 68);
+  s.pay(['repair-' + o.id]);
+  assert.equal(s.read().orders.find(x => x.id === o.id).paid, true);
+  s.review(o.id, { rating: 3, comment: '已修复' });
+  assert.equal(s.read().orders.find(x => x.id === o.id).status, 'closed');
+  assert.throws(() => s.review(o.id, { rating: 5 }));
+});
+test('arrival SLA starts on acceptance and records an overdue checkin', () => {
+  const s = make();
+  const order = s.createOrder({ description: '厨房主管道持续漏水需要紧急处理', room: '16-2-502', phone: '13800006688', appointment: '2026-09-07 下午', urgent: true });
+  assert.equal(order.sla.arrivalMinutes, 30);
+  s.transition(order.id, 'assigned', { technician: '张建国' });
+  s.transition(order.id, 'accepted', { technician: '张建国' });
+  let current = s.read().orders.find(o => o.id === order.id);
+  assert.ok(current.acceptedAt);
+  assert.ok(current.arrivalDueAt);
+  assert.equal(new Date(current.arrivalDueAt).getTime() - new Date(current.acceptedAt).getTime(), 30 * 60000);
+  s.change(state => { state.orders.find(o => o.id === order.id).arrivalDueAt = new Date(Date.now() - 60000).toISOString(); });
+  s.transition(order.id, 'arrived');
+  current = s.read().orders.find(o => o.id === order.id);
+  assert.equal(current.arrivalResult.state, 'overdue');
+  assert.match(current.timeline.at(-1).label, /超时到岗/);
+});
+test('content audiences keep property publishing within its current community', () => {
+  const s = make();
+  assert.equal(s.read().articles.find(a => a.id === 'elevator').audience, 'platform');
+  const communityArticle = s.publishContent({ title: '彭一设备巡检', body: '巡检结果已归档。', kind: 'article' });
+  assert.equal(communityArticle.audience, 'community');
+  assert.deepEqual(communityArticle.communityIds, ['pengyi']);
+  assert.equal(communityArticle.publisher, '彭一小区物业服务中心');
+  assert.throws(() => s.publishContent({ title: '越权内容', body: '不应发布', kind: 'article', audience: 'platform' }));
+  const platformArticle = s.publishContent({ title: '平台服务提醒', body: '全量社区可见。', kind: 'article', audience: 'platform' }, { level: 'platform' });
+  assert.equal(platformArticle.audience, 'platform');
+  assert.deepEqual(platformArticle.communityIds, []);
+});
+test('payments atomic, duplicate safe and coupons scoped', () => {
+  const s = make();
+  s.redeem('coupon50', '自提', 'req1');
+  const coupon = s.read().coupons[0];
+  assert.throws(() => s.pay(['parking-current'], coupon.id));
+  assert.equal(s.read().coupons[0].used, false);
+  const p = s.pay(['property-current'], coupon.id);
+  assert.equal(p.amount, 933.2);
+  assert.throws(() => s.pay(['property-current']));
+  assert.equal(s.read().payments.length, 1);
+});
+test('redemptions insufficient balance and idempotency', () => {
+  const s = make();
+  s.redeem('oil', '自提', 'req1');
+  s.redeem('oil', '自提', 'req1');
+  assert.equal(s.read().redemptions.length, 1);
+  assert.throws(() => s.redeem('rice', '自提', 'req2'));
+  assert.equal(s.read().user.points, 680);
+});
+test('cash redemptions record a payment and do not mutate state on failure', () => {
+  const s = make();
+  const before = s.read().user.points;
+  assert.throws(() => s.redeem('cleaning', '自提', 'cash-failure', { cashPayment: 'failure' }));
+  assert.equal(s.read().user.points, before);
+  assert.equal(s.read().redemptions.length, 0);
+  const redemption = s.redeem('cleaning', '自提', 'cash-success', { cashPayment: 'success' });
+  const payment = s.read().payments.find(p => p.id === redemption.paymentId);
+  assert.equal(payment.amount, 49);
+  assert.equal(payment.redemptionId, redemption.id);
+  assert.equal(s.read().user.points, before - 1200);
+});
+test('transfers validate amount and conserve balance', () => {
+  const s = make();
+  const sum = () => Object.values(s.read().balances).reduce((a, b) => a + b, 0);
+  const before = sum();
+  assert.throws(() => s.transfer({ from: 'group', to: 'group', amount: 100, reason: '测试' }));
+  assert.throws(() => s.transfer({ from: 'penger', to: 'group', amount: 1000000, reason: '测试' }));
+  s.transfer({ from: 'group', to: 'penger', amount: '123.45', reason: '测试批文' });
+  assert.equal(sum(), before);
+});
+test('booking quantity date and phone validation', () => {
+  const s = make();
+  const base = { date: new Date().toLocaleDateString('en-CA'), phone: '13800006688', quantity: 1 };
+  assert.throws(() => s.book('ac', { ...base, quantity: -1 }, 'req1'));
+  assert.throws(() => s.book('ac', { ...base, phone: '123' }, 'req1'));
+  assert.throws(() => s.book('ac', { ...base, date: '2000-01-01' }, 'req1'));
+  s.book('ac', { ...base, quantity: 2 }, 'req1');
+  s.book('ac', base, 'req1');
+  assert.equal(s.read().bookings.length, 1);
+  assert.equal(s.read().bookings[0].amount, 198);
+});

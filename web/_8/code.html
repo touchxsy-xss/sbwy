@@ -1,0 +1,345 @@
+<!DOCTYPE html><html lang="zh-CN"><head><meta charset="utf-8"><meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" name="viewport"><link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&amp;display=swap" rel="stylesheet"><link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"><script src="https://cdn.tailwindcss.com"></script><script id="tailwind-config">tailwind.config = { darkMode: "class", theme: { extend: { colors: { "error-container": "#ffdad6", "on-secondary-container": "#00714d", "on-secondary-fixed-variant": "#005236", "primary-fixed-dim": "#78d9aa", "on-primary-fixed-variant": "#005236", "inverse-primary": "#78d9aa", "on-background": "#0f1f18", "secondary-fixed": "#6ffbbe", "tertiary-container": "#9d6300", "on-surface": "#0f1f18", "on-primary-container": "#d6ffe6", "surface-container-lowest": "#ffffff", "surface-container-high": "#daede1", "surface": "#ebfef2", "on-primary-fixed": "#002113", "secondary": "#006c49", "on-tertiary-container": "#fff3e9", "inverse-surface": "#24342c", "on-error-container": "#93000a", "primary-fixed": "#94f6c5", "outline-variant": "#bdc9c0", "surface-container-low": "#e5f8ed", "error": "#ba1a1a", "on-tertiary-fixed": "#2a1700", "surface-container": "#dff2e7", "on-tertiary-fixed-variant": "#653e00", "tertiary-fixed-dim": "#ffb95f", "on-surface-variant": "#3e4942", "background": "#ebfef2", "surface-bright": "#ebfef2", "on-primary": "#ffffff", "inverse-on-surface": "#e2f5ea", "surface-variant": "#d4e7dc", "surface-container-highest": "#d4e7dc", "on-secondary-fixed": "#002113", "tertiary-fixed": "#ffddb8", "on-tertiary": "#ffffff", "surface-tint": "#006c49", "primary": "#006544", "secondary-fixed-dim": "#4edea3", "surface-dim": "#ccdfd3", "outline": "#6e7a72", "on-secondary": "#ffffff", "secondary-container": "#6cf8bb", "tertiary": "#7c4d00", "on-error": "#ffffff", "primary-container": "#0e8058" }, borderRadius: { "DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px" }, spacing: { "spacing-2xl": "32px", "spacing-lg": "20px", "spacing-sm": "12px", "spacing-md": "16px", "spacing-xl": "24px", "grid-gutter": "12px", "card-padding": "18px", "spacing-3xl": "40px", "spacing-2xs": "4px", "spacing-xs": "8px", "screen-margin": "16px" }, fontFamily: { "body-md": ["Plus Jakarta Sans"], "headline-md": ["Plus Jakarta Sans"], "headline-sm": ["Plus Jakarta Sans"], "display-lg": ["Plus Jakarta Sans"], "headline-lg": ["Plus Jakarta Sans"], "label-sm": ["Plus Jakarta Sans"], "label-md": ["Plus Jakarta Sans"], "body-lg": ["Plus Jakarta Sans"], "body-sm": ["Plus Jakarta Sans"] }, fontSize: { "body-md": ["14px", { "lineHeight": "22px", "fontWeight": "400" }], "headline-md": ["20px", { "lineHeight": "28px", "letterSpacing": "-0.01em", "fontWeight": "600" }], "headline-sm": ["17px", { "lineHeight": "24px", "fontWeight": "600" }], "display-lg": ["34px", { "lineHeight": "42px", "letterSpacing": "-0.02em", "fontWeight": "700" }], "headline-lg": ["26px", { "lineHeight": "34px", "letterSpacing": "-0.015em", "fontWeight": "700" }], "label-sm": ["10px", { "lineHeight": "14px", "letterSpacing": "0.03em", "fontWeight": "500" }], "label-md": ["12px", { "lineHeight": "16px", "letterSpacing": "0.02em", "fontWeight": "600" }], "body-lg": ["16px", { "lineHeight": "24px", "fontWeight": "400" }], "body-sm": ["13px", { "lineHeight": "18px", "fontWeight": "400" }] } } } };</script><style>@layer base { html, body { margin: 0; padding: 0; width: 100%; min-height: 100%; overscroll-behavior-y: none; } .pb-safe { padding-bottom: env(safe-area-inset-bottom, 0px); } .pt-safe { padding-top: env(safe-area-inset-top, 0px); } } ::-webkit-scrollbar { display: none; }</style></head><body class="bg-background font-body-md text-body-md text-on-surface antialiased min-h-screen flex flex-col"><header class="fixed top-0 w-full z-50 pt-safe bg-surface-container-lowest/90 backdrop-blur-xl shadow-[0_4px_20px_-4px_rgba(14,128,88,0.08)]"><div class="h-16 px-screen-margin flex items-center justify-between"><div class="flex items-center gap-spacing-xs min-w-0"><button aria-label="返回" class="w-11 h-11 -ml-2 flex items-center justify-center rounded-full text-on-surface active:bg-surface-container transition-colors" onclick="history.back()"><span class="material-symbols-outlined text-[24px]">arrow_back_ios_new</span></button><h1 class="font-headline-sm text-headline-sm text-on-surface truncate">Repair Checkin</h1></div><div class="flex items-center gap-spacing-xs"><div class="w-8 h-8 rounded-full bg-primary flex items-center justify-center shadow-[0_2px_8px_rgba(0,101,68,0.25)]"><span class="material-symbols-outlined text-on-primary text-[18px]">person</span></div></div></div></header><main class="flex-1 w-full bg-background pt-16 pb-safe"><div class="flex flex-col w-full pb-32">
+<!-- 紧急工单信息条 (Tactile Glass Header) -->
+<section class="px-screen-margin pt-spacing-sm pb-spacing-xs">
+<div class="bg-surface-container-lowest p-card-padding rounded-xl shadow-sm">
+<div class="flex items-center justify-between gap-spacing-xs mb-spacing-xs">
+<div class="flex items-center gap-1.5">
+<span class="px-2 py-0.5 rounded-full bg-error-container text-on-error-container font-label-md text-label-md">突发抢修</span>
+<span class="font-label-md text-label-md text-on-surface-variant tracking-wide">工单号: SB-20241028-092</span>
+</div>
+<a aria-label="呼叫业主" class="flex items-center gap-1 px-2.5 py-1 rounded-full bg-surface-container text-primary active:scale-95 transition-transform" href="tel:13812345678">
+<span class="material-symbols-outlined text-[15px]">call</span>
+<span class="font-label-md text-label-md font-semibold">联系业主</span>
+</a>
+</div>
+<div class="flex items-baseline gap-spacing-xs">
+<h2 class="font-headline-md text-headline-md text-on-surface font-bold tracking-tight">彭一小区 16号楼2单元502室</h2>
+</div>
+<div class="mt-1 flex items-center gap-spacing-xs text-on-surface-variant font-body-sm text-body-sm">
+<span class="material-symbols-outlined text-[16px] text-error">water_damage</span>
+<span>水管漏水突发故障 · 厨房主管道角阀爆裂渗水</span>
+</div>
+</div>
+</section>
+<!-- 步骤 1：点位到岗打卡 -->
+<section class="px-screen-margin py-spacing-xs">
+<div class="bg-surface-container-lowest p-card-padding rounded-xl shadow-sm">
+<div class="flex items-center justify-between mb-spacing-sm">
+<div class="flex items-center gap-2">
+<span class="w-6 h-6 rounded-full bg-primary text-on-primary font-label-md text-label-md flex items-center justify-center font-bold">1</span>
+<h3 class="font-headline-sm text-headline-sm text-on-surface font-semibold">现场到岗打卡</h3>
+</div>
+<div class="flex items-center gap-1 font-label-sm text-label-sm text-secondary bg-surface-container-low px-2 py-0.5 rounded-full">
+<span class="w-1.5 h-1.5 rounded-full bg-secondary animate-pulse"></span>
+<span>高精度定位</span>
+</div>
+</div>
+<!-- GPS位置提示条 -->
+<div class="bg-surface-container-low p-2.5 rounded-lg flex items-center gap-2 mb-spacing-sm">
+<span class="material-symbols-outlined text-primary text-[18px]">location_on</span>
+<p class="font-body-sm text-body-sm text-on-surface truncate">
+          彭一小区16号楼单元门 <span class="text-on-surface-variant text-[11px]">(GPS已定位·误差&lt;5米)</span>
+</p>
+</div>
+<!-- 打卡切换状态容器 -->
+<div id="checkin-container">
+<!-- 打卡后激活状态 -->
+<div class="bg-surface-container-highest/60 p-3 rounded-lg flex flex-col gap-1.5" id="checked-state">
+<div class="flex items-center justify-between">
+<div class="flex items-center gap-1.5 text-primary font-label-md text-label-md font-bold">
+<span class="material-symbols-outlined text-[18px]">verified</span>
+<span>14:32 已成功到岗打卡</span>
+</div>
+<div class="flex items-center gap-1 px-2 py-0.5 rounded-full bg-surface-container-lowest shadow-sm">
+<span class="material-symbols-outlined text-tertiary text-[14px]">schedule</span>
+<span class="font-label-sm text-label-sm font-bold text-on-surface" id="service-timer">服务用时 24 分钟</span>
+</div>
+</div>
+<p class="font-body-sm text-body-sm text-on-surface-variant pl-6 leading-tight">
+            打卡点位：16号楼2单元门禁刷卡点，凭证已自动同步物业后台与业主端微信通知。
+          </p>
+</div>
+<!-- 备用未打卡交互切换按钮 -->
+<button class="hidden w-full py-3 rounded-full bg-primary text-on-primary font-headline-sm text-headline-sm font-semibold flex items-center justify-center gap-2 shadow-sm active:scale-95 transition-all" id="checkin-btn" onclick="toggleCheckin()">
+<span class="material-symbols-outlined text-[20px]">near_me</span>
+<span>点击现场到岗打卡</span>
+</button>
+</div>
+</div>
+</section>
+<!-- 步骤 2：完工照片与证据留存 -->
+<section class="px-screen-margin py-spacing-xs">
+<div class="bg-surface-container-lowest p-card-padding rounded-xl shadow-sm">
+<div class="flex items-center justify-between mb-spacing-sm">
+<div class="flex items-center gap-2">
+<span class="w-6 h-6 rounded-full bg-primary text-on-primary font-label-md text-label-md flex items-center justify-center font-bold">2</span>
+<h3 class="font-headline-sm text-headline-sm text-on-surface font-semibold">完工照片与证据留存</h3>
+</div>
+<span class="px-2 py-0.5 rounded bg-error-container text-on-error-container font-label-sm text-label-sm">必填存证</span>
+</div>
+<!-- 维修前：报修图 -->
+<div class="mb-spacing-md">
+<div class="flex items-center justify-between mb-2">
+<span class="font-label-md text-label-md text-on-surface font-semibold">维修前照片 (已同步业主报修图 1 张)</span>
+<span class="font-label-sm text-label-sm text-on-surface-variant">2024-10-28 14:10</span>
+</div>
+<div class="w-24 h-24 rounded-lg overflow-hidden relative shadow-sm">
+<img class="w-full h-full object-cover" data-alt="Close up photograph of a leaking indoor brass water pipe underneath a residential kitchen sink, water droplets actively spraying out from damaged valve thread, realistic documentary property inspection style, authentic lighting with sharp details" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBO_ISewJbxg4PLCgaSUAoiTdVGf15OjX3Ch443uOR56V_iBPSR8EdLwaPyug0iGIyD4M-OjWBvh6ctRvvdqjzNdOQCb0CYVY5S3D5ATj7HijncdRMBrK8jXnP-oCUGllV7yy4E-zUNfmIpOs-vgNFAsgbVtuRJhWefpZZD7Q9b8-lhhdA5UWOg_cYYnNbW0P9_4I7LsGFLY0XQN0B-CENx_GKwt7t29Kb73MvUEE6CZlRGJ3pXdUl5">
+<span class="absolute bottom-1 right-1 bg-inverse-surface/80 text-inverse-on-surface font-label-sm text-label-sm px-1.5 py-0.5 rounded backdrop-blur-sm">报修原图</span>
+</div>
+</div>
+<!-- 维修后：完工上传区 -->
+<div>
+<div class="flex items-center justify-between mb-2">
+<div class="flex items-center gap-1">
+<span class="font-label-md text-label-md text-on-surface font-semibold">维修后完工照片</span>
+<span class="text-error font-bold text-xs">*</span>
+<span class="font-label-sm text-label-sm text-on-surface-variant">(现场修复实拍，防纠纷)</span>
+</div>
+<span class="font-label-sm text-label-sm text-primary font-medium">已传 2/4 张</span>
+</div>
+<!-- 照片网格 -->
+<div class="grid grid-cols-3 gap-2.5">
+<!-- 实拍预览 1 -->
+<div class="aspect-square rounded-lg overflow-hidden relative shadow-sm group">
+<img class="w-full h-full object-cover" data-alt="High detail macro photograph of a newly installed polished brass corner angle valve installed beneath a kitchen sink counter, clean plumbing workmanship, dry sparkling clean tile background, crisp lighting, soft jade reflection tones" src="https://lh3.googleusercontent.com/aida-public/AB6AXuA9ZESqCcvfOLB-BF7mMFndefl-yzCH2VJjv8ZrtMAK5hnWLqWG0Jfrl7gy8I3gemwZidtKbkIM05GaFYjq-909bHVvfwzHzKZZRdR4YACRLb6wUTnLPyRkm0w7bCiEspo4pW5CXFW37Syw4A0T9Luzglfo9pvomPoIpZnC3PQ2zUq1HK2Tp_DfemB-tfTuEB3Wc749-1rATET8D0pgjRgz6Ir9uhEW1iHsJQrc29PShMYeHx5wHEO6">
+<span class="absolute top-1 left-1 bg-primary/90 text-on-primary font-label-sm text-label-sm px-1 rounded">更换新角阀</span>
+<button aria-label="删除图片" class="absolute top-1 right-1 w-5 h-5 rounded-full bg-inverse-surface/70 text-inverse-on-surface flex items-center justify-center">
+<span class="material-symbols-outlined text-[12px]">close</span>
+</button>
+</div>
+<!-- 实拍预览 2 -->
+<div class="aspect-square rounded-lg overflow-hidden relative shadow-sm group">
+<img class="w-full h-full object-cover" data-alt="Clean closeup view of repaired white PPR domestic water pipe neatly wrapped with white Teflon plumber tape, completely dry and clean joint without any water leakage, bright modern utility room lighting, crisp professional quality" src="https://lh3.googleusercontent.com/aida-public/AB6AXuA3mMnQM-nYFh7fZv_LTvvGOA-bF5j873uzsIx2LM1vE_fsDSOxfdx4ltgJ37hRcERxy3YxGE5gvwk6Tnmn3c4Ma_6QGLMmbW1lom0C-O9NNA31mIo5v5rEGYvgasrK8zzdqaXKR73jfzwRtUk8WDf5B1XNUQ-_c1Zl9KC4yF_eXgFDEA00JYRWPJ5vJAujoTRBMwf-uYwBGDJNi4reVRqgsv-j3_iiyeJhT1BUwI4NgMRBH8BRwCi4">
+<span class="absolute top-1 left-1 bg-primary/90 text-on-primary font-label-sm text-label-sm px-1 rounded">焊接处干爽</span>
+<button aria-label="删除图片" class="absolute top-1 right-1 w-5 h-5 rounded-full bg-inverse-surface/70 text-inverse-on-surface flex items-center justify-center">
+<span class="material-symbols-outlined text-[12px]">close</span>
+</button>
+</div>
+<!-- 继续拍照上传按钮 -->
+<div class="aspect-square rounded-lg bg-surface-container-low active:bg-surface-container flex flex-col items-center justify-center text-on-surface-variant cursor-pointer transition-colors">
+<span class="material-symbols-outlined text-[26px] text-primary">add_a_photo</span>
+<span class="font-label-sm text-label-sm mt-1 text-on-surface-variant font-medium">+ 拍照/上传</span>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- 步骤 3：收费项目明细 -->
+<section class="px-screen-margin py-spacing-xs">
+<div class="bg-surface-container-lowest p-card-padding rounded-xl shadow-sm">
+<div class="flex items-center justify-between mb-spacing-xs">
+<div class="flex items-center gap-2">
+<span class="w-6 h-6 rounded-full bg-primary text-on-primary font-label-md text-label-md flex items-center justify-center font-bold">3</span>
+<h3 class="font-headline-sm text-headline-sm text-on-surface font-semibold">收费项目明细</h3>
+</div>
+<span class="font-label-sm text-label-sm text-secondary bg-surface-container-low px-2 py-0.5 rounded-full font-medium">明码标价·无隐形费用</span>
+</div>
+<!-- 政策依据标牌 -->
+<div class="flex items-center gap-1.5 px-3 py-2 rounded-lg bg-surface-container-low text-on-surface-variant mb-spacing-sm">
+<span class="material-symbols-outlined text-[16px] text-secondary">gavel</span>
+<span class="font-label-sm text-label-sm truncate">依据《彭一物业便民维修明码标价目录2024版》</span>
+</div>
+<!-- 收费条目列表 -->
+<div class="space-y-spacing-xs">
+<!-- 项目一 -->
+<div class="p-2.5 rounded-lg bg-surface-container-low/60 flex items-start justify-between gap-2">
+<div class="min-w-0">
+<div class="flex items-center gap-1.5 flex-wrap">
+<h4 class="font-body-md text-body-md text-on-surface font-semibold">上门基础排查与工时费</h4>
+<span class="px-1.5 py-0.2 rounded bg-surface-container-high text-on-secondary-container font-label-sm text-label-sm">包干免首半小时</span>
+</div>
+<p class="font-body-sm text-body-sm text-on-surface-variant mt-0.5">物业费权益已覆盖（首30分钟无收费）</p>
+</div>
+<div class="text-right whitespace-nowrap">
+<span class="font-headline-sm text-headline-sm text-on-surface line-through text-opacity-50">¥30.00</span>
+<div class="font-label-md text-label-md text-primary font-bold">¥0.00</div>
+</div>
+</div>
+<!-- 项目二 -->
+<div class="p-2.5 rounded-lg bg-surface-container-low/60 flex items-start justify-between gap-2">
+<div class="min-w-0">
+<div class="flex items-center gap-1.5">
+<h4 class="font-body-md text-body-md text-on-surface font-semibold">PPR热熔水管断裂焊接修复</h4>
+<span class="px-1.5 py-0.2 rounded bg-surface-container text-on-surface-variant font-label-sm text-label-sm">工时定额</span>
+</div>
+<p class="font-body-sm text-body-sm text-on-surface-variant mt-0.5">管道切割、双向热熔管箍对接加压测试</p>
+</div>
+<div class="text-right whitespace-nowrap">
+<span class="font-headline-sm text-headline-sm text-on-surface font-bold">¥35.00</span>
+</div>
+</div>
+<!-- 项目三 -->
+<div class="p-2.5 rounded-lg bg-surface-container-low/60 flex items-start justify-between gap-2">
+<div class="min-w-0">
+<div class="flex items-center gap-1.5 flex-wrap">
+<h4 class="font-body-md text-body-md text-on-surface font-semibold">九牧高压防爆角阀</h4>
+<span class="px-1.5 py-0.2 rounded bg-primary/10 text-primary font-label-sm text-label-sm">国标原厂保1年</span>
+</div>
+<div class="flex items-center gap-1 mt-0.5 text-on-surface-variant font-body-sm text-body-sm">
+<span class="material-symbols-outlined text-[13px] text-primary">qr_code_scanner</span>
+<span>条码: JM-88219-X <span class="text-secondary">(扫码真伪溯源)</span></span>
+</div>
+</div>
+<div class="text-right whitespace-nowrap">
+<span class="font-headline-sm text-headline-sm text-on-surface font-bold">¥28.00</span>
+</div>
+</div>
+<!-- 项目四 -->
+<div class="p-2.5 rounded-lg bg-surface-container-low/60 flex items-start justify-between gap-2">
+<div class="min-w-0">
+<h4 class="font-body-md text-body-md text-on-surface font-semibold">耐高温加厚生料带辅料</h4>
+<p class="font-body-sm text-body-sm text-on-surface-variant mt-0.5">防渗漏密封生料带缠绕消耗</p>
+</div>
+<div class="text-right whitespace-nowrap">
+<span class="font-headline-sm text-headline-sm text-on-surface font-bold">¥5.00</span>
+</div>
+</div>
+</div>
+<!-- 添加其他耗材入口 -->
+<button class="mt-spacing-sm w-full py-2 rounded-lg bg-surface-container-low text-primary font-label-md text-label-md font-semibold flex items-center justify-center gap-1.5 active:bg-surface-container transition-colors">
+<span class="material-symbols-outlined text-[16px]">library_add</span>
+<span>+ 添加其他明码标价配件/耗材项</span>
+</button>
+<!-- 费用汇总小结卡片 -->
+<div class="mt-spacing-sm pt-spacing-sm bg-surface-container-low/80 p-3 rounded-lg flex flex-col gap-1.5">
+<div class="flex justify-between items-center font-body-sm text-body-sm text-on-surface-variant">
+<span>材料配件费小计:</span>
+<span class="font-semibold text-on-surface">¥33.00</span>
+</div>
+<div class="flex justify-between items-center font-body-sm text-body-sm text-on-surface-variant">
+<span>维修工时费小计:</span>
+<span class="font-semibold text-on-surface">¥35.00</span>
+</div>
+<div class="flex justify-between items-center font-body-sm text-body-sm text-on-surface-variant">
+<span>便民优惠及物业抵扣:</span>
+<span class="text-secondary font-semibold">-¥30.00</span>
+</div>
+<div class="pt-1.5 mt-1 flex justify-between items-baseline">
+<span class="font-headline-sm text-headline-sm text-on-surface font-bold">实付应收总计</span>
+<div class="flex items-baseline gap-0.5 text-primary">
+<span class="font-label-md text-label-md font-bold">¥</span>
+<span class="font-display-lg text-display-lg font-bold tracking-tight">68.00</span>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- 步骤 4：完工确认与收款方式 -->
+<section class="px-screen-margin py-spacing-xs">
+<div class="bg-surface-container-lowest p-card-padding rounded-xl shadow-sm">
+<div class="flex items-center gap-2 mb-spacing-sm">
+<span class="w-6 h-6 rounded-full bg-primary text-on-primary font-label-md text-label-md flex items-center justify-center font-bold">4</span>
+<h3 class="font-headline-sm text-headline-sm text-on-surface font-semibold">结算方式选择</h3>
+</div>
+<!-- 单选列表 -->
+<div class="space-y-2" id="payment-options">
+<!-- 方式1：线上支付 (推荐) -->
+<label class="flex items-center justify-between p-3 rounded-lg bg-surface-container cursor-pointer transition-all payment-option" data-pay="online">
+<div class="flex items-center gap-3">
+<div class="w-8 h-8 rounded-full bg-primary text-on-primary flex items-center justify-center">
+<span class="material-symbols-outlined text-[18px]">qr_code_2</span>
+</div>
+<div>
+<div class="flex items-center gap-1.5">
+<span class="font-body-md text-body-md text-on-surface font-bold">居民端线上微信支付</span>
+<span class="px-1.5 py-0.2 rounded-full bg-tertiary-container text-on-tertiary-container font-label-sm text-label-sm font-bold">官方推荐</span>
+</div>
+<p class="font-body-sm text-body-sm text-on-surface-variant">推送至业主微信，在线查验无误后实时支付入账</p>
+</div>
+</div>
+<span class="material-symbols-outlined text-primary text-[22px] option-check">radio_button_checked</span>
+</label>
+<!-- 方式2：现金/师傅代收 -->
+<label class="flex items-center justify-between p-3 rounded-lg bg-surface-container-low cursor-pointer transition-all payment-option" data-pay="offline">
+<div class="flex items-center gap-3">
+<div class="w-8 h-8 rounded-full bg-surface-container-high text-on-surface flex items-center justify-center">
+<span class="material-symbols-outlined text-[18px]">payments</span>
+</div>
+<div>
+<span class="font-body-md text-body-md text-on-surface font-medium">现金 / 师傅线下代收</span>
+<p class="font-body-sm text-body-sm text-on-surface-variant">适合高龄居民，现场收取现金后师傅后台代缴转账</p>
+</div>
+</div>
+<span class="material-symbols-outlined text-outline-variant text-[22px] option-check">radio_button_unchecked</span>
+</label>
+<!-- 方式3：物业公区记账 -->
+<label class="flex items-center justify-between p-3 rounded-lg bg-surface-container-low cursor-pointer transition-all payment-option" data-pay="public">
+<div class="flex items-center gap-3">
+<div class="w-8 h-8 rounded-full bg-surface-container-high text-on-surface flex items-center justify-center">
+<span class="material-symbols-outlined text-[18px]">apartment</span>
+</div>
+<div>
+<span class="font-body-md text-body-md text-on-surface font-medium">记入物业公区维护账目</span>
+<p class="font-body-sm text-body-sm text-on-surface-variant">公用部位公共管网故障，费用经核验由公维金支付</p>
+</div>
+</div>
+<span class="material-symbols-outlined text-outline-variant text-[22px] option-check">radio_button_unchecked</span>
+</label>
+</div>
+</div>
+</section>
+<!-- 底部固定大操作栏 (Floating Action Dock) -->
+<div class="fixed bottom-0 left-0 right-0 z-40 bg-surface-container-lowest/95 backdrop-blur-xl shadow-lg px-screen-margin pt-3 pb-safe">
+<div class="flex items-center gap-3 pb-3">
+<!-- 快捷电话呼叫按钮 -->
+<a aria-label="拨打业主电话" class="w-12 h-12 rounded-full bg-surface-container text-primary flex items-center justify-center shrink-0 active:scale-90 transition-transform" href="tel:13812345678">
+<span class="material-symbols-outlined text-[24px]">phone_in_talk</span>
+</a>
+<!-- 核心提交大按钮 -->
+<button class="flex-1 h-12 rounded-full bg-primary text-on-primary font-headline-sm text-headline-sm font-bold flex items-center justify-center gap-2 shadow-sm active:scale-95 transition-all" onclick="submitOrder()">
+<span class="material-symbols-outlined text-[22px]">check_circle</span>
+<span>提交完工并推送账单 (¥68.00)</span>
+</button>
+</div>
+</div>
+</div>
+<script>
+  // 简易支付单选切换交互
+  const options = document.querySelectorAll('.payment-option');
+  options.forEach(opt => {
+    opt.addEventListener('click', () => {
+      options.forEach(item => {
+        item.classList.remove('bg-surface-container');
+        item.classList.add('bg-surface-container-low');
+        const icon = item.querySelector('.option-check');
+        icon.innerText = 'radio_button_unchecked';
+        icon.classList.remove('text-primary');
+        icon.classList.add('text-outline-variant');
+      });
+      opt.classList.remove('bg-surface-container-low');
+      opt.classList.add('bg-surface-container');
+      const activeIcon = opt.querySelector('.option-check');
+      activeIcon.innerText = 'radio_button_checked';
+      activeIcon.classList.remove('text-outline-variant');
+      activeIcon.classList.add('text-primary');
+    });
+  });
+
+  // 打卡状态微交互
+  let isChecked = true;
+  function toggleCheckin() {
+    isChecked = !isChecked;
+    const checkedState = document.getElementById('checked-state');
+    const checkinBtn = document.getElementById('checkin-btn');
+    if (isChecked) {
+      checkedState.classList.remove('hidden');
+      checkinBtn.classList.add('hidden');
+    } else {
+      checkedState.classList.add('hidden');
+      checkinBtn.classList.remove('hidden');
+    }
+  }
+
+  // 完工提交轻量反馈
+  function submitOrder() {
+    const btn = event.currentTarget;
+    btn.innerHTML = '<span class="material-symbols-outlined animate-spin text-[20px]">progress_activity</span> 正在推送核实中...';
+    setTimeout(() => {
+      btn.classList.remove('bg-primary');
+      btn.classList.add('bg-secondary');
+      btn.innerHTML = '<span class="material-symbols-outlined text-[20px]">done_all</span> 账单已送达业主手机';
+    }, 900);
+  }
+</script></main></body></html>

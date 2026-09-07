@@ -1,0 +1,3923 @@
+[
+  {
+    "key": "overview",
+    "path": "/web/overview",
+    "file": "web/_1/code.html",
+    "name": "调度概览工作台",
+    "group": "web",
+    "level": 1,
+    "controls": [
+      {
+        "index": 0,
+        "tag": "div",
+        "id": "",
+        "text": "location_city彭一智慧社区示范区unfold_more"
+      },
+      {
+        "index": 1,
+        "tag": "a",
+        "id": "",
+        "text": "space_dashboard调度概览工作台",
+        "href": "#"
+      },
+      {
+        "index": 2,
+        "tag": "a",
+        "id": "",
+        "text": "assignment_turned_in工单派发与调度12",
+        "href": "#"
+      },
+      {
+        "index": 3,
+        "tag": "a",
+        "id": "",
+        "text": "account_balance_wallet物业财务收缴中心",
+        "href": "#"
+      },
+      {
+        "index": 4,
+        "tag": "a",
+        "id": "",
+        "text": "payments物业支出管理",
+        "href": "#"
+      },
+      {
+        "index": 5,
+        "tag": "a",
+        "id": "",
+        "text": "home_repair_service维修基金支出管理",
+        "href": "#"
+      },
+      {
+        "index": 6,
+        "tag": "a",
+        "id": "",
+        "text": "podcasts声边融媒体采编采集",
+        "href": "#"
+      },
+      {
+        "index": 7,
+        "tag": "a",
+        "id": "",
+        "text": "campaign紧急通知与广播volume_up",
+        "href": "#"
+      },
+      {
+        "index": 8,
+        "tag": "a",
+        "id": "",
+        "text": "domain房产与居民管理",
+        "href": "#"
+      },
+      {
+        "index": 9,
+        "tag": "a",
+        "id": "",
+        "text": "manage_accounts系统与权限设置",
+        "href": "#"
+      },
+      {
+        "index": 10,
+        "tag": "button",
+        "id": "",
+        "text": "lock"
+      },
+      {
+        "index": 11,
+        "tag": "a",
+        "id": "",
+        "text": "logout",
+        "href": "#"
+      },
+      {
+        "index": 12,
+        "tag": "input",
+        "id": "",
+        "text": "",
+        "placeholder": "搜索房号(如502)/工单号/业主手机..."
+      },
+      {
+        "index": 13,
+        "tag": "button",
+        "id": "",
+        "text": "warning一键紧急广播"
+      },
+      {
+        "index": 14,
+        "tag": "button",
+        "id": "",
+        "text": "add新建工单"
+      },
+      {
+        "index": 15,
+        "tag": "button",
+        "id": "",
+        "text": "mic"
+      },
+      {
+        "index": 16,
+        "tag": "button",
+        "id": "",
+        "text": "notifications"
+      },
+      {
+        "index": 17,
+        "tag": "button",
+        "id": "",
+        "text": "fullscreen"
+      },
+      {
+        "index": 18,
+        "tag": "div",
+        "id": "",
+        "text": "person"
+      },
+      {
+        "index": 19,
+        "tag": "button",
+        "id": "",
+        "text": "send 一键催缴"
+      },
+      {
+        "index": 20,
+        "tag": "button",
+        "id": "",
+        "text": "tune 高级筛选"
+      },
+      {
+        "index": 21,
+        "tag": "button",
+        "id": "",
+        "text": "smart_toy 智能一键分派 (4)"
+      },
+      {
+        "index": 22,
+        "tag": "button",
+        "id": "",
+        "text": "全部工单 (18)"
+      },
+      {
+        "index": 23,
+        "tag": "button",
+        "id": "",
+        "text": "紧急报修"
+      },
+      {
+        "index": 24,
+        "tag": "button",
+        "id": "",
+        "text": "水暖电路 (8)"
+      },
+      {
+        "index": 25,
+        "tag": "button",
+        "id": "",
+        "text": "公区维保 (5)"
+      },
+      {
+        "index": 26,
+        "tag": "input",
+        "id": "",
+        "text": "",
+        "placeholder": "搜索报修房号/业主/工单号..."
+      },
+      {
+        "index": 27,
+        "tag": "img",
+        "id": "",
+        "text": ""
+      },
+      {
+        "index": 28,
+        "tag": "img",
+        "id": "",
+        "text": ""
+      },
+      {
+        "index": 29,
+        "tag": "button",
+        "id": "",
+        "text": "派工 (张师傅)"
+      },
+      {
+        "index": 30,
+        "tag": "button",
+        "id": "",
+        "text": "more_vert"
+      },
+      {
+        "index": 31,
+        "tag": "img",
+        "id": "",
+        "text": ""
+      },
+      {
+        "index": 32,
+        "tag": "button",
+        "id": "",
+        "text": "查看轨迹"
+      },
+      {
+        "index": 33,
+        "tag": "button",
+        "id": "",
+        "text": "more_vert"
+      },
+      {
+        "index": 34,
+        "tag": "img",
+        "id": "",
+        "text": ""
+      },
+      {
+        "index": 35,
+        "tag": "button",
+        "id": "",
+        "text": "查看回执"
+      },
+      {
+        "index": 36,
+        "tag": "button",
+        "id": "",
+        "text": "more_vert"
+      },
+      {
+        "index": 37,
+        "tag": "button",
+        "id": "",
+        "text": "<"
+      },
+      {
+        "index": 38,
+        "tag": "button",
+        "id": "",
+        "text": "2"
+      },
+      {
+        "index": 39,
+        "tag": "button",
+        "id": "",
+        "text": ">"
+      },
+      {
+        "index": 40,
+        "tag": "button",
+        "id": "",
+        "text": "进入财务对账专区 arrow_forward"
+      },
+      {
+        "index": 41,
+        "tag": "button",
+        "id": "",
+        "text": "推催缴通知"
+      },
+      {
+        "index": 42,
+        "tag": "button",
+        "id": "",
+        "text": "推催缴通知"
+      },
+      {
+        "index": 43,
+        "tag": "button",
+        "id": "",
+        "text": "推催缴通知"
+      }
+    ]
+  },
+  {
+    "key": "work-orders",
+    "path": "/web/work-orders",
+    "file": "web/_2/code.html",
+    "name": "工单派发与调度",
+    "group": "web",
+    "level": 1,
+    "controls": [
+      {
+        "index": 0,
+        "tag": "div",
+        "id": "",
+        "text": "location_city彭一智慧社区示范区unfold_more"
+      },
+      {
+        "index": 1,
+        "tag": "a",
+        "id": "",
+        "text": "space_dashboard调度概览工作台",
+        "href": "#"
+      },
+      {
+        "index": 2,
+        "tag": "a",
+        "id": "",
+        "text": "assignment_turned_in工单派发与调度12",
+        "href": "#"
+      },
+      {
+        "index": 3,
+        "tag": "a",
+        "id": "",
+        "text": "account_balance_wallet物业财务收缴中心",
+        "href": "#"
+      },
+      {
+        "index": 4,
+        "tag": "a",
+        "id": "",
+        "text": "payments物业支出管理",
+        "href": "#"
+      },
+      {
+        "index": 5,
+        "tag": "a",
+        "id": "",
+        "text": "home_repair_service维修基金支出管理",
+        "href": "#"
+      },
+      {
+        "index": 6,
+        "tag": "a",
+        "id": "",
+        "text": "podcasts声边融媒体采编采集",
+        "href": "#"
+      },
+      {
+        "index": 7,
+        "tag": "a",
+        "id": "",
+        "text": "campaign紧急通知与广播volume_up",
+        "href": "#"
+      },
+      {
+        "index": 8,
+        "tag": "a",
+        "id": "",
+        "text": "domain房产与居民管理",
+        "href": "#"
+      },
+      {
+        "index": 9,
+        "tag": "a",
+        "id": "",
+        "text": "manage_accounts系统与权限设置",
+        "href": "#"
+      },
+      {
+        "index": 10,
+        "tag": "button",
+        "id": "",
+        "text": "lock"
+      },
+      {
+        "index": 11,
+        "tag": "a",
+        "id": "",
+        "text": "logout",
+        "href": "#"
+      },
+      {
+        "index": 12,
+        "tag": "input",
+        "id": "",
+        "text": "",
+        "placeholder": "搜索房号(如502)/工单号/业主手机..."
+      },
+      {
+        "index": 13,
+        "tag": "button",
+        "id": "",
+        "text": "warning一键紧急广播"
+      },
+      {
+        "index": 14,
+        "tag": "button",
+        "id": "",
+        "text": "add新建工单"
+      },
+      {
+        "index": 15,
+        "tag": "button",
+        "id": "",
+        "text": "mic"
+      },
+      {
+        "index": 16,
+        "tag": "button",
+        "id": "",
+        "text": "notifications"
+      },
+      {
+        "index": 17,
+        "tag": "button",
+        "id": "",
+        "text": "fullscreen"
+      },
+      {
+        "index": 18,
+        "tag": "div",
+        "id": "",
+        "text": "person"
+      },
+      {
+        "index": 19,
+        "tag": "button",
+        "id": "",
+        "text": "全部 (25)"
+      },
+      {
+        "index": 20,
+        "tag": "button",
+        "id": "",
+        "text": "待派发 4"
+      },
+      {
+        "index": 21,
+        "tag": "button",
+        "id": "",
+        "text": "已接单 (6)"
+      },
+      {
+        "index": 22,
+        "tag": "button",
+        "id": "",
+        "text": "已到达 (2)"
+      },
+      {
+        "index": 23,
+        "tag": "button",
+        "id": "",
+        "text": "处理中 (3)"
+      },
+      {
+        "index": 24,
+        "tag": "button",
+        "id": "",
+        "text": "已完工验收 (12)"
+      },
+      {
+        "index": 25,
+        "tag": "button",
+        "id": "",
+        "text": "sync"
+      },
+      {
+        "index": 26,
+        "tag": "button",
+        "id": "",
+        "text": "download 导出调度表"
+      },
+      {
+        "index": 27,
+        "tag": "input",
+        "id": "",
+        "text": "",
+        "placeholder": "楼栋房号 (如 16-2-502)"
+      },
+      {
+        "index": 28,
+        "tag": "select",
+        "id": "",
+        "text": "全部报修分类 (水暖/强弱电/安防...) 水暖卫浴 强弱电路 门禁安防 公区修缮 绿化保洁"
+      },
+      {
+        "index": 29,
+        "tag": "select",
+        "id": "",
+        "text": "全部紧急等级 紧急工单 (红色警报) 普通报修 定期维保"
+      },
+      {
+        "index": 30,
+        "tag": "select",
+        "id": "",
+        "text": "全部值班师傅 (14人在岗) 张建国 (水暖主管 · 工号 E-1024) 王德利 (强电技师 · 工号 E-1029) 刘建军 (智能弱电 · 工号 E-1031) 陈大华 (综合修缮 · 工号 E-1045)"
+      },
+      {
+        "index": 31,
+        "tag": "input",
+        "id": "",
+        "text": ""
+      },
+      {
+        "index": 32,
+        "tag": "button",
+        "id": "",
+        "text": "查看轨迹详情"
+      },
+      {
+        "index": 33,
+        "tag": "button",
+        "id": "",
+        "text": "person_add 立即指派师傅"
+      },
+      {
+        "index": 34,
+        "tag": "button",
+        "id": "",
+        "text": "催促签到"
+      },
+      {
+        "index": 35,
+        "tag": "button",
+        "id": "",
+        "text": "改派他人"
+      },
+      {
+        "index": 36,
+        "tag": "button",
+        "id": "",
+        "text": "联系师傅"
+      },
+      {
+        "index": 37,
+        "tag": "button",
+        "id": "",
+        "text": "实时工况查看"
+      },
+      {
+        "index": 38,
+        "tag": "button",
+        "id": "",
+        "text": "chevron_left"
+      },
+      {
+        "index": 39,
+        "tag": "button",
+        "id": "",
+        "text": "1"
+      },
+      {
+        "index": 40,
+        "tag": "button",
+        "id": "",
+        "text": "2"
+      },
+      {
+        "index": 41,
+        "tag": "button",
+        "id": "",
+        "text": "3"
+      },
+      {
+        "index": 42,
+        "tag": "button",
+        "id": "",
+        "text": "chevron_right"
+      },
+      {
+        "index": 43,
+        "tag": "button",
+        "id": "",
+        "text": "play_arrow"
+      },
+      {
+        "index": 44,
+        "tag": "img",
+        "id": "",
+        "text": ""
+      },
+      {
+        "index": 45,
+        "tag": "img",
+        "id": "",
+        "text": ""
+      },
+      {
+        "index": 46,
+        "tag": "img",
+        "id": "",
+        "text": ""
+      },
+      {
+        "index": 47,
+        "tag": "button",
+        "id": "",
+        "text": "call 联系师傅 (138****8891)"
+      },
+      {
+        "index": 48,
+        "tag": "button",
+        "id": "",
+        "text": "phone_iphone 联系业主 (139****7721)"
+      },
+      {
+        "index": 49,
+        "tag": "button",
+        "id": "",
+        "text": "cached 发起转单/协办"
+      },
+      {
+        "index": 50,
+        "tag": "button",
+        "id": "",
+        "text": "print 打印工单履约凭证"
+      },
+      {
+        "index": 51,
+        "tag": "button",
+        "id": "",
+        "text": "一键派发"
+      },
+      {
+        "index": 52,
+        "tag": "button",
+        "id": "",
+        "text": "指派此人"
+      },
+      {
+        "index": 53,
+        "tag": "button",
+        "id": "",
+        "text": "排队顺延"
+      }
+    ]
+  },
+  {
+    "key": "expenses",
+    "path": "/web/expenses",
+    "file": "web/_3/code.html",
+    "name": "物业支出管理",
+    "group": "web",
+    "level": 1,
+    "controls": [
+      {
+        "index": 0,
+        "tag": "div",
+        "id": "",
+        "text": "location_city彭一智慧社区示范区unfold_more"
+      },
+      {
+        "index": 1,
+        "tag": "a",
+        "id": "",
+        "text": "space_dashboard调度概览工作台",
+        "href": "#"
+      },
+      {
+        "index": 2,
+        "tag": "a",
+        "id": "",
+        "text": "assignment_turned_in工单派发与调度12",
+        "href": "#"
+      },
+      {
+        "index": 3,
+        "tag": "a",
+        "id": "",
+        "text": "account_balance_wallet物业财务收缴中心",
+        "href": "#"
+      },
+      {
+        "index": 4,
+        "tag": "a",
+        "id": "",
+        "text": "podcasts声边融媒体采编采集",
+        "href": "#"
+      },
+      {
+        "index": 5,
+        "tag": "a",
+        "id": "",
+        "text": "campaign紧急通知与广播volume_up",
+        "href": "#"
+      },
+      {
+        "index": 6,
+        "tag": "a",
+        "id": "",
+        "text": "domain房产与居民管理",
+        "href": "#"
+      },
+      {
+        "index": 7,
+        "tag": "a",
+        "id": "",
+        "text": "manage_accounts系统与权限设置",
+        "href": "#"
+      },
+      {
+        "index": 8,
+        "tag": "button",
+        "id": "",
+        "text": "lock"
+      },
+      {
+        "index": 9,
+        "tag": "a",
+        "id": "",
+        "text": "logout",
+        "href": "#"
+      },
+      {
+        "index": 10,
+        "tag": "input",
+        "id": "",
+        "text": "",
+        "placeholder": "搜索房号(如502)/工单号/业主手机..."
+      },
+      {
+        "index": 11,
+        "tag": "button",
+        "id": "",
+        "text": "warning一键紧急广播"
+      },
+      {
+        "index": 12,
+        "tag": "button",
+        "id": "",
+        "text": "add新建工单"
+      },
+      {
+        "index": 13,
+        "tag": "button",
+        "id": "",
+        "text": "mic"
+      },
+      {
+        "index": 14,
+        "tag": "button",
+        "id": "",
+        "text": "notifications"
+      },
+      {
+        "index": 15,
+        "tag": "button",
+        "id": "",
+        "text": "fullscreen"
+      },
+      {
+        "index": 16,
+        "tag": "div",
+        "id": "",
+        "text": "person"
+      },
+      {
+        "index": 17,
+        "tag": "button",
+        "id": "btn-export-inspect",
+        "text": "print 凭证"
+      },
+      {
+        "index": 18,
+        "tag": "button",
+        "id": "btn-action-primary",
+        "text": "verified 重新打印凭证"
+      },
+      {
+        "index": 19,
+        "tag": "div",
+        "id": "",
+        "text": "zoom_in"
+      },
+      {
+        "index": 20,
+        "tag": "input",
+        "id": "search-input",
+        "text": "",
+        "placeholder": "搜索单号、经办人、费用类型..."
+      },
+      {
+        "index": 21,
+        "tag": "select",
+        "id": "",
+        "text": "全部分类 (全部支出) 公区能耗水电 绿化保洁外包 工程维保零配件 消防维保检测 人员薪酬与社保"
+      },
+      {
+        "index": 22,
+        "tag": "button",
+        "id": "",
+        "text": "本月记账"
+      },
+      {
+        "index": 23,
+        "tag": "button",
+        "id": "",
+        "text": "历史账单"
+      },
+      {
+        "index": 24,
+        "tag": "button",
+        "id": "",
+        "text": "file_download"
+      },
+      {
+        "index": 25,
+        "tag": "input",
+        "id": "",
+        "text": ""
+      },
+      {
+        "index": 26,
+        "tag": "tr",
+        "id": "",
+        "text": "EX-20241024-001 bolt 公区能耗水电 ¥38,420.00 工程运维部 (周建国) 2024-10-24 银行对公转账 已付款"
+      },
+      {
+        "index": 27,
+        "tag": "input",
+        "id": "",
+        "text": ""
+      },
+      {
+        "index": 28,
+        "tag": "tr",
+        "id": "",
+        "text": "EX-20241022-045 park 绿化保洁外包 ¥12,800.00 环境绿化部 (陈阿妹) 2024-10-22 银行对公转账 待审批"
+      },
+      {
+        "index": 29,
+        "tag": "input",
+        "id": "",
+        "text": ""
+      },
+      {
+        "index": 30,
+        "tag": "tr",
+        "id": "",
+        "text": "EX-20241021-012 build 工程维保零配件 ¥4,350.00 工程维修组 (刘师傅) 2024-10-21 管理处备用金 审批中"
+      },
+      {
+        "index": 31,
+        "tag": "input",
+        "id": "",
+        "text": ""
+      },
+      {
+        "index": 32,
+        "tag": "tr",
+        "id": "",
+        "text": "EX-20241019-009 local_fire_department 消防维保检测 ¥7,450.00 安全保卫部 (孙浩) 2024-10-19 银行对公转账 待审批"
+      },
+      {
+        "index": 33,
+        "tag": "input",
+        "id": "",
+        "text": ""
+      },
+      {
+        "index": 34,
+        "tag": "tr",
+        "id": "",
+        "text": "EX-20241018-088 description 办公耗材 ¥1,640.00 综合客服部 (王晓) 2024-10-18 快捷扣费 已付款"
+      },
+      {
+        "index": 35,
+        "tag": "input",
+        "id": "",
+        "text": ""
+      },
+      {
+        "index": 36,
+        "tag": "tr",
+        "id": "",
+        "text": "EX-20241015-003 badge 人员薪酬与社保 ¥68,500.00 人事行政部 (赵敏) 2024-10-15 银行对公转账 已付款"
+      },
+      {
+        "index": 37,
+        "tag": "input",
+        "id": "",
+        "text": ""
+      },
+      {
+        "index": 38,
+        "tag": "button",
+        "id": "",
+        "text": "chevron_left"
+      },
+      {
+        "index": 39,
+        "tag": "button",
+        "id": "",
+        "text": "chevron_right"
+      },
+      {
+        "index": 40,
+        "tag": "button",
+        "id": "btn-reset-form",
+        "text": "清空"
+      },
+      {
+        "index": 41,
+        "tag": "select",
+        "id": "form-category",
+        "text": "公区能耗水电 (水暖电费) 绿化保洁外包 (园林修剪消杀) 工程维保零配件 (机电加压电梯) 消防维保检测 (水压喷淋监测) 安保秩序服务 (门岗道闸维护) 人员薪酬与社保 (值班/外聘) 办公耗材物料 (前台用纸用墨)"
+      },
+      {
+        "index": 42,
+        "tag": "input",
+        "id": "form-amount",
+        "text": "",
+        "placeholder": "0.00"
+      },
+      {
+        "index": 43,
+        "tag": "input",
+        "id": "form-applicant",
+        "text": ""
+      },
+      {
+        "index": 44,
+        "tag": "select",
+        "id": "form-dept",
+        "text": "工程运维部 综合客服部 环境绿化部 安全保卫部 人事行政部"
+      },
+      {
+        "index": 45,
+        "tag": "input",
+        "id": "form-payee",
+        "text": "",
+        "placeholder": "例如：国网上海市电力公司 / 绿洁生态工程有限公司"
+      },
+      {
+        "index": 46,
+        "tag": "select",
+        "id": "form-channel",
+        "text": "银行对公转账 管理处备用金 快捷电子扣费"
+      },
+      {
+        "index": 47,
+        "tag": "input",
+        "id": "form-taxno",
+        "text": "",
+        "placeholder": "选填，如 FP-2024..."
+      },
+      {
+        "index": 48,
+        "tag": "div",
+        "id": "",
+        "text": "cloud_upload 点击或拖拽发票文件/转账截屏至此处 (支持 PDF, JPG)"
+      },
+      {
+        "index": 49,
+        "tag": "textarea",
+        "id": "form-remark",
+        "text": "",
+        "placeholder": "请简明阐述支出背景、受惠区域或紧急处置经过..."
+      },
+      {
+        "index": 50,
+        "tag": "button",
+        "id": "",
+        "text": "send_and_archive 提交支出核销与审批流"
+      }
+    ]
+  },
+  {
+    "key": "finance",
+    "path": "/web/finance",
+    "file": "web/_4/code.html",
+    "name": "物业财务收缴中心",
+    "group": "web",
+    "level": 1,
+    "controls": [
+      {
+        "index": 0,
+        "tag": "div",
+        "id": "",
+        "text": "location_city彭一智慧社区示范区unfold_more"
+      },
+      {
+        "index": 1,
+        "tag": "a",
+        "id": "",
+        "text": "space_dashboard调度概览工作台",
+        "href": "#"
+      },
+      {
+        "index": 2,
+        "tag": "a",
+        "id": "",
+        "text": "assignment_turned_in工单派发与调度12",
+        "href": "#"
+      },
+      {
+        "index": 3,
+        "tag": "a",
+        "id": "",
+        "text": "account_balance_wallet物业财务收缴中心",
+        "href": "#"
+      },
+      {
+        "index": 4,
+        "tag": "a",
+        "id": "",
+        "text": "payments物业支出管理",
+        "href": "#"
+      },
+      {
+        "index": 5,
+        "tag": "a",
+        "id": "",
+        "text": "home_repair_service维修基金支出管理",
+        "href": "#"
+      },
+      {
+        "index": 6,
+        "tag": "a",
+        "id": "",
+        "text": "podcasts声边融媒体采编采集",
+        "href": "#"
+      },
+      {
+        "index": 7,
+        "tag": "a",
+        "id": "",
+        "text": "campaign紧急通知与广播volume_up",
+        "href": "#"
+      },
+      {
+        "index": 8,
+        "tag": "a",
+        "id": "",
+        "text": "domain房产与居民管理",
+        "href": "#"
+      },
+      {
+        "index": 9,
+        "tag": "a",
+        "id": "",
+        "text": "manage_accounts系统与权限设置",
+        "href": "#"
+      },
+      {
+        "index": 10,
+        "tag": "button",
+        "id": "",
+        "text": "lock"
+      },
+      {
+        "index": 11,
+        "tag": "a",
+        "id": "",
+        "text": "logout",
+        "href": "#"
+      },
+      {
+        "index": 12,
+        "tag": "input",
+        "id": "",
+        "text": "",
+        "placeholder": "搜索房号(如502)/工单号/业主手机..."
+      },
+      {
+        "index": 13,
+        "tag": "button",
+        "id": "",
+        "text": "warning一键紧急广播"
+      },
+      {
+        "index": 14,
+        "tag": "button",
+        "id": "",
+        "text": "add新建工单"
+      },
+      {
+        "index": 15,
+        "tag": "button",
+        "id": "",
+        "text": "mic"
+      },
+      {
+        "index": 16,
+        "tag": "button",
+        "id": "",
+        "text": "notifications"
+      },
+      {
+        "index": 17,
+        "tag": "button",
+        "id": "",
+        "text": "fullscreen"
+      },
+      {
+        "index": 18,
+        "tag": "div",
+        "id": "",
+        "text": "person"
+      },
+      {
+        "index": 19,
+        "tag": "button",
+        "id": "",
+        "text": "download 导出对账汇总"
+      },
+      {
+        "index": 20,
+        "tag": "button",
+        "id": "",
+        "text": "post_add 补录线下缴费"
+      },
+      {
+        "index": 21,
+        "tag": "button",
+        "id": "btn-batch-remind",
+        "text": "send_time_extension 一键批量催缴 (32户)"
+      },
+      {
+        "index": 22,
+        "tag": "button",
+        "id": "tab-btn-property",
+        "text": "apartment 物业费收缴中心 88.2%",
+        "originalHandler": "switchTab('property')"
+      },
+      {
+        "index": 23,
+        "tag": "button",
+        "id": "tab-btn-parking",
+        "text": "local_parking 停车费收缴中心 ¥540,600",
+        "originalHandler": "switchTab('parking')"
+      },
+      {
+        "index": 24,
+        "tag": "button",
+        "id": "tab-btn-other",
+        "text": "receipt 其他收费与增值经营 公摊/押金",
+        "originalHandler": "switchTab('other')"
+      },
+      {
+        "index": 25,
+        "tag": "select",
+        "id": "",
+        "text": "2024年度 (当期) 2023年度 (归档)"
+      },
+      {
+        "index": 26,
+        "tag": "button",
+        "id": "",
+        "text": "派发走访"
+      },
+      {
+        "index": 27,
+        "tag": "button",
+        "id": "",
+        "text": "一键催缴",
+        "originalHandler": "triggerNotice('12-1602')"
+      },
+      {
+        "index": 28,
+        "tag": "button",
+        "id": "",
+        "text": "催告函"
+      },
+      {
+        "index": 29,
+        "tag": "button",
+        "id": "",
+        "text": "一键催缴",
+        "originalHandler": "triggerNotice('18-0501')"
+      },
+      {
+        "index": 30,
+        "tag": "button",
+        "id": "",
+        "text": "催告函"
+      },
+      {
+        "index": 31,
+        "tag": "button",
+        "id": "",
+        "text": "一键催缴",
+        "originalHandler": "triggerNotice('03-2204')"
+      },
+      {
+        "index": 32,
+        "tag": "button",
+        "id": "",
+        "text": "明细"
+      },
+      {
+        "index": 33,
+        "tag": "button",
+        "id": "",
+        "text": "审批单"
+      },
+      {
+        "index": 34,
+        "tag": "button",
+        "id": "",
+        "text": "1"
+      },
+      {
+        "index": 35,
+        "tag": "button",
+        "id": "",
+        "text": "2"
+      },
+      {
+        "index": 36,
+        "tag": "button",
+        "id": "",
+        "text": "3"
+      },
+      {
+        "index": 37,
+        "tag": "button",
+        "id": "",
+        "text": "8"
+      },
+      {
+        "index": 38,
+        "tag": "button",
+        "id": "",
+        "text": "全部车位"
+      },
+      {
+        "index": 39,
+        "tag": "button",
+        "id": "",
+        "text": "临停流水"
+      },
+      {
+        "index": 40,
+        "tag": "button",
+        "id": "",
+        "text": "批量提醒续费"
+      },
+      {
+        "index": 41,
+        "tag": "button",
+        "id": "",
+        "text": "微信提醒"
+      },
+      {
+        "index": 42,
+        "tag": "button",
+        "id": "",
+        "text": "续期"
+      },
+      {
+        "index": 43,
+        "tag": "button",
+        "id": "",
+        "text": "解禁/补缴"
+      },
+      {
+        "index": 44,
+        "tag": "button",
+        "id": "",
+        "text": "详情"
+      },
+      {
+        "index": 45,
+        "tag": "button",
+        "id": "",
+        "text": "发票电子联"
+      },
+      {
+        "index": 46,
+        "tag": "button",
+        "id": "",
+        "text": "+ 登记新收费项 / 押金"
+      },
+      {
+        "index": 47,
+        "tag": "button",
+        "id": "",
+        "text": "银行流水勾兑日志"
+      },
+      {
+        "index": 48,
+        "tag": "button",
+        "id": "",
+        "text": "财务权限与参数设置"
+      }
+    ]
+  },
+  {
+    "key": "weekly",
+    "path": "/web/media",
+    "file": "web/_6/code.html",
+    "name": "周报附件上传",
+    "group": "web",
+    "level": 1,
+    "controls": [
+      {
+        "index": 0,
+        "tag": "div",
+        "id": "",
+        "text": "location_city彭一智慧社区示范区unfold_more"
+      },
+      {
+        "index": 1,
+        "tag": "a",
+        "id": "",
+        "text": "space_dashboard调度概览工作台",
+        "href": "#"
+      },
+      {
+        "index": 2,
+        "tag": "a",
+        "id": "",
+        "text": "assignment_turned_in工单派发与调度12",
+        "href": "#"
+      },
+      {
+        "index": 3,
+        "tag": "a",
+        "id": "",
+        "text": "account_balance_wallet物业财务收缴中心",
+        "href": "#"
+      },
+      {
+        "index": 4,
+        "tag": "a",
+        "id": "",
+        "text": "podcasts声边融媒体采编采编",
+        "href": "#"
+      },
+      {
+        "index": 5,
+        "tag": "a",
+        "id": "",
+        "text": "campaign紧急通知与广播volume_up",
+        "href": "#"
+      },
+      {
+        "index": 6,
+        "tag": "a",
+        "id": "",
+        "text": "domain房产与居民管理",
+        "href": "#"
+      },
+      {
+        "index": 7,
+        "tag": "a",
+        "id": "",
+        "text": "manage_accounts系统与权限设置",
+        "href": "#"
+      },
+      {
+        "index": 8,
+        "tag": "button",
+        "id": "",
+        "text": "lock"
+      },
+      {
+        "index": 9,
+        "tag": "a",
+        "id": "",
+        "text": "logout",
+        "href": "#"
+      },
+      {
+        "index": 10,
+        "tag": "button",
+        "id": "",
+        "text": "save保存草稿"
+      },
+      {
+        "index": 11,
+        "tag": "button",
+        "id": "",
+        "text": "send提交发布"
+      },
+      {
+        "index": 12,
+        "tag": "div",
+        "id": "",
+        "text": "person"
+      },
+      {
+        "index": 13,
+        "tag": "textarea",
+        "id": "",
+        "text": "",
+        "placeholder": "请总结本周工程、保洁、安防、便民等各项核心工作完成情况..."
+      },
+      {
+        "index": 14,
+        "tag": "textarea",
+        "id": "",
+        "text": "",
+        "placeholder": "请列出下周重点推进的物业服务工作计划与安排..."
+      },
+      {
+        "index": 15,
+        "tag": "button",
+        "id": "",
+        "text": "add_photo_alternate 上传图片 JPG/PNG"
+      },
+      {
+        "index": 16,
+        "tag": "button",
+        "id": "",
+        "text": "video_call 上传视频 MP4/MOV"
+      },
+      {
+        "index": 17,
+        "tag": "button",
+        "id": "",
+        "text": "upload_file 上传文件 PDF/Word/Excel"
+      },
+      {
+        "index": 18,
+        "tag": "button",
+        "id": "",
+        "text": "close"
+      },
+      {
+        "index": 19,
+        "tag": "button",
+        "id": "",
+        "text": "close"
+      },
+      {
+        "index": 20,
+        "tag": "button",
+        "id": "",
+        "text": "close"
+      },
+      {
+        "index": 21,
+        "tag": "button",
+        "id": "",
+        "text": "close"
+      },
+      {
+        "index": 22,
+        "tag": "button",
+        "id": "",
+        "text": "delete"
+      },
+      {
+        "index": 23,
+        "tag": "button",
+        "id": "",
+        "text": "delete"
+      },
+      {
+        "index": 24,
+        "tag": "button",
+        "id": "",
+        "text": "delete"
+      },
+      {
+        "index": 25,
+        "tag": "button",
+        "id": "",
+        "text": "save保存草稿"
+      },
+      {
+        "index": 26,
+        "tag": "button",
+        "id": "",
+        "text": "cloud_upload确认上传"
+      },
+      {
+        "index": 27,
+        "tag": "button",
+        "id": "",
+        "text": "send提交发布"
+      }
+    ]
+  },
+  {
+    "key": "broadcast",
+    "path": "/web/broadcast",
+    "file": "web/_7/code.html",
+    "name": "紧急通知与广播",
+    "group": "web",
+    "level": 1,
+    "controls": [
+      {
+        "index": 0,
+        "tag": "div",
+        "id": "",
+        "text": "location_city彭一智慧社区示范区unfold_more"
+      },
+      {
+        "index": 1,
+        "tag": "a",
+        "id": "",
+        "text": "space_dashboard调度概览工作台",
+        "href": "#"
+      },
+      {
+        "index": 2,
+        "tag": "a",
+        "id": "",
+        "text": "assignment_turned_in工单派发与调度12",
+        "href": "#"
+      },
+      {
+        "index": 3,
+        "tag": "a",
+        "id": "",
+        "text": "account_balance_wallet物业财务收缴中心",
+        "href": "#"
+      },
+      {
+        "index": 4,
+        "tag": "a",
+        "id": "",
+        "text": "podcasts声边融媒体采编采集",
+        "href": "#"
+      },
+      {
+        "index": 5,
+        "tag": "a",
+        "id": "",
+        "text": "campaign紧急通知与广播volume_up",
+        "href": "#"
+      },
+      {
+        "index": 6,
+        "tag": "a",
+        "id": "",
+        "text": "domain房产与居民管理",
+        "href": "#"
+      },
+      {
+        "index": 7,
+        "tag": "a",
+        "id": "",
+        "text": "manage_accounts系统与权限设置",
+        "href": "#"
+      },
+      {
+        "index": 8,
+        "tag": "button",
+        "id": "",
+        "text": "lock"
+      },
+      {
+        "index": 9,
+        "tag": "a",
+        "id": "",
+        "text": "logout",
+        "href": "#"
+      },
+      {
+        "index": 10,
+        "tag": "input",
+        "id": "",
+        "text": "",
+        "placeholder": "搜索房号(如502)/工单号/业主手机..."
+      },
+      {
+        "index": 11,
+        "tag": "button",
+        "id": "",
+        "text": "warning一键紧急广播"
+      },
+      {
+        "index": 12,
+        "tag": "button",
+        "id": "",
+        "text": "add新建工单"
+      },
+      {
+        "index": 13,
+        "tag": "button",
+        "id": "",
+        "text": "mic"
+      },
+      {
+        "index": 14,
+        "tag": "button",
+        "id": "",
+        "text": "notifications"
+      },
+      {
+        "index": 15,
+        "tag": "button",
+        "id": "",
+        "text": "fullscreen"
+      },
+      {
+        "index": 16,
+        "tag": "div",
+        "id": "",
+        "text": "person"
+      },
+      {
+        "index": 17,
+        "tag": "button",
+        "id": "",
+        "text": "history 广播下发历史"
+      },
+      {
+        "index": 18,
+        "tag": "button",
+        "id": "",
+        "text": "settings_voice AI语音引擎调试"
+      },
+      {
+        "index": 19,
+        "tag": "button",
+        "id": "",
+        "text": "warning 常规紧急通知"
+      },
+      {
+        "index": 20,
+        "tag": "button",
+        "id": "",
+        "text": "water_drop 水电气停供提醒"
+      },
+      {
+        "index": 21,
+        "tag": "button",
+        "id": "",
+        "text": "storm 极端恶劣天气预警"
+      },
+      {
+        "index": 22,
+        "tag": "button",
+        "id": "",
+        "text": "fire_truck 消防演练通知"
+      },
+      {
+        "index": 23,
+        "tag": "input",
+        "id": "noticeTitle",
+        "text": ""
+      },
+      {
+        "index": 24,
+        "tag": "button",
+        "id": "",
+        "text": "auto_awesomeAI 润色",
+        "originalHandler": "showLiveToast('AI 正在深度润色正文内容...')"
+      },
+      {
+        "index": 25,
+        "tag": "button",
+        "id": "",
+        "text": "语气更亲和",
+        "originalHandler": "showLiveToast('已应用：语气更亲和润色')"
+      },
+      {
+        "index": 26,
+        "tag": "button",
+        "id": "",
+        "text": "更严肃专业",
+        "originalHandler": "showLiveToast('已应用：更严肃专业预警')"
+      },
+      {
+        "index": 27,
+        "tag": "button",
+        "id": "",
+        "text": "精简通顺",
+        "originalHandler": "showLiveToast('已精简压缩正文字数')"
+      },
+      {
+        "index": 28,
+        "tag": "textarea",
+        "id": "noticeContent",
+        "text": "【紧急停水通知】尊敬的各位业主：因16号楼前地下主管网突发破裂需紧急开挖抢修，预计将于今日（10月25日）14:00至18:00暂停供水，请相关楼宇业主提前储水并关闭水阀。抢修完毕后将第一时间恢复供水。物业24小时值班热线：400-880-6888。",
+        "placeholder": "请输入需要播报的紧急通知内容...（发布后将在居民端小程序首页顶部【置顶内容/小区公告】位置高亮滚动轮播，支持语音合成同步播报）"
+      },
+      {
+        "index": 29,
+        "tag": "button",
+        "id": "",
+        "text": "phone_in_talk 追加客服热线",
+        "originalHandler": "appendPhrase(' [物业24小时调度专线: 021-5698-2121]')"
+      },
+      {
+        "index": 30,
+        "tag": "button",
+        "id": "",
+        "text": "engineering 追加抢修范围",
+        "originalHandler": "appendPhrase(' [工程抢修中，预计受影响住户480户]')"
+      },
+      {
+        "index": 31,
+        "tag": "button",
+        "id": "",
+        "text": "water_bottle 追加应急取水点",
+        "originalHandler": "appendPhrase(' [已开启小区应急临时供水取水点位于中央花园小广场]')"
+      },
+      {
+        "index": 32,
+        "tag": "button",
+        "id": "",
+        "text": "backspace 清空重写",
+        "originalHandler": "clearContent()"
+      },
+      {
+        "index": 33,
+        "tag": "label",
+        "id": "",
+        "text": ""
+      },
+      {
+        "index": 34,
+        "tag": "input",
+        "id": "voiceToggle",
+        "text": ""
+      },
+      {
+        "index": 35,
+        "tag": "button",
+        "id": "",
+        "text": "24小时自动结束"
+      },
+      {
+        "index": 36,
+        "tag": "button",
+        "id": "",
+        "text": "48小时"
+      },
+      {
+        "index": 37,
+        "tag": "button",
+        "id": "",
+        "text": "直到管家手动撤回"
+      },
+      {
+        "index": 38,
+        "tag": "button",
+        "id": "",
+        "text": "恢复默认抢修模板",
+        "originalHandler": "showLiveToast('已进入演练模式，正文已重置为默认模板')"
+      },
+      {
+        "index": 39,
+        "tag": "button",
+        "id": "",
+        "text": "visibility 对焦居民端预览",
+        "originalHandler": "highlightPreview()"
+      },
+      {
+        "index": 40,
+        "tag": "button",
+        "id": "publishBtn",
+        "text": "podcasts 立即发布并同步滚动",
+        "originalHandler": "handleBroadcastPublish()"
+      },
+      {
+        "index": 41,
+        "tag": "button",
+        "id": "",
+        "text": "编辑内容",
+        "originalHandler": "editCurrentNotice()"
+      },
+      {
+        "index": 42,
+        "tag": "button",
+        "id": "",
+        "text": "下线撤回",
+        "originalHandler": "revokeCurrentNotice()"
+      }
+    ]
+  },
+  {
+    "key": "checkin",
+    "path": "/worker/checkin",
+    "file": "web/_8/code.html",
+    "name": "现场打卡与完工结算",
+    "group": "worker",
+    "level": 2,
+    "controls": [
+      {
+        "index": 0,
+        "tag": "button",
+        "id": "",
+        "text": "arrow_back_ios_new",
+        "originalHandler": "history.back()"
+      },
+      {
+        "index": 1,
+        "tag": "a",
+        "id": "",
+        "text": "call 联系业主",
+        "href": "tel:13812345678"
+      },
+      {
+        "index": 2,
+        "tag": "button",
+        "id": "checkin-btn",
+        "text": "near_me 点击现场到岗打卡",
+        "originalHandler": "toggleCheckin()"
+      },
+      {
+        "index": 3,
+        "tag": "button",
+        "id": "",
+        "text": "close"
+      },
+      {
+        "index": 4,
+        "tag": "button",
+        "id": "",
+        "text": "close"
+      },
+      {
+        "index": 5,
+        "tag": "div",
+        "id": "",
+        "text": "add_a_photo + 拍照/上传"
+      },
+      {
+        "index": 6,
+        "tag": "button",
+        "id": "",
+        "text": "library_add + 添加其他明码标价配件/耗材项"
+      },
+      {
+        "index": 7,
+        "tag": "label",
+        "id": "",
+        "text": "qr_code_2 居民端线上微信支付 官方推荐 推送至业主微信，在线查验无误后实时支付入账 radio_button_checked"
+      },
+      {
+        "index": 8,
+        "tag": "label",
+        "id": "",
+        "text": "payments 现金 / 师傅线下代收 适合高龄居民，现场收取现金后师傅后台代缴转账 radio_button_unchecked"
+      },
+      {
+        "index": 9,
+        "tag": "label",
+        "id": "",
+        "text": "apartment 记入物业公区维护账目 公用部位公共管网故障，费用经核验由公维金支付 radio_button_unchecked"
+      },
+      {
+        "index": 10,
+        "tag": "a",
+        "id": "",
+        "text": "phone_in_talk",
+        "href": "tel:13812345678"
+      },
+      {
+        "index": 11,
+        "tag": "button",
+        "id": "",
+        "text": "check_circle 提交完工并推送账单 (¥68.00)",
+        "originalHandler": "submitOrder()"
+      }
+    ]
+  },
+  {
+    "key": "tasks",
+    "path": "/worker/tasks",
+    "file": "web/_9/code.html",
+    "name": "师傅任务接单",
+    "group": "worker",
+    "level": 1,
+    "controls": [
+      {
+        "index": 0,
+        "tag": "button",
+        "id": "",
+        "text": "hearing"
+      },
+      {
+        "index": 1,
+        "tag": "button",
+        "id": "dispatchToggle",
+        "text": "听单中 sync_alt"
+      },
+      {
+        "index": 2,
+        "tag": "button",
+        "id": "",
+        "text": "待接新单 3"
+      },
+      {
+        "index": 3,
+        "tag": "button",
+        "id": "",
+        "text": "待到岗/进行中 1"
+      },
+      {
+        "index": 4,
+        "tag": "button",
+        "id": "",
+        "text": "完工待结 2"
+      },
+      {
+        "index": 5,
+        "tag": "div",
+        "id": "voicePlayer",
+        "text": "play_arrow 语音描述 0:12″"
+      },
+      {
+        "index": 6,
+        "tag": "button",
+        "id": "",
+        "text": "play_arrow"
+      },
+      {
+        "index": 7,
+        "tag": "button",
+        "id": "",
+        "text": "phone_in_talk 电联业主"
+      },
+      {
+        "index": 8,
+        "tag": "button",
+        "id": "acceptOrderBtn",
+        "text": "bolt 立即接单 (加急+¥20)"
+      },
+      {
+        "index": 9,
+        "tag": "button",
+        "id": "",
+        "text": "查看详情"
+      },
+      {
+        "index": 10,
+        "tag": "button",
+        "id": "",
+        "text": "抢此单"
+      },
+      {
+        "index": 11,
+        "tag": "button",
+        "id": "",
+        "text": "查看详情"
+      },
+      {
+        "index": 12,
+        "tag": "button",
+        "id": "",
+        "text": "抢此单"
+      },
+      {
+        "index": 13,
+        "tag": "a",
+        "id": "",
+        "text": "electric_meter任务接单",
+        "href": "#"
+      },
+      {
+        "index": 14,
+        "tag": "a",
+        "id": "",
+        "text": "pending_actions进行中",
+        "href": "#"
+      },
+      {
+        "index": 15,
+        "tag": "a",
+        "id": "",
+        "text": "verified完工记录",
+        "href": "#"
+      },
+      {
+        "index": 16,
+        "tag": "a",
+        "id": "",
+        "text": "manage_accounts个人中心",
+        "href": "#"
+      }
+    ]
+  },
+  {
+    "key": "group",
+    "path": "/web/group",
+    "file": "web/_10/code.html",
+    "name": "集团运营中枢",
+    "group": "web",
+    "level": 1,
+    "controls": [
+      {
+        "index": 0,
+        "tag": "a",
+        "id": "",
+        "text": "account_balance多小区财务总览",
+        "href": "#"
+      },
+      {
+        "index": 1,
+        "tag": "a",
+        "id": "",
+        "text": "compare_arrows收缴率横向对比",
+        "href": "#"
+      },
+      {
+        "index": 2,
+        "tag": "a",
+        "id": "",
+        "text": "receipt_long项目支出对账",
+        "href": "#"
+      },
+      {
+        "index": 3,
+        "tag": "a",
+        "id": "",
+        "text": "savings资金归集池监控",
+        "href": "#"
+      },
+      {
+        "index": 4,
+        "tag": "a",
+        "id": "",
+        "text": "hub项目运营矩阵",
+        "href": "#"
+      },
+      {
+        "index": 5,
+        "tag": "a",
+        "id": "",
+        "text": "assignment多小区工单看板",
+        "href": "#"
+      },
+      {
+        "index": 6,
+        "tag": "a",
+        "id": "",
+        "text": "podcasts融媒体声边矩阵",
+        "href": "#"
+      },
+      {
+        "index": 7,
+        "tag": "a",
+        "id": "",
+        "text": "shield_person组织与权限配置",
+        "href": "#"
+      },
+      {
+        "index": 8,
+        "tag": "select",
+        "id": "",
+        "text": "全部管理小区 (12个资产单元)彭一智慧示范区彭二新村锦绣华庭绿岛阳光家园"
+      },
+      {
+        "index": 9,
+        "tag": "button",
+        "id": "",
+        "text": "notifications"
+      },
+      {
+        "index": 10,
+        "tag": "button",
+        "id": "",
+        "text": "warning3"
+      },
+      {
+        "index": 11,
+        "tag": "button",
+        "id": "",
+        "text": "今日实时"
+      },
+      {
+        "index": 12,
+        "tag": "button",
+        "id": "",
+        "text": "本周"
+      },
+      {
+        "index": 13,
+        "tag": "button",
+        "id": "",
+        "text": "本月"
+      },
+      {
+        "index": 14,
+        "tag": "button",
+        "id": "",
+        "text": "本季度"
+      },
+      {
+        "index": 15,
+        "tag": "button",
+        "id": "",
+        "text": "年度"
+      },
+      {
+        "index": 16,
+        "tag": "button",
+        "id": "btn-reconcile",
+        "text": "account_balance 银行一键对账"
+      },
+      {
+        "index": 17,
+        "tag": "button",
+        "id": "",
+        "text": "download 导出集团合并底表"
+      },
+      {
+        "index": 18,
+        "tag": "a",
+        "id": "",
+        "text": "穿透核查明细 arrow_forward",
+        "href": "#matrix-table"
+      },
+      {
+        "index": 19,
+        "tag": "input",
+        "id": "",
+        "text": "",
+        "placeholder": "搜索小区名称/楼栋主管..."
+      },
+      {
+        "index": 20,
+        "tag": "button",
+        "id": "",
+        "text": "过滤状态: 全部 (6)"
+      },
+      {
+        "index": 21,
+        "tag": "button",
+        "id": "",
+        "text": "visibility"
+      },
+      {
+        "index": 22,
+        "tag": "button",
+        "id": "",
+        "text": "open_in_new"
+      },
+      {
+        "index": 23,
+        "tag": "button",
+        "id": "",
+        "text": "swap_horiz"
+      },
+      {
+        "index": 24,
+        "tag": "button",
+        "id": "",
+        "text": "visibility"
+      },
+      {
+        "index": 25,
+        "tag": "button",
+        "id": "",
+        "text": "open_in_new"
+      },
+      {
+        "index": 26,
+        "tag": "button",
+        "id": "",
+        "text": "swap_horiz"
+      },
+      {
+        "index": 27,
+        "tag": "button",
+        "id": "",
+        "text": "visibility"
+      },
+      {
+        "index": 28,
+        "tag": "button",
+        "id": "",
+        "text": "open_in_new"
+      },
+      {
+        "index": 29,
+        "tag": "button",
+        "id": "",
+        "text": "swap_horiz"
+      },
+      {
+        "index": 30,
+        "tag": "button",
+        "id": "",
+        "text": "priority_high"
+      },
+      {
+        "index": 31,
+        "tag": "button",
+        "id": "",
+        "text": "open_in_new"
+      },
+      {
+        "index": 32,
+        "tag": "button",
+        "id": "",
+        "text": "督办整改"
+      },
+      {
+        "index": 33,
+        "tag": "button",
+        "id": "",
+        "text": "visibility"
+      },
+      {
+        "index": 34,
+        "tag": "button",
+        "id": "",
+        "text": "open_in_new"
+      },
+      {
+        "index": 35,
+        "tag": "button",
+        "id": "",
+        "text": "swap_horiz"
+      },
+      {
+        "index": 36,
+        "tag": "button",
+        "id": "",
+        "text": "visibility"
+      },
+      {
+        "index": 37,
+        "tag": "button",
+        "id": "",
+        "text": "open_in_new"
+      },
+      {
+        "index": 38,
+        "tag": "button",
+        "id": "",
+        "text": "swap_horiz"
+      },
+      {
+        "index": 39,
+        "tag": "button",
+        "id": "",
+        "text": "sync"
+      },
+      {
+        "index": 40,
+        "tag": "button",
+        "id": "",
+        "text": "进入集团收支流水明细台账 chevron_right"
+      }
+    ]
+  },
+  {
+    "key": "home",
+    "path": "/mobile/home",
+    "file": "小程序/_1/code.html",
+    "name": "居民首页",
+    "group": "mobile",
+    "level": 1,
+    "public": true,
+    "controls": [
+      {
+        "index": 0,
+        "tag": "button",
+        "id": "",
+        "text": "notifications"
+      },
+      {
+        "index": 1,
+        "tag": "button",
+        "id": "",
+        "text": "彭一小区 expand_more"
+      },
+      {
+        "index": 2,
+        "tag": "button",
+        "id": "",
+        "text": "qr_code_scanner"
+      },
+      {
+        "index": 3,
+        "tag": "button",
+        "id": "",
+        "text": "notifications"
+      },
+      {
+        "index": 4,
+        "tag": "button",
+        "id": "radioPlayBtn",
+        "text": "play_arrow"
+      },
+      {
+        "index": 5,
+        "tag": "button",
+        "id": "",
+        "text": "chevron_right"
+      },
+      {
+        "index": 6,
+        "tag": "div",
+        "id": "",
+        "text": "account_balance_wallet arrow_outward 我要缴费 7月待缴 ¥168.00"
+      },
+      {
+        "index": 7,
+        "tag": "div",
+        "id": "",
+        "text": "handyman 极速 我要报修 15分钟响应派工"
+      },
+      {
+        "index": 8,
+        "tag": "div",
+        "id": "",
+        "text": "support_agent chevron_right 我要服务 专属管家与预约"
+      },
+      {
+        "index": 9,
+        "tag": "div",
+        "id": "",
+        "text": "redeem1,280分我的积分积分计划 · 兑好礼"
+      },
+      {
+        "index": 10,
+        "tag": "div",
+        "id": "",
+        "text": "说点什么... 分享身边新鲜事"
+      },
+      {
+        "index": 11,
+        "tag": "button",
+        "id": "",
+        "text": "add_photo_alternate"
+      },
+      {
+        "index": 12,
+        "tag": "button",
+        "id": "",
+        "text": "发布"
+      },
+      {
+        "index": 13,
+        "tag": "button",
+        "id": "",
+        "text": "favorite 28"
+      },
+      {
+        "index": 14,
+        "tag": "button",
+        "id": "",
+        "text": "favorite 45"
+      },
+      {
+        "index": 15,
+        "tag": "a",
+        "id": "",
+        "text": "cottage首页",
+        "href": "#"
+      },
+      {
+        "index": 16,
+        "tag": "a",
+        "id": "",
+        "text": "podcasts声边",
+        "href": "#"
+      },
+      {
+        "index": 17,
+        "tag": "a",
+        "id": "",
+        "text": "forum邻里圈",
+        "href": "#"
+      },
+      {
+        "index": 18,
+        "tag": "a",
+        "id": "",
+        "text": "manage_accounts我的",
+        "href": "#"
+      }
+    ]
+  },
+  {
+    "key": "login",
+    "path": "/mobile/login",
+    "file": "小程序/_2/code.html",
+    "name": "居民登录",
+    "group": "mobile",
+    "level": 2,
+    "public": true,
+    "controls": [
+      {
+        "index": 0,
+        "tag": "button",
+        "id": "",
+        "text": "arrow_back",
+        "originalHandler": "history.back()"
+      },
+      {
+        "index": 1,
+        "tag": "input",
+        "id": "accountInput",
+        "text": "",
+        "placeholder": "请输入手机号或业主编号"
+      },
+      {
+        "index": 2,
+        "tag": "button",
+        "id": "clearAccountBtn",
+        "text": "cancel"
+      },
+      {
+        "index": 3,
+        "tag": "input",
+        "id": "passwordInput",
+        "text": "",
+        "placeholder": "请输入居民通行密码"
+      },
+      {
+        "index": 4,
+        "tag": "button",
+        "id": "togglePasswordBtn",
+        "text": "visibility_off"
+      },
+      {
+        "index": 5,
+        "tag": "button",
+        "id": "",
+        "text": "sms 短信验证码登录"
+      },
+      {
+        "index": 6,
+        "tag": "button",
+        "id": "",
+        "text": "忘记密码？"
+      },
+      {
+        "index": 7,
+        "tag": "button",
+        "id": "",
+        "text": "立即登录 arrow_forward"
+      },
+      {
+        "index": 8,
+        "tag": "button",
+        "id": "",
+        "text": "微信一键快捷登录"
+      },
+      {
+        "index": 9,
+        "tag": "a",
+        "id": "",
+        "text": "去办理 chevron_right",
+        "href": "javascript:void(0)"
+      },
+      {
+        "index": 10,
+        "tag": "input",
+        "id": "agreementCheckbox",
+        "text": ""
+      },
+      {
+        "index": 11,
+        "tag": "label",
+        "id": "",
+        "text": "已阅读并同意 《声边智慧社区用户服务协议》 与 《隐私政策》"
+      },
+      {
+        "index": 12,
+        "tag": "a",
+        "id": "",
+        "text": "《声边智慧社区用户服务协议》",
+        "href": "javascript:void(0)"
+      },
+      {
+        "index": 13,
+        "tag": "a",
+        "id": "",
+        "text": "《隐私政策》",
+        "href": "javascript:void(0)"
+      },
+      {
+        "index": 14,
+        "tag": "a",
+        "id": "",
+        "text": "400-880-6899",
+        "href": "tel:4008806899"
+      }
+    ]
+  },
+  {
+    "key": "verify",
+    "path": "/mobile/verify",
+    "file": "小程序/_3/code.html",
+    "name": "实名与房屋确权",
+    "group": "mobile",
+    "level": 2,
+    "public": true,
+    "controls": [
+      {
+        "index": 0,
+        "tag": "button",
+        "id": "",
+        "text": "arrow_back_ios_new",
+        "originalHandler": "history.back()"
+      },
+      {
+        "index": 1,
+        "tag": "button",
+        "id": "",
+        "text": "support_agent"
+      },
+      {
+        "index": 2,
+        "tag": "input",
+        "id": "",
+        "text": "",
+        "placeholder": "请输入您的真实姓名（与身份证一致）"
+      },
+      {
+        "index": 3,
+        "tag": "input",
+        "id": "idCardInput",
+        "text": ""
+      },
+      {
+        "index": 4,
+        "tag": "button",
+        "id": "toggleIdMask",
+        "text": "visibility"
+      },
+      {
+        "index": 5,
+        "tag": "button",
+        "id": "roleOwnerBtn",
+        "text": "自有房产 check 业主 / 直系家属 gavel 需产权法定确权"
+      },
+      {
+        "index": 6,
+        "tag": "button",
+        "id": "roleTenantBtn",
+        "text": "租房居住 租客 / 长期租户 assignment 需租约与房东授权"
+      },
+      {
+        "index": 7,
+        "tag": "button",
+        "id": "tabMethod1",
+        "text": "不动产权证",
+        "originalHandler": "switchMethod('method1')"
+      },
+      {
+        "index": 8,
+        "tag": "button",
+        "id": "tabMethod2",
+        "text": "网签/完税",
+        "originalHandler": "switchMethod('method2')"
+      },
+      {
+        "index": 9,
+        "tag": "button",
+        "id": "tabMethod3",
+        "text": "物业预留对账",
+        "originalHandler": "switchMethod('method3')"
+      },
+      {
+        "index": 10,
+        "tag": "input",
+        "id": "",
+        "text": "",
+        "placeholder": "如：沪(202X)静字第XXXX号"
+      },
+      {
+        "index": 11,
+        "tag": "button",
+        "id": "",
+        "text": "refresh"
+      },
+      {
+        "index": 12,
+        "tag": "div",
+        "id": "",
+        "text": "task_alt 权利人页 (匹配 李雅欣) 坐落地址一致性 99.4%"
+      },
+      {
+        "index": 13,
+        "tag": "input",
+        "id": "",
+        "text": "",
+        "placeholder": "输入20位电子网签合同号"
+      },
+      {
+        "index": 14,
+        "tag": "input",
+        "id": "",
+        "text": "",
+        "placeholder": "如：PY2023-502-A"
+      },
+      {
+        "index": 15,
+        "tag": "input",
+        "id": "agreementCheck",
+        "text": ""
+      },
+      {
+        "index": 16,
+        "tag": "a",
+        "id": "",
+        "text": "《彭一智慧物业服务公约》",
+        "href": "#"
+      },
+      {
+        "index": 17,
+        "tag": "a",
+        "id": "",
+        "text": "《业主数字权限管理细则》",
+        "href": "#"
+      },
+      {
+        "index": 18,
+        "tag": "button",
+        "id": "submitBtn",
+        "text": "shield_with_heart 提交确权并绑定房屋 (502室)"
+      },
+      {
+        "index": 19,
+        "tag": "a",
+        "id": "",
+        "text": "call 400-880-6899",
+        "href": "tel:4008806899"
+      }
+    ]
+  },
+  {
+    "key": "review",
+    "path": "/mobile/review",
+    "file": "小程序/_4/code.html",
+    "name": "维修服务评价",
+    "group": "mobile",
+    "level": 3,
+    "controls": [
+      {
+        "index": 0,
+        "tag": "button",
+        "id": "",
+        "text": "arrow_back_ios_new",
+        "originalHandler": "history.back()"
+      },
+      {
+        "index": 1,
+        "tag": "button",
+        "id": "",
+        "text": "headset_mic"
+      },
+      {
+        "index": 2,
+        "tag": "a",
+        "id": "",
+        "text": "phone_in_talk",
+        "href": "tel:4008806899"
+      },
+      {
+        "index": 3,
+        "tag": "button",
+        "id": "",
+        "text": "star"
+      },
+      {
+        "index": 4,
+        "tag": "button",
+        "id": "",
+        "text": "star"
+      },
+      {
+        "index": 5,
+        "tag": "button",
+        "id": "",
+        "text": "star"
+      },
+      {
+        "index": 6,
+        "tag": "button",
+        "id": "",
+        "text": "star"
+      },
+      {
+        "index": 7,
+        "tag": "button",
+        "id": "",
+        "text": "star"
+      },
+      {
+        "index": 8,
+        "tag": "button",
+        "id": "",
+        "text": "准时到达 ⚡️"
+      },
+      {
+        "index": 9,
+        "tag": "button",
+        "id": "",
+        "text": "专业高效 🛠️"
+      },
+      {
+        "index": 10,
+        "tag": "button",
+        "id": "",
+        "text": "着装规范穿鞋套 👟"
+      },
+      {
+        "index": 11,
+        "tag": "button",
+        "id": "",
+        "text": "收拾干净 🧹"
+      },
+      {
+        "index": 12,
+        "tag": "button",
+        "id": "",
+        "text": "态度温和 👍"
+      },
+      {
+        "index": 13,
+        "tag": "button",
+        "id": "",
+        "text": "收费透明无加价 📋"
+      },
+      {
+        "index": 14,
+        "tag": "button",
+        "id": "",
+        "text": "声边管家即时响应 🎙️"
+      },
+      {
+        "index": 15,
+        "tag": "textarea",
+        "id": "comment-input",
+        "text": "",
+        "placeholder": "师傅服务怎么样？修得是否彻底？快来说说您的真实感受吧..."
+      },
+      {
+        "index": 16,
+        "tag": "button",
+        "id": "voice-btn",
+        "text": "mic 长按语音转文字"
+      },
+      {
+        "index": 17,
+        "tag": "button",
+        "id": "",
+        "text": "close"
+      },
+      {
+        "index": 18,
+        "tag": "button",
+        "id": "",
+        "text": "add_photo_alternate 拍照/视频 1/6"
+      },
+      {
+        "index": 19,
+        "tag": "label",
+        "id": "",
+        "text": ""
+      },
+      {
+        "index": 20,
+        "tag": "input",
+        "id": "",
+        "text": ""
+      },
+      {
+        "index": 21,
+        "tag": "input",
+        "id": "",
+        "text": ""
+      },
+      {
+        "index": 22,
+        "tag": "button",
+        "id": "submit-review-btn",
+        "text": "verified 提交评价并领取积分"
+      },
+      {
+        "index": 23,
+        "tag": "a",
+        "id": "",
+        "text": "400-880-6899",
+        "href": "tel:4008806899"
+      }
+    ]
+  },
+  {
+    "key": "media",
+    "path": "/mobile/media",
+    "file": "小程序/_5/code.html",
+    "name": "声边视听",
+    "group": "mobile",
+    "level": 1,
+    "public": true,
+    "controls": [
+      {
+        "index": 0,
+        "tag": "button",
+        "id": "",
+        "text": "notifications"
+      },
+      {
+        "index": 1,
+        "tag": "button",
+        "id": "",
+        "text": "stars 全部精选"
+      },
+      {
+        "index": 2,
+        "tag": "button",
+        "id": "",
+        "text": "podcasts 物业电台"
+      },
+      {
+        "index": 3,
+        "tag": "button",
+        "id": "",
+        "text": "article 邻居FM"
+      },
+      {
+        "index": 4,
+        "tag": "button",
+        "id": "",
+        "text": "smart_display 微纪录视频"
+      },
+      {
+        "index": 5,
+        "tag": "button",
+        "id": "",
+        "text": "sensors 活动直播"
+      },
+      {
+        "index": 6,
+        "tag": "button",
+        "id": "favorite-btn",
+        "text": "favorite"
+      },
+      {
+        "index": 7,
+        "tag": "div",
+        "id": "progress-bar-wrapper",
+        "text": "04:12 12:30"
+      },
+      {
+        "index": 8,
+        "tag": "button",
+        "id": "speed-btn",
+        "text": "1.0X"
+      },
+      {
+        "index": 9,
+        "tag": "button",
+        "id": "",
+        "text": "replay_10"
+      },
+      {
+        "index": 10,
+        "tag": "button",
+        "id": "main-play-btn",
+        "text": "pause"
+      },
+      {
+        "index": 11,
+        "tag": "button",
+        "id": "",
+        "text": "forward_30"
+      },
+      {
+        "index": 12,
+        "tag": "button",
+        "id": "playlist-btn",
+        "text": "queue_music"
+      },
+      {
+        "index": 13,
+        "tag": "a",
+        "id": "",
+        "text": "全部专栏 chevron_right",
+        "href": "#"
+      },
+      {
+        "index": 14,
+        "tag": "button",
+        "id": "",
+        "text": "volume_up 朗读全文 (AI语音)"
+      },
+      {
+        "index": 15,
+        "tag": "button",
+        "id": "",
+        "text": "进入微信阅读 open_in_new"
+      },
+      {
+        "index": 16,
+        "tag": "div",
+        "id": "",
+        "text": "物业透明公开 play_arrow visibility 3420次播放 03:15 3分钟看懂二次供水水箱深度清洗消毒全过程 工程维保部 share"
+      },
+      {
+        "index": 17,
+        "tag": "div",
+        "id": "",
+        "text": "安全防线 play_arrow visibility 2810次播放 01:45 保安小哥的晨间硬核防暴演练，安全感直接拉满！ 秩序维护队 share"
+      },
+      {
+        "index": 18,
+        "tag": "button",
+        "id": "post-voice-btn",
+        "text": "audio_file 我要录音/发声"
+      },
+      {
+        "index": 19,
+        "tag": "button",
+        "id": "submit-article-btn",
+        "text": "edit_note 文字投稿"
+      },
+      {
+        "index": 20,
+        "tag": "a",
+        "id": "",
+        "text": "cottage首页",
+        "href": "#"
+      },
+      {
+        "index": 21,
+        "tag": "a",
+        "id": "",
+        "text": "podcasts声边",
+        "href": "#"
+      },
+      {
+        "index": 22,
+        "tag": "a",
+        "id": "",
+        "text": "forum邻里圈",
+        "href": "#"
+      },
+      {
+        "index": 23,
+        "tag": "a",
+        "id": "",
+        "text": "manage_accounts我的",
+        "href": "#"
+      }
+    ]
+  },
+  {
+    "key": "services",
+    "path": "/mobile/services",
+    "file": "小程序/_6/code.html",
+    "name": "物业便利与邻居闪铺",
+    "group": "mobile",
+    "level": 1,
+    "public": true,
+    "controls": [
+      {
+        "index": 0,
+        "tag": "button",
+        "id": "",
+        "text": "notifications"
+      },
+      {
+        "index": 1,
+        "tag": "button",
+        "id": "",
+        "text": "金牌管家在岗"
+      },
+      {
+        "index": 2,
+        "tag": "button",
+        "id": "",
+        "text": "立即拼团 arrow_forward"
+      },
+      {
+        "index": 3,
+        "tag": "button",
+        "id": "",
+        "text": "预约排班"
+      },
+      {
+        "index": 4,
+        "tag": "button",
+        "id": "",
+        "text": "立即预订"
+      },
+      {
+        "index": 5,
+        "tag": "button",
+        "id": "",
+        "text": "add_circle我也要开铺chevron_right"
+      },
+      {
+        "index": 6,
+        "tag": "button",
+        "id": "",
+        "text": "chat 联系"
+      },
+      {
+        "index": 7,
+        "tag": "button",
+        "id": "",
+        "text": "calendar_today 预约"
+      },
+      {
+        "index": 8,
+        "tag": "button",
+        "id": "",
+        "text": "handshake 免押借"
+      },
+      {
+        "index": 9,
+        "tag": "button",
+        "id": "",
+        "text": "chat 联系"
+      },
+      {
+        "index": 10,
+        "tag": "div",
+        "id": "",
+        "text": "cleaning_services 深度家政保洁 全屋开荒/擦玻璃"
+      },
+      {
+        "index": 11,
+        "tag": "div",
+        "id": "",
+        "text": "build_circle 家电拆洗养护 油烟机/洗衣机"
+      },
+      {
+        "index": 12,
+        "tag": "div",
+        "id": "",
+        "text": "home_repair_service 空间微改焕新 墙面补漆/阳台定制"
+      },
+      {
+        "index": 13,
+        "tag": "div",
+        "id": "",
+        "text": "garage 车位与仓储租售 闲置代管/地库月租"
+      },
+      {
+        "index": 14,
+        "tag": "div",
+        "id": "",
+        "text": "local_mall 产地甄选生鲜 冷链到家/基地直发"
+      },
+      {
+        "index": 15,
+        "tag": "div",
+        "id": "",
+        "text": "pets 康养与宠物托养 老人助餐/上门遛喂"
+      },
+      {
+        "index": 16,
+        "tag": "button",
+        "id": "",
+        "text": "play_arrow"
+      },
+      {
+        "index": 17,
+        "tag": "a",
+        "id": "",
+        "text": "全部服务 chevron_right",
+        "href": "#"
+      },
+      {
+        "index": 18,
+        "tag": "button",
+        "id": "",
+        "text": "calendar_today 一键快捷预约"
+      },
+      {
+        "index": 19,
+        "tag": "button",
+        "id": "",
+        "text": "免费量尺预约"
+      },
+      {
+        "index": 20,
+        "tag": "button",
+        "id": "",
+        "text": "立即抢鲜"
+      },
+      {
+        "index": 21,
+        "tag": "button",
+        "id": "",
+        "text": "phone_in_talk"
+      },
+      {
+        "index": 22,
+        "tag": "button",
+        "id": "",
+        "text": "chat 专属管家"
+      },
+      {
+        "index": 23,
+        "tag": "a",
+        "id": "",
+        "text": "cottage首页",
+        "href": "#"
+      },
+      {
+        "index": 24,
+        "tag": "a",
+        "id": "",
+        "text": "podcasts融媒专区",
+        "href": "#"
+      },
+      {
+        "index": 25,
+        "tag": "a",
+        "id": "",
+        "text": "forum增值精选特惠",
+        "href": "#"
+      },
+      {
+        "index": 26,
+        "tag": "a",
+        "id": "",
+        "text": "manage_accounts服务与我的",
+        "href": "#"
+      }
+    ]
+  },
+  {
+    "key": "bills",
+    "path": "/mobile/bills",
+    "file": "小程序/_7/code.html",
+    "name": "合并缴费账单",
+    "group": "mobile",
+    "level": 2,
+    "controls": [
+      {
+        "index": 0,
+        "tag": "button",
+        "id": "",
+        "text": "notifications"
+      },
+      {
+        "index": 1,
+        "tag": "button",
+        "id": "houseDropdownBtn",
+        "text": "home_pin 彭一小区 16-2-502 expand_more"
+      },
+      {
+        "index": 2,
+        "tag": "div",
+        "id": "",
+        "text": "彭一小区 16号楼2单元502室 住宅 · 98㎡ check_circle"
+      },
+      {
+        "index": 3,
+        "tag": "div",
+        "id": "",
+        "text": "彭一小区 地下车位 B1-108 地下产权车位 · 沪A·8899K radio_button_unchecked"
+      },
+      {
+        "index": 4,
+        "tag": "button",
+        "id": "payAllBtn",
+        "text": "receipt_long 合并缴费"
+      },
+      {
+        "index": 5,
+        "tag": "button",
+        "id": "tab-property",
+        "text": "我的物业费",
+        "originalHandler": "switchTab('property')"
+      },
+      {
+        "index": 6,
+        "tag": "button",
+        "id": "tab-parking",
+        "text": "我的停车费",
+        "originalHandler": "switchTab('parking')"
+      },
+      {
+        "index": 7,
+        "tag": "button",
+        "id": "tab-others",
+        "text": "其他费用",
+        "originalHandler": "switchTab('others')"
+      },
+      {
+        "index": 8,
+        "tag": "span",
+        "id": "",
+        "text": "预缴政策"
+      },
+      {
+        "index": 9,
+        "tag": "button",
+        "id": "",
+        "text": "立即缴费 arrow_forward"
+      },
+      {
+        "index": 10,
+        "tag": "button",
+        "id": "",
+        "text": "receipt 查看电子发票"
+      },
+      {
+        "index": 11,
+        "tag": "button",
+        "id": "",
+        "text": "receipt 查看电子发票"
+      },
+      {
+        "index": 12,
+        "tag": "button",
+        "id": "",
+        "text": "缴车位费 arrow_forward"
+      },
+      {
+        "index": 13,
+        "tag": "button",
+        "id": "",
+        "text": "receipt 发票凭据"
+      },
+      {
+        "index": 14,
+        "tag": "button",
+        "id": "",
+        "text": "receipt 电子回单"
+      },
+      {
+        "index": 15,
+        "tag": "button",
+        "id": "",
+        "text": "receipt 电子回单"
+      },
+      {
+        "index": 16,
+        "tag": "a",
+        "id": "",
+        "text": "一键拨打 chevron_right",
+        "href": "tel:4008806899"
+      },
+      {
+        "index": 17,
+        "tag": "a",
+        "id": "",
+        "text": "cottage首页",
+        "href": "#"
+      },
+      {
+        "index": 18,
+        "tag": "a",
+        "id": "",
+        "text": "podcasts融媒专区",
+        "href": "#"
+      },
+      {
+        "index": 19,
+        "tag": "a",
+        "id": "",
+        "text": "forum邻里圈",
+        "href": "#"
+      },
+      {
+        "index": 20,
+        "tag": "a",
+        "id": "",
+        "text": "manage_accounts服务与我的",
+        "href": "#"
+      }
+    ]
+  },
+  {
+    "key": "repair",
+    "path": "/mobile/repair",
+    "file": "小程序/_8/code.html",
+    "name": "在线报修",
+    "group": "mobile",
+    "level": 2,
+    "controls": [
+      {
+        "index": 0,
+        "tag": "button",
+        "id": "",
+        "text": "arrow_back_ios_new",
+        "originalHandler": "history.back()"
+      },
+      {
+        "index": 1,
+        "tag": "button",
+        "id": "",
+        "text": "headset_mic"
+      },
+      {
+        "index": 2,
+        "tag": "button",
+        "id": "",
+        "text": "切换房屋 chevron_right"
+      },
+      {
+        "index": 3,
+        "tag": "button",
+        "id": "tab-private",
+        "text": "door_front 室内专有报修",
+        "originalHandler": "switchRepairScope('private')"
+      },
+      {
+        "index": 4,
+        "tag": "button",
+        "id": "tab-public",
+        "text": "domain 公共区域报修",
+        "originalHandler": "switchRepairScope('public')"
+      },
+      {
+        "index": 5,
+        "tag": "button",
+        "id": "",
+        "text": "plumbing 管道疏通",
+        "originalHandler": "selectCategory(this, '管道疏通')"
+      },
+      {
+        "index": 6,
+        "tag": "button",
+        "id": "",
+        "text": "light 电路灯具",
+        "originalHandler": "selectCategory(this, '电路灯具')"
+      },
+      {
+        "index": 7,
+        "tag": "button",
+        "id": "",
+        "text": "lock_reset 门窗锁具",
+        "originalHandler": "selectCategory(this, '门窗锁具')"
+      },
+      {
+        "index": 8,
+        "tag": "button",
+        "id": "",
+        "text": "faucet 水龙头渗水",
+        "originalHandler": "selectCategory(this, '水龙头渗水')"
+      },
+      {
+        "index": 9,
+        "tag": "button",
+        "id": "",
+        "text": "ac_unit 空调暖通",
+        "originalHandler": "selectCategory(this, '空调暖通')"
+      },
+      {
+        "index": 10,
+        "tag": "button",
+        "id": "",
+        "text": "more_horiz 其他故障",
+        "originalHandler": "selectCategory(this, '其他故障')"
+      },
+      {
+        "index": 11,
+        "tag": "textarea",
+        "id": "issue-text",
+        "text": "",
+        "placeholder": "请详细描述您遇到的报修故障情况，以便师傅提前备件..."
+      },
+      {
+        "index": 12,
+        "tag": "button",
+        "id": "voice-record-btn",
+        "text": "mic 长按语音输入",
+        "originalHandler": "simulateVoiceRecord()"
+      },
+      {
+        "index": 13,
+        "tag": "button",
+        "id": "",
+        "text": "close",
+        "originalHandler": "this.parentElement.remove()"
+      },
+      {
+        "index": 14,
+        "tag": "button",
+        "id": "",
+        "text": "photo_camera videocam 照片/视频 最多6项"
+      },
+      {
+        "index": 15,
+        "tag": "button",
+        "id": "",
+        "text": "今天 07-22 周一",
+        "originalHandler": "selectDateTab(this)"
+      },
+      {
+        "index": 16,
+        "tag": "button",
+        "id": "",
+        "text": "明天 07-23 周二",
+        "originalHandler": "selectDateTab(this)"
+      },
+      {
+        "index": 17,
+        "tag": "button",
+        "id": "",
+        "text": "后天 07-24 周三",
+        "originalHandler": "selectDateTab(this)"
+      },
+      {
+        "index": 18,
+        "tag": "button",
+        "id": "",
+        "text": "calendar_month 自选日期",
+        "originalHandler": "selectDateTab(this)"
+      },
+      {
+        "index": 19,
+        "tag": "button",
+        "id": "",
+        "text": "尽快上门 加急 30分钟内急速响应",
+        "originalHandler": "selectSlot(this)"
+      },
+      {
+        "index": 20,
+        "tag": "button",
+        "id": "",
+        "text": "上午时段 check_circle 09:00 - 11:30",
+        "originalHandler": "selectSlot(this)"
+      },
+      {
+        "index": 21,
+        "tag": "button",
+        "id": "",
+        "text": "下午时段 14:00 - 16:30",
+        "originalHandler": "selectSlot(this)"
+      },
+      {
+        "index": 22,
+        "tag": "button",
+        "id": "",
+        "text": "傍晚时段 17:30 - 19:30",
+        "originalHandler": "selectSlot(this)"
+      },
+      {
+        "index": 23,
+        "tag": "button",
+        "id": "toggle-call",
+        "text": "",
+        "originalHandler": "toggleCallConfirm(this)"
+      },
+      {
+        "index": 24,
+        "tag": "button",
+        "id": "",
+        "text": "send 立即提交报修",
+        "originalHandler": "submitRepairTicket(this)"
+      }
+    ]
+  },
+  {
+    "key": "profile",
+    "path": "/mobile/profile",
+    "file": "小程序/_9/code.html",
+    "name": "服务与我的",
+    "group": "mobile",
+    "level": 1,
+    "controls": [
+      {
+        "index": 0,
+        "tag": "button",
+        "id": "",
+        "text": "notifications"
+      },
+      {
+        "index": 1,
+        "tag": "button",
+        "id": "switchHouseBtn",
+        "text": "切换 expand_more"
+      },
+      {
+        "index": 2,
+        "tag": "a",
+        "id": "",
+        "text": "call 直呼师傅",
+        "href": "tel:13800000000"
+      },
+      {
+        "index": 3,
+        "tag": "button",
+        "id": "",
+        "text": "receipt_long我的缴费水电·物业费"
+      },
+      {
+        "index": 4,
+        "tag": "button",
+        "id": "",
+        "text": "handyman我的报修进度实时查"
+      },
+      {
+        "index": 5,
+        "tag": "button",
+        "id": "",
+        "text": "monetization_on我的积分1,280 积分"
+      },
+      {
+        "index": 6,
+        "tag": "div",
+        "id": "",
+        "text": "campaign邻里动态我要发布分享社区新鲜事 / 邻里圈去发布生活圈arrow_forward"
+      },
+      {
+        "index": 7,
+        "tag": "div",
+        "id": "",
+        "text": "storefront副业增收我要开闪铺副业挣生活费 · 入驻开店立即入驻开店arrow_forward"
+      },
+      {
+        "index": 8,
+        "tag": "button",
+        "id": "",
+        "text": "play_arrow 收听"
+      },
+      {
+        "index": 9,
+        "tag": "a",
+        "id": "",
+        "text": "phone_in_talk 拨打",
+        "href": "tel:4008206888"
+      },
+      {
+        "index": 10,
+        "tag": "button",
+        "id": "closeButlerModal",
+        "text": "close"
+      },
+      {
+        "index": 11,
+        "tag": "a",
+        "id": "",
+        "text": "call 电话呼叫",
+        "href": "tel:13900000000"
+      },
+      {
+        "index": 12,
+        "tag": "button",
+        "id": "",
+        "text": "chat 微信联系",
+        "originalHandler": "alert('已复制专属管家企业微信号：SB_Butler_Lin')"
+      },
+      {
+        "index": 13,
+        "tag": "a",
+        "id": "",
+        "text": "cottage首页",
+        "href": "#"
+      },
+      {
+        "index": 14,
+        "tag": "a",
+        "id": "",
+        "text": "podcasts声边",
+        "href": "#"
+      },
+      {
+        "index": 15,
+        "tag": "a",
+        "id": "",
+        "text": "forum邻里圈",
+        "href": "#"
+      },
+      {
+        "index": 16,
+        "tag": "a",
+        "id": "",
+        "text": "manage_accounts我的",
+        "href": "#"
+      }
+    ]
+  },
+  {
+    "key": "billing",
+    "path": "/mobile/billing",
+    "file": "小程序/_10/code.html",
+    "name": "分项收费账单",
+    "group": "mobile",
+    "level": 2,
+    "controls": [
+      {
+        "index": 0,
+        "tag": "button",
+        "id": "",
+        "text": "notifications"
+      },
+      {
+        "index": 1,
+        "tag": "button",
+        "id": "houseDropdownBtn",
+        "text": "home_pin 彭一小区 16-2-502 expand_more"
+      },
+      {
+        "index": 2,
+        "tag": "div",
+        "id": "",
+        "text": "彭一小区 16号楼2单元502室 住宅 · 98㎡ check_circle"
+      },
+      {
+        "index": 3,
+        "tag": "div",
+        "id": "",
+        "text": "彭一小区 地下车位 B1-088 地下固定车位 · 沪A·D88921 radio_button_unchecked"
+      },
+      {
+        "index": 4,
+        "tag": "button",
+        "id": "payAllBtn",
+        "text": "receipt_long 缴纳物业费"
+      },
+      {
+        "index": 5,
+        "tag": "button",
+        "id": "tab-property",
+        "text": "我的物业费",
+        "originalHandler": "switchTab('property')"
+      },
+      {
+        "index": 6,
+        "tag": "button",
+        "id": "tab-parking",
+        "text": "我的停车费",
+        "originalHandler": "switchTab('parking')"
+      },
+      {
+        "index": 7,
+        "tag": "button",
+        "id": "tab-others",
+        "text": "其他费用",
+        "originalHandler": "switchTab('others')"
+      },
+      {
+        "index": 8,
+        "tag": "button",
+        "id": "",
+        "text": "receipt 查看电子发票"
+      },
+      {
+        "index": 9,
+        "tag": "button",
+        "id": "",
+        "text": "receipt 查看电子发票"
+      },
+      {
+        "index": 10,
+        "tag": "button",
+        "id": "",
+        "text": "缴纳停车费arrow_forward",
+        "originalHandler": "handlePayAction('2024年第二季度地下停车服务费', '450.00')"
+      },
+      {
+        "index": 11,
+        "tag": "button",
+        "id": "",
+        "text": "receipt 查看电子发票"
+      },
+      {
+        "index": 12,
+        "tag": "button",
+        "id": "",
+        "text": "receipt 查看电子发票"
+      },
+      {
+        "index": 13,
+        "tag": "span",
+        "id": "",
+        "text": "查看公示"
+      },
+      {
+        "index": 14,
+        "tag": "button",
+        "id": "",
+        "text": "立即缴费 arrow_forward",
+        "originalHandler": "handlePayAction('2024年4月份公共维修与能耗代扣', '128.50')"
+      },
+      {
+        "index": 15,
+        "tag": "button",
+        "id": "",
+        "text": "receipt 查看电子发票"
+      },
+      {
+        "index": 16,
+        "tag": "button",
+        "id": "",
+        "text": "receipt 查看电子发票"
+      },
+      {
+        "index": 17,
+        "tag": "a",
+        "id": "",
+        "text": "一键拨打 chevron_right",
+        "href": "tel:4008806899"
+      },
+      {
+        "index": 18,
+        "tag": "a",
+        "id": "",
+        "text": "cottage首页",
+        "href": "#"
+      },
+      {
+        "index": 19,
+        "tag": "a",
+        "id": "",
+        "text": "podcasts融媒专区",
+        "href": "#"
+      },
+      {
+        "index": 20,
+        "tag": "a",
+        "id": "",
+        "text": "forum邻里圈",
+        "href": "#"
+      },
+      {
+        "index": 21,
+        "tag": "a",
+        "id": "",
+        "text": "manage_accounts服务与我的",
+        "href": "#"
+      }
+    ]
+  },
+  {
+    "key": "points",
+    "path": "/mobile/points",
+    "file": "小程序/_11/code.html",
+    "name": "声边积分与兑换",
+    "group": "mobile",
+    "level": 2,
+    "controls": [
+      {
+        "index": 0,
+        "tag": "button",
+        "id": "",
+        "text": "notifications"
+      },
+      {
+        "index": 1,
+        "tag": "button",
+        "id": "",
+        "text": "arrow_back_ios_new"
+      },
+      {
+        "index": 2,
+        "tag": "button",
+        "id": "",
+        "text": "receipt_long 积分明细"
+      },
+      {
+        "index": 3,
+        "tag": "button",
+        "id": "",
+        "text": "history 兑换记录"
+      },
+      {
+        "index": 4,
+        "tag": "button",
+        "id": "",
+        "text": "help_outline 规则",
+        "originalHandler": "document.getElementById('ruleModal').classList.remove('hidden')"
+      },
+      {
+        "index": 5,
+        "tag": "a",
+        "id": "",
+        "text": "去抵扣",
+        "href": "#exchange-section"
+      },
+      {
+        "index": 6,
+        "tag": "button",
+        "id": "",
+        "text": "bolt 做任务快速赚分",
+        "originalHandler": "document.getElementById('taskSection').scrollIntoView({behavior: 'smooth'})"
+      },
+      {
+        "index": 7,
+        "tag": "button",
+        "id": "",
+        "text": "info 积分权益说明",
+        "originalHandler": "document.getElementById('ruleModal').classList.remove('hidden')"
+      },
+      {
+        "index": 8,
+        "tag": "button",
+        "id": "radioPlayBtn",
+        "text": "play_arrow 听播赚分"
+      },
+      {
+        "index": 9,
+        "tag": "button",
+        "id": "",
+        "text": "去评价 (1单待评)"
+      },
+      {
+        "index": 10,
+        "tag": "button",
+        "id": "",
+        "text": "立即缴费"
+      },
+      {
+        "index": 11,
+        "tag": "button",
+        "id": "",
+        "text": "去逛邻里圈"
+      },
+      {
+        "index": 12,
+        "tag": "button",
+        "id": "",
+        "text": "报名参与"
+      },
+      {
+        "index": 13,
+        "tag": "button",
+        "id": "",
+        "text": "全部精选",
+        "originalHandler": "filterTab('all', this)"
+      },
+      {
+        "index": 14,
+        "tag": "button",
+        "id": "",
+        "text": "物业抵扣券",
+        "originalHandler": "filterTab('deduction', this)"
+      },
+      {
+        "index": 15,
+        "tag": "button",
+        "id": "",
+        "text": "便民服务",
+        "originalHandler": "filterTab('convenience', this)"
+      },
+      {
+        "index": 16,
+        "tag": "button",
+        "id": "",
+        "text": "生活优选",
+        "originalHandler": "filterTab('life', this)"
+      },
+      {
+        "index": 17,
+        "tag": "button",
+        "id": "",
+        "text": "文娱周边",
+        "originalHandler": "filterTab('culture', this)"
+      },
+      {
+        "index": 18,
+        "tag": "button",
+        "id": "",
+        "text": "立即兑换"
+      },
+      {
+        "index": 19,
+        "tag": "button",
+        "id": "",
+        "text": "积分换购"
+      },
+      {
+        "index": 20,
+        "tag": "button",
+        "id": "",
+        "text": "立即借用"
+      },
+      {
+        "index": 21,
+        "tag": "button",
+        "id": "",
+        "text": "立即兑换"
+      },
+      {
+        "index": 22,
+        "tag": "button",
+        "id": "",
+        "text": "立即兑换"
+      },
+      {
+        "index": 23,
+        "tag": "button",
+        "id": "",
+        "text": "立即兑换"
+      },
+      {
+        "index": 24,
+        "tag": "button",
+        "id": "",
+        "text": "立即兑换"
+      },
+      {
+        "index": 25,
+        "tag": "button",
+        "id": "",
+        "text": "立即兑换"
+      },
+      {
+        "index": 26,
+        "tag": "button",
+        "id": "",
+        "text": "close",
+        "originalHandler": "document.getElementById('ruleModal').classList.add('hidden')"
+      },
+      {
+        "index": 27,
+        "tag": "button",
+        "id": "",
+        "text": "我知道了",
+        "originalHandler": "document.getElementById('ruleModal').classList.add('hidden')"
+      },
+      {
+        "index": 28,
+        "tag": "a",
+        "id": "",
+        "text": "cottage首页",
+        "href": "#"
+      },
+      {
+        "index": 29,
+        "tag": "a",
+        "id": "",
+        "text": "podcasts融媒专区",
+        "href": "#"
+      },
+      {
+        "index": 30,
+        "tag": "a",
+        "id": "",
+        "text": "forum邻里圈",
+        "href": "#"
+      },
+      {
+        "index": 31,
+        "tag": "a",
+        "id": "",
+        "text": "manage_accounts服务与我的",
+        "href": "#"
+      }
+    ]
+  }
+]

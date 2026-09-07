@@ -1,0 +1,127 @@
+:root { --demo-primary: #006544; --demo-surface: #ebfef2; }
+body { font-family: "Plus Jakarta Sans", -apple-system, BlinkMacSystemFont, "PingFang SC", "Microsoft YaHei", sans-serif; }
+button, a, [role="button"] { -webkit-tap-highlight-color: transparent; }
+#billing-tabs { max-width: 100%; overflow-x: auto; }
+[role="button"], [data-action] { cursor: pointer; }
+button:disabled { opacity: .55; cursor: not-allowed; }
+:focus-visible { outline: 2px solid #006544; outline-offset: 3px; }
+[hidden] { display: none !important; }
+.demo-selected { background-color: #006544 !important; color: white !important; }
+.demo-selected .material-symbols-outlined { color: inherit !important; }
+.demo-toast { position: fixed; bottom: 105px; left: 50%; transform: translateX(-50%); z-index: 10000; background: #24342c; color: white; padding: 12px 20px; border-radius: 8px; max-width: min(520px, 90vw); width: max-content; box-shadow: 0 8px 24px #0002; font-size: 14px; }
+.demo-toast[data-error="true"] { background: #93000a; }
+.demo-dialog { width: min(620px, calc(100vw - 32px)); max-height: 88dvh; border: 1px solid #bdc9c0; padding: 0; border-radius: 12px; background: #fff; color: #0f1f18; box-shadow: 0 16px 60px #00211338; }
+.demo-dialog::backdrop { background: #14241d66; backdrop-filter: blur(3px); }
+.demo-dialog > header { display: flex; align-items: center; justify-content: space-between; position: sticky; top: 0; padding: 16px 20px; border-bottom: 1px solid #dff2e7; background: #fff; z-index: 1; }
+.demo-dialog h2 { font-size: 18px; font-weight: 700; line-height: 26px; margin: 0; overflow-wrap: anywhere; }
+.demo-dialog h3 { font-size: 16px; font-weight: 600; margin: 12px 0; }
+.demo-dialog-body { padding: 20px; line-height: 1.7; overflow-wrap: anywhere; }
+.demo-dialog > footer { display: flex; flex-wrap: wrap; gap: 8px; justify-content: flex-end; padding: 12px 20px 18px; background: #fff; }
+.demo-dialog > .demo-toast { position: sticky; left: auto; bottom: 0; transform: none; margin: 0 auto 12px; max-width: calc(100% - 24px); }
+.demo-button { background: #006544; color: white; border: 0; border-radius: 999px; padding: 10px 18px; font-size: 14px; font-weight: 600; display: inline-flex; align-items: center; justify-content: center; gap: 6px; }
+.demo-button.secondary { background: #e5f8ed; color: #006544; }
+.demo-icon { width: 36px; height: 36px; display: inline-flex; align-items: center; justify-content: center; border-radius: 50%; background: #e5f8ed; flex-shrink: 0; }
+.demo-field { display: flex; flex-direction: column; gap: 6px; font-size: 13px; font-weight: 600; margin-bottom: 14px; }
+.demo-field input, .demo-field textarea, .demo-field select { width: 100%; background: #e5f8ed; color: #0f1f18; border: 1px solid #bdc9c0; padding: 10px 12px; border-radius: 8px; font: inherit; font-weight: 400; }
+.demo-form-error { color: #ba1a1a; }
+.demo-list > * { display: block; padding: 12px 0; border-bottom: 1px solid #dff2e7; }
+.demo-list button { text-align: left; width: 100%; }
+.demo-list small, .demo-muted { color: #3e4942; font-size: 12px; }
+.demo-list strong { display: block; font-weight: 600; }
+.demo-empty { display: flex; align-items: center; justify-content: center; gap: 10px; padding: 36px 16px; color: #6e7a72; }
+.demo-inline { margin: 12px 0; display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+.demo-inline img, .demo-upload-preview { width: 64px; height: 64px; object-fit: cover; border-radius: 8px; }
+.demo-detail-image { width: 100%; max-height: 420px; object-fit: contain; border-radius: 8px; }
+.demo-timeline { list-style: none; padding-left: 16px; border-left: 2px solid #94f6c5; }
+.demo-timeline li { padding: 6px 0 14px; }
+.demo-timeline time { display: block; color: #6e7a72; font-size: 12px; }
+.demo-meta { display: grid; grid-template-columns: auto 1fr; gap: 8px 16px; margin-bottom: 16px; font-size: 13px; }
+.demo-meta dt { color: #6e7a72; }
+.demo-meta dd { margin: 0; }
+.demo-inline-section { padding: 12px 0; }
+.demo-scope-banner { display: flex; gap: 10px; align-items: flex-start; margin-bottom: 12px; padding: 12px 14px; border: 1px solid #94f6c5; border-radius: 8px; background: #e5f8ed; color: #005236; }
+.demo-scope-banner > .material-symbols-outlined { flex: 0 0 auto; margin-top: 1px; }
+.demo-scope-banner strong, .demo-scope-banner small { display: block; }
+.demo-scope-banner small, .demo-content-audience { color: #3e4942; font-size: 12px; line-height: 1.5; }
+.demo-content-audience { margin: 0 0 12px; padding: 8px 10px; border-radius: 6px; background: #e5f8ed; }
+.demo-arrival-sla { display: flex; gap: 9px; align-items: flex-start; margin: 0 0 12px; padding: 10px 12px; border-radius: 8px; background: #e5f8ed; color: #005236; }
+.demo-arrival-sla strong, .demo-arrival-sla small { display: block; }
+.demo-arrival-sla small { margin-top: 2px; color: #3e4942; font-size: 12px; }
+.demo-arrival-sla[data-state="overdue"] { background: #ffdad6; color: #93000a; }
+.demo-group-overview { margin-bottom: 22px; padding: 20px; border: 1px solid #94f6c5; border-radius: 8px; background: #ffffff; box-shadow: 0 4px 16px rgba(0, 101, 68, .06); }
+.demo-group-heading { display: flex; justify-content: space-between; align-items: flex-start; gap: 18px; }
+.demo-tree-kicker { display: block; color: #006544; font-size: 12px; font-weight: 700; }
+.demo-group-heading h2 { margin: 3px 0; font-size: 22px; line-height: 1.3; }
+.demo-group-heading p { margin: 0; color: #3e4942; }
+.demo-group-actions { display: flex; flex-wrap: wrap; gap: 8px; }
+.demo-group-metrics { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 10px; margin: 18px 0; }
+.demo-group-metrics article { padding: 12px; border-radius: 6px; background: #e5f8ed; }
+.demo-group-metrics strong, .demo-group-metrics span { display: block; }
+.demo-group-metrics strong { color: #006544; font-size: 24px; line-height: 1.2; }
+.demo-group-metrics span { margin-top: 4px; color: #3e4942; font-size: 12px; }
+.demo-group-tree { padding-top: 4px; }
+.demo-platform-root { display: flex; align-items: center; gap: 9px; padding: 12px; border-radius: 6px; background: #006544; color: #fff; }
+.demo-platform-root small { margin-left: auto; color: #d6ffe6; font-size: 12px; }
+.demo-company-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; margin-top: 12px; }
+.demo-group-company { padding: 14px; border: 1px solid #dff2e7; border-radius: 6px; background: #fff; }
+.demo-group-company > div { display: flex; align-items: baseline; gap: 8px; }
+.demo-group-company h3 { margin: 0; font-size: 16px; }
+.demo-tree-branch { color: #006544; font-size: 12px; font-weight: 700; }
+.demo-group-company > button { margin-top: 10px; padding: 7px 12px; font-size: 12px; }
+.demo-group-company ul { margin: 12px 0 0; padding: 10px 0 0 18px; border-top: 1px solid #dff2e7; }
+.demo-group-company li { padding: 4px 0; }
+.demo-group-company li span, .demo-group-company li small { display: block; }
+.demo-group-company li small { color: #6e7a72; font-size: 12px; }
+.demo-auth-note { margin: 12px 0; font-size: 12px; color: #3e4942; }
+.demo-mobile-only { display: none; }
+html[data-group="web"] main { padding-top: 84px; }
+html[data-group="web"] header.fixed { gap: 12px; }
+html[data-group="web"] header.fixed button, html[data-group="web"] header.fixed a { white-space: nowrap; }
+html[data-group="web"] header.fixed > div { min-width: 0; }
+html[data-group="web"] header.fixed .hidden.xl\:flex { white-space: nowrap; }
+html[data-group="web"] header .relative.w-80 { width: min(250px, 19vw); }
+html[data-group="web"] main > div { min-width: 0; }
+html[data-group="web"] table { min-width: 680px; }
+html[data-group="web"] table th { white-space: nowrap; }
+@media (max-width: 1250px) {
+  html[data-group="web"] header.fixed > div:first-child > div:first-child { display: none; }
+}
+@media (min-width: 801px) and (max-width: 1600px) {
+  html[data-group="web"] header.fixed > div:first-child > div:first-child { display: none; }
+}
+@media (max-width: 800px) {
+  html[data-group="web"] body > aside { transform: translateX(-100%); transition: transform .15s; width: 260px; }
+  html[data-group="web"] body.demo-menu-open > aside { transform: translateX(0); z-index: 80; }
+  html[data-group="web"] body > .pl-72, html[data-group="web"] body > .pl-64 { padding-left: 0; }
+  html[data-group="web"] header.fixed { left: 0; padding-left: 52px; }
+  html[data-group="web"] header.fixed .relative.w-80 { display: none; }
+  html[data-group="web"] header.fixed button { flex-shrink: 0; }
+  html[data-group="web"] header.fixed [title="切换全屏"] { display: none; }
+  .demo-mobile-only { display: inline-flex; position: fixed; top: 14px; left: 10px; z-index: 90; }
+  html[data-group="web"] main { padding-left: 12px; padding-right: 12px; }
+  .demo-group-heading { flex-direction: column; }
+  .demo-group-metrics { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .demo-company-grid { grid-template-columns: 1fr; }
+  .demo-platform-root { align-items: flex-start; flex-wrap: wrap; }
+  .demo-platform-root small { width: 100%; margin-left: 0; }
+}
+@media (max-width: 480px) {
+  .demo-dialog { width: calc(100vw - 20px); max-height: 91dvh; }
+  .demo-dialog-body { padding: 16px; }
+  .demo-dialog > footer { padding: 12px; }
+  html:not([data-group="web"]) button, html:not([data-group="web"]) h2, html:not([data-group="web"]) h3 { overflow-wrap: anywhere; }
+  html[data-group="worker"] .font-display-lg { font-size: 30px; }
+  html[data-group="worker"] h2 { font-size: 20px; }
+  html[data-page="checkin"] .fixed.bottom-0 button { font-size: 14px; }
+  html[data-group="web"] header [title="融媒体待审素材"], html[data-group="web"] header [title="消息通知"] { display: none; }
+  html[data-page="expenses"] main .flex:has(> .relative > #search-input) { flex-wrap: wrap; width: 100%; }
+  html[data-page="finance"] #billing-tabs > .flex:first-child { max-width: 100%; overflow-x: auto; }
+  html[data-page="finance"] #billing-tabs button { flex-shrink: 0; white-space: nowrap; }
+  html[data-page="weekly"] main .flex:has(> #preview-trigger-btn) { flex-wrap: wrap; flex-shrink: 1; }
+  html[data-page="weekly"] main .flex:has(> .text-outline) { flex-wrap: wrap; }
+}
+@media print {
+  body > *:not(dialog) { display: none !important; }
+  dialog.demo-dialog { position: static; display: block; max-height: none; border: 0; width: 100%; box-shadow: none; }
+  dialog footer, dialog header button { display: none !important; }
+}

@@ -1,0 +1,638 @@
+{
+  "overview": {
+    "expenses": [],
+    "textareas": [],
+    "images": [
+      {
+        "src": "/assets/ebdf2b56114265967b86.jpg",
+        "alt": "Close up photograph of a damaged PVC water pipe leaking under a clean stainless steel sink inside an apartment kitchen, realistic documentary lighting in soft tones"
+      },
+      {
+        "src": "/assets/f05fe32169f04b5e4c67.jpg",
+        "alt": "Residential tiled kitchen floor with a small puddle of clear water beside a cabinet baseboard, high detail texture"
+      },
+      {
+        "src": "/assets/7ad97d9f7abb312fdde3.jpg",
+        "alt": "Modern smart access control panel unit mounted on an apartment residential lobby wall, sleek jade aesthetic"
+      },
+      {
+        "src": "/assets/667037f89da2d90beaf5.jpg",
+        "alt": "Neatly manicured residential garden shrubs and trimmed trees in a modern Chinese apartment community garden, sunny day morning"
+      }
+    ],
+    "backgroundImages": [],
+    "tables": [
+      {
+        "rows": [
+          "急 #GD2024062801 彭一小区 16号楼2单元502室 (李雅欣)",
+          "厨房主水管接口渗漏 schedule预约今日 14:00 (余35分钟)",
+          "+2",
+          "待派工",
+          "派工 (张师傅) more_vert",
+          "修 #GD2024062803 彭一小区 8号楼1单元301室",
+          "单元楼道智能门禁机刷卡无感应 engineering陈工 (已携带备件到达现场)",
+          "",
+          "上门处理中",
+          "查看轨迹 more_vert",
+          "绿 #GD2024062788 彭一小区 12号楼2单元101室 (李先生)",
+          "一楼庭院遮阳乔木枯枝修剪与清理 check_circle已完成 · 业主给 5 星好评",
+          "",
+          "已归档结单",
+          "查看回执 more_vert"
+        ]
+      }
+    ]
+  },
+  "work-orders": {
+    "expenses": [],
+    "textareas": [],
+    "images": [
+      {
+        "src": "/assets/f00ecc526703cabd8955.jpg",
+        "alt": "A modern kitchen sink under-cabinet plumbing leak, glistening water droplets on brass valve fitting, warm interior lighting with emerald reflective accents, high resolution photography"
+      },
+      {
+        "src": "/assets/a1322f99c8680aa78071.jpg",
+        "alt": "Close-up of residential pipeline replacement tools and high durability replacement rubber gasket rings on a clean tool mat, crisp contrast, emerald tones, warm indoor lighting"
+      },
+      {
+        "src": "/assets/7f4f675d7e7a0eba803e.jpg",
+        "alt": "Post-repair finished residential water pipe valve installation, dry floor surface, spotless high standard maintenance completion, bright clean lighting"
+      }
+    ],
+    "backgroundImages": [],
+    "tables": []
+  },
+  "expenses": {
+    "expenses": [
+      {
+        "class": "expense-row group cursor-pointer bg-primary/10 transition-all",
+        "data-amount": "¥38,420.00",
+        "data-budget": "22.8%",
+        "data-channel": "上海农商行对公转账 (尾号 4108)",
+        "data-dept": "工程运维部 · 周建国",
+        "data-id": "1",
+        "data-invoice": "FP-SH-990812401",
+        "data-sn": "EX-20241024-001",
+        "data-status": "paid",
+        "data-title": "公区能耗水电（10月电费）"
+      },
+      {
+        "class": "expense-row group cursor-pointer hover:bg-surface-container-low transition-all",
+        "data-amount": "¥12,800.00",
+        "data-budget": "7.6%",
+        "data-channel": "建设银行基本户转账",
+        "data-dept": "环境绿化部 · 陈阿妹",
+        "data-id": "2",
+        "data-invoice": "FP-20249821-GR",
+        "data-sn": "EX-20241022-045",
+        "data-status": "pending",
+        "data-title": "园区秋季苗木养护修剪及消杀服务"
+      },
+      {
+        "class": "expense-row group cursor-pointer hover:bg-surface-container-low transition-all",
+        "data-amount": "¥4,350.00",
+        "data-budget": "2.5%",
+        "data-channel": "管理处零用备用金",
+        "data-dept": "工程维修组 · 刘师傅",
+        "data-id": "3",
+        "data-invoice": "NO-INV-PUMP201",
+        "data-sn": "EX-20241021-012",
+        "data-status": "reviewing",
+        "data-title": "12号楼高区加压水泵密封轴承更换"
+      },
+      {
+        "class": "expense-row group cursor-pointer hover:bg-surface-container-low transition-all",
+        "data-amount": "¥7,450.00",
+        "data-budget": "4.4%",
+        "data-channel": "上海农商行对公转账",
+        "data-dept": "安全保卫部 · 孙浩",
+        "data-id": "4",
+        "data-invoice": "FP-SAFE-202410",
+        "data-sn": "EX-20241019-009",
+        "data-status": "pending",
+        "data-title": "消火栓年检与水压测试检测技术服务费"
+      },
+      {
+        "class": "expense-row group cursor-pointer hover:bg-surface-container-low transition-all",
+        "data-amount": "¥1,640.00",
+        "data-budget": "0.9%",
+        "data-channel": "财务快捷预付款扣除",
+        "data-dept": "综合客服部 · 王晓",
+        "data-id": "5",
+        "data-invoice": "JD-ELEC-2024090",
+        "data-sn": "EX-20241018-088",
+        "data-status": "paid",
+        "data-title": "客服管家秋季日常办公耗材与巡检记录本采购"
+      },
+      {
+        "class": "expense-row group cursor-pointer hover:bg-surface-container-low transition-all",
+        "data-amount": "¥68,500.00",
+        "data-budget": "40.6%",
+        "data-channel": "银行对公批量代发",
+        "data-dept": "人事行政部 · 赵敏",
+        "data-id": "6",
+        "data-invoice": "SB-SH-202409-HR",
+        "data-sn": "EX-20241015-003",
+        "data-status": "paid",
+        "data-title": "外聘秩序维护员9月份社保代缴与津贴核发"
+      }
+    ],
+    "textareas": [
+      ""
+    ],
+    "images": [
+      {
+        "src": "/assets/9b52f8296aba72892f80.jpg",
+        "alt": "Clear high-definition photo of an official utility reimbursement invoice and bank transfer remittance receipt neatly stamped with red accounting seals on an ivory desk."
+      }
+    ],
+    "backgroundImages": [],
+    "tables": [
+      {
+        "rows": [
+          "",
+          "EX-20241024-001",
+          "bolt 公区能耗水电",
+          "¥38,420.00",
+          "工程运维部 (周建国)",
+          "2024-10-24",
+          "银行对公转账",
+          "已付款",
+          "",
+          "EX-20241022-045",
+          "park 绿化保洁外包",
+          "¥12,800.00",
+          "环境绿化部 (陈阿妹)",
+          "2024-10-22",
+          "银行对公转账",
+          "待审批",
+          "",
+          "EX-20241021-012",
+          "build 工程维保零配件",
+          "¥4,350.00",
+          "工程维修组 (刘师傅)",
+          "2024-10-21",
+          "管理处备用金",
+          "审批中",
+          "",
+          "EX-20241019-009",
+          "local_fire_department 消防维保检测",
+          "¥7,450.00",
+          "安全保卫部 (孙浩)",
+          "2024-10-19",
+          "银行对公转账",
+          "待审批",
+          "",
+          "EX-20241018-088",
+          "description 办公耗材",
+          "¥1,640.00",
+          "综合客服部 (王晓)",
+          "2024-10-18",
+          "快捷扣费",
+          "已付款",
+          "",
+          "EX-20241015-003",
+          "badge 人员薪酬与社保",
+          "¥68,500.00",
+          "人事行政部 (赵敏)",
+          "2024-10-15",
+          "银行对公转账",
+          "已付款"
+        ]
+      }
+    ]
+  },
+  "finance": {
+    "expenses": [],
+    "textareas": [],
+    "images": [],
+    "backgroundImages": [],
+    "tables": [
+      {
+        "rows": [
+          "12号楼-1602室张德海 (138****0921)",
+          "142.8 ㎡",
+          "¥3.80/㎡/月",
+          "欠缴 10个月",
+          "¥5,426.40",
+          "10-18 (微信推送)",
+          "一键催缴 催告函",
+          "18号楼-0501室王秀芳 (139****4412)",
+          "118.5 ㎡",
+          "¥3.80/㎡/月",
+          "欠缴 8个月",
+          "¥3,602.40",
+          "10-12 (管家电话)",
+          "一键催缴 催告函",
+          "03号楼-2204室林振宇 (150****8831)",
+          "89.2 ㎡",
+          "¥3.80/㎡/月",
+          "欠缴 3个月",
+          "¥1,016.88",
+          "09-28 (系统自动)",
+          "一键催缴 明细",
+          "07号楼-0302室陈建国 (军烈属优抚)",
+          "95.0 ㎡",
+          "¥3.80/㎡/月",
+          "优抚减免核准",
+          "¥0.00 (已减免50%)",
+          "李明主管已批复",
+          "审批单"
+        ]
+      },
+      {
+        "rows": [
+          "沪A·D88192地库A区-A088",
+          "何少华 (186****1120)",
+          "固定产权位管理费",
+          "2024-10-28 (剩4天)",
+          "¥150/月",
+          "即将到期",
+          "微信提醒 续期",
+          "沪B·5K998地库B区-B142",
+          "苏景祥 (137****9022)",
+          "长租固定位",
+          "2024-09-30 (已逾期)",
+          "¥450/月 (欠900)",
+          "欠费停运/锁闸",
+          "解禁/补缴 详情",
+          "苏E·910QA地库A区-A201",
+          "陆雨欣 (159****3310)",
+          "长租固定位",
+          "2025-06-30",
+          "¥450/月 (已缴年租)",
+          "正常在租",
+          "发票电子联"
+        ]
+      },
+      {
+        "rows": [
+          "室内装修押金",
+          "05号楼-1201室 (方天盛)",
+          "¥5,000.00",
+          "¥5,000.00",
+          "赵玉华",
+          "电子收据 SJ24102101",
+          "押金在押托管",
+          "电梯框架广告屏 Q4季度租",
+          "分众传媒 (上海) 营销部",
+          "¥36,000.00",
+          "¥36,000.00",
+          "李明主管",
+          "增值税专票已开具",
+          "已全额结算",
+          "装潢建筑垃圾清运代运费",
+          "14号楼-0902室 (郭瑞)",
+          "¥1,200.00",
+          "¥1,200.00",
+          "孙立伟",
+          "微信电子凭据",
+          "已运抵消纳场",
+          "声边好物闪铺商户流水抽佣",
+          "彭一鲜果生活超市",
+          "¥4,820.50",
+          "待月结对账",
+          "系统自动",
+          "系统汇总单",
+          "25日自动分账"
+        ]
+      }
+    ]
+  },
+  "weekly": {
+    "expenses": [],
+    "textareas": [
+      "",
+      ""
+    ],
+    "images": [
+      {
+        "src": "/assets/a529d4411d56c28051fd.jpg",
+        "alt": "Technicians inspecting elevator"
+      },
+      {
+        "src": "/assets/45fa6580929a357295ce.jpg",
+        "alt": "Gardening in community park"
+      },
+      {
+        "src": "/assets/c8940b7189e9333aa9fb.jpg",
+        "alt": "Night firefighting drill"
+      },
+      {
+        "src": "/assets/1ffcb60b399231cdb252.jpg",
+        "alt": "Staff helping elderly resident"
+      }
+    ],
+    "backgroundImages": [],
+    "tables": []
+  },
+  "broadcast": {
+    "expenses": [],
+    "textareas": [
+      "【紧急停水通知】尊敬的各位业主：因16号楼前地下主管网突发破裂需紧急开挖抢修，预计将于今日（10月25日）14:00至18:00暂停供水，请相关楼宇业主提前储水并关闭水阀。抢修完毕后将第一时间恢复供水。物业24小时值班热线：400-880-6888。"
+    ],
+    "images": [
+      {
+        "src": "/assets/56fcaed7eebd2944d388.jpg",
+        "alt": "A lush green eco-friendly modern residential apartment complex courtyard in Shanghai with blooming autumn trees, sunlight streaming through glass balconies, warm peaceful neighborhood lifestyle"
+      }
+    ],
+    "backgroundImages": [],
+    "tables": []
+  },
+  "checkin": {
+    "expenses": [],
+    "textareas": [],
+    "images": [
+      {
+        "src": "/assets/f9d4f8927ba09b920f4b.jpg",
+        "alt": "Close up photograph of a leaking indoor brass water pipe underneath a residential kitchen sink, water droplets actively spraying out from damaged valve thread, realistic documentary property inspection style, authentic lighting with sharp details"
+      },
+      {
+        "src": "/assets/3579ea7541990e915933.jpg",
+        "alt": "High detail macro photograph of a newly installed polished brass corner angle valve installed beneath a kitchen sink counter, clean plumbing workmanship, dry sparkling clean tile background, crisp lighting, soft jade reflection tones"
+      },
+      {
+        "src": "/assets/b7432cac117b895ca4eb.jpg",
+        "alt": "Clean closeup view of repaired white PPR domestic water pipe neatly wrapped with white Teflon plumber tape, completely dry and clean joint without any water leakage, bright modern utility room lighting, crisp professional quality"
+      }
+    ],
+    "backgroundImages": [],
+    "tables": []
+  },
+  "tasks": {
+    "expenses": [],
+    "textareas": [],
+    "images": [
+      {
+        "src": "/assets/7b8e5a2d15ef6cd339fa.jpg",
+        "alt": "A warm, confident Chinese master technician in his 40s wearing a clean dark emerald work vest and cap, warm natural lighting, professional and friendly portrait, modern smart community backdrop"
+      },
+      {
+        "src": "/assets/a98d1e7e323df13055f8.jpg",
+        "alt": "High quality close-up photo of a burst metal water pipe valve in a domestic bathroom, spraying water on modern gray ceramic floor tiles, sharp detail, dramatic ambient indoor lighting"
+      },
+      {
+        "src": "/assets/0edc5e6631c7640993ec.jpg",
+        "alt": "Modern Chinese residential apartment interior with a designer ceiling lamp fixture on a clean plaster ceiling, daylight streaming through large windows"
+      },
+      {
+        "src": "/assets/15447bb9b7ebd132d87a.jpg",
+        "alt": "Close up of modern kitchen sink plumbing pipe and brass angle stop valve under stainless steel sink, neat installation, bright neutral lighting"
+      }
+    ],
+    "backgroundImages": [],
+    "tables": []
+  },
+  "group": {
+    "expenses": [],
+    "textareas": [],
+    "images": [],
+    "backgroundImages": [],
+    "tables": [
+      {
+        "rows": [
+          "彭一 彭一智慧社区 标杆示范 静安彭浦 · 智慧数字改造示范区",
+          "2,480 户 入驻率 98.4%",
+          "¥84,210.00 320笔 / 秒级清算",
+          "94.2% 超集团指标 4.2%",
+          "¥12,400.00",
+          "+¥71,810.00",
+          "¥2,340,000",
+          "正常运营",
+          "visibility open_in_new swap_horiz",
+          "彭二 彭二新村 老旧改造 老龄化高 / 维修单密集",
+          "1,860 户 入驻率 91.2%",
+          "¥32,150.00 线下居委收缴转接",
+          "81.5% 距目标差 3.5%",
+          "¥28,600.00 主供水管抢修出账",
+          "+¥3,550.00",
+          "¥820,000",
+          "抢修支出偏高",
+          "visibility open_in_new swap_horiz",
+          "锦绣 锦绣华庭 高端商业住宅 高层双会所 · 车位比 1:1.6",
+          "3,200 户 入驻率 99.1%",
+          "¥142,800.00 年缴业主集中返现",
+          "96.8% 全集团第一",
+          "¥18,900.00",
+          "+¥123,900.00",
+          "¥5,180,000",
+          "极优资金流",
+          "visibility open_in_new swap_horiz",
+          "绿洲 绿洲康城 欠费风险 连续两季度低于 75% 警戒线",
+          "1,420 户 空置率 14%",
+          "¥28,940.00 小额催缴入账",
+          "73.2% 黄牌催缴整改",
+          "¥14,500.00",
+          "+¥14,440.00",
+          "¥410,000 (近预警)",
+          "催缴预警",
+          "priority_high open_in_new 督办整改",
+          "滨江 滨江雅苑 徐汇沿江 · 中型品质盘",
+          "980 户 入驻率 96.5%",
+          "¥41,200.00 微信即时清缴",
+          "88.0% 达标稳健",
+          "¥8,300.00",
+          "+¥32,900.00",
+          "¥1,920,000",
+          "运行平稳",
+          "visibility open_in_new swap_horiz",
+          "望江 望江府 新交付期 交付首年预缴收缴顺畅",
+          "1,600 户 交付率 94.0%",
+          "¥57,220.80 装修押金与车位管费",
+          "92.4% 首期达标",
+          "¥9,730.00",
+          "+¥47,490.80",
+          "¥3,100,000",
+          "良好推进",
+          "visibility open_in_new swap_horiz"
+        ]
+      }
+    ]
+  },
+  "home": {
+    "expenses": [],
+    "textareas": [],
+    "images": [],
+    "backgroundImages": [
+      "background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuAIjQfA8fFppEcAlnD3Uc4g4tNRr3gOq0vABRbpCbbWAGjHGUt4kCrhRelezt-4bvcR081ZSus3DIYRvr1HazqxyvPbSYQr2FJikrMYzYryeV038pY-5Q_0VyYB_ZgPYWhvGAiQzVKcMbCYU2b9mxd2lFrhScUq5LAzP33VJVHbQ_5w8I26EZ5u0WK_WM5f00RpQBpLd6ZqGLOw8U4IKrQkSSmyTLVB3U53vPwZIsjiQqOKmu-lsH3R')",
+      "background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuCSxWEbXU2_e13R8BzQEEqva0vvI5LKrDts0YHEV2yMPXcCTX9TajYBvXrkKXjiviwG1laZLnABm5vlOMxj7iq6sMOu9x2to36qYpeM9zOScmqvWa7SIqC5DkB34r3jYuO0AoJ_3olbQFcUOkBLarFvRkGh-lcl0aUWEC256mwGDOPMwVLD8PMnnVtTOyjEsnvVsk6U6FvrOyVOo8O-yVPwjAtEYiDswvFVn-oypQUFxy7klCJj9sUS')",
+      "background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuC53Y82v8ImOwGO1Shtu3wcJVQoL5q_npojmwi2wd_BruqsdeperEJzU4EOwa77oMDTKhkDM_Z05ZzDc0ACulrQhh0BI5Ffsgm_heaW1gBn9bknm7U1dqVf0s34NSQwjsyzIx259xmltCHher8zaTT8dOfseG53z_-oH7CbQOptC9nMoh0UzouE7ZPE6LW-oVnOpm-yYxYEopSCHNQT_JUa0Uqwr6tUcC-Bx893WnqzA06DKJJQLouW')",
+      "background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuDTdPJ1COx0rCu8yW7NWq-GScTOjVUATc8lRnu4d5NaF4JPB2-TX2jkR8zYjpHaWHjn8F8aJML3d8ajaPP-j3O9bBZlVadvcSPIyDgpah38t-8z0vpjQVzwMc9T1B-w06n8U3HLQ6LJ6Q7gaQsAI-EHJQbzAELdEw6SvfvN5-PyIf3PXOT6sLs0Q1H6K4Y2Q_PjS2RS1x9qCk_gYBDG5P4T1Sk6pmHGVXKXNZLm05d4LYccZVZ1tI-I')",
+      "background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuD6zF3dDZ0zbgehZDMB5RbzDaBy82almrdGllwEfoMcitBpKT9MM4aZv5pprnKeTuZA4vruxQE7KrXvdqy6sVbcjckHIcReMEjMNdUm-x5U3rcT3t3f6BdycjxXh-pEpRDeHTVrZdkpZzLKq39SZpArrF27Wsezc4VeaYNnRBaP3YeZPTwmYEnkrMgIX-y8aBDE1E0RnhUp9ZFD8DUNfoCOFrFLGTzps4r3IoGxEnpDDTRwSYbmh_4h')",
+      "background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuBS9Akb44sysodwYPLfE7p7sTUQvBjCwLu6f7MiB0fZ3qvP2kKfyoThU7gpOi8Poc-mrL6xP1lSzbxJXhz06QA-U2qp2gRLqQl0PQ3lBU4X4obAI15XGaESfw3t4M1iFHeG61G3QgB5Wy0h3MOdI-Aed5CChEYvH87g9OnzYEPhuoxhCM_r3yQZOceanRU38C2DRGmyItDaaNv0xmLNU_xBiSnHw75gNHLUulYjsV1GEw-uNvrmML1B')",
+      "background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuDeMUw9xY13ey1wMeWAwd5wlQBGE2YtiDT_2S5NDPCVSco-HExRm839QM7D9G-BihW9iakuWkpAP2qMmh1x-rnC36gytggXpDAOwJoa_pyUU7H6_XT8t0rvx28GOb6n_h_dP17gU0rtJcaoj_kVAIrReZoWkJSuPMIIGHOZVLWTHX_UejDQj1FZ0CSs7ICHOGjpi5e3imcEfoMhD6_E7u9dg1EP4VAmVdHs_iW9dAPn52XhQHtZ8OWG')"
+    ],
+    "tables": []
+  },
+  "login": {
+    "expenses": [],
+    "textareas": [],
+    "images": [],
+    "backgroundImages": [],
+    "tables": []
+  },
+  "verify": {
+    "expenses": [],
+    "textareas": [],
+    "images": [
+      {
+        "src": "/assets/d0d1114a9eaa87fdba21.jpg",
+        "alt": "Close-up photograph of Chinese real estate ownership certificate title deed booklet cover with green embossed emblem, lying on a clean wooden desk under warm morning lighting, architectural documentary photography."
+      },
+      {
+        "src": "/assets/9984cbb09a4ed950b78d.jpg",
+        "alt": "Macro macro detailed view of Chinese official property deed interior registration page showing official red seal stamp and clear property registry table, soft ambient office light."
+      }
+    ],
+    "backgroundImages": [],
+    "tables": []
+  },
+  "review": {
+    "expenses": [],
+    "textareas": [
+      ""
+    ],
+    "images": [
+      {
+        "src": "/assets/21dc9ebb33ce2c349202.jpg",
+        "alt": "A warm, smiling Asian professional maintenance craftsman wearing a neat emerald green utility work uniform with safety ID badge and clean demeanor, soft indoor daylight, cinematic natural portrait, high detail, friendly and reliable aura."
+      },
+      {
+        "src": "/assets/d78c09e1a9b16f472816.jpg",
+        "alt": "Close up photography of brand new sparkling chrome plumbing faucet and shiny PVC sink pipe installed properly without any leaks in a clean warm-toned apartment kitchen, bright daylight reflecting on porcelain tiles, sharp focus."
+      }
+    ],
+    "backgroundImages": [],
+    "tables": []
+  },
+  "media": {
+    "expenses": [],
+    "textareas": [],
+    "images": [
+      {
+        "src": "/assets/6d06b50456b95f0e5d62.jpg",
+        "alt": "A warm and cinematic documentary portrait of a smiling middle-aged Asian property manager wearing a smart emerald green uniform, standing in a lush sunlit modern residential garden courtyard, shallow depth of field, warm ambient morning light, authentic and comforting editorial atmosphere."
+      },
+      {
+        "src": "/assets/4d0ea3cf0aa95de90bb5.jpg",
+        "alt": "A cinematic, rain-soaked community scene at dusk showing property management heroes in high-visibility emerald green waterproof raincoats unclogging outdoor drainage grills to prevent flooding during a storm, dramatic storm lighting with warm streetlamps reflecting in clear puddles, documentary realism."
+      },
+      {
+        "src": "/assets/f1b304f62a62f235d0e9.jpg",
+        "alt": "Close up photograph of a beautifully maintained spring community garden with vibrant blooming marigolds and manicured bushes, bright cheerful natural sunlight, peaceful residential landscape."
+      },
+      {
+        "src": "/assets/b05b382caae1ef8de11b.jpg",
+        "alt": "A clean, industrial yet highly hygienic view of certified property maintenance workers in full sterile protective suits and headgear thoroughly sanitizing a sparkling clean stainless steel underground municipal water cistern, bright industrial white-blue lighting showcasing pristine hygiene standards."
+      },
+      {
+        "src": "/assets/9023e91ec87656813fb2.jpg",
+        "alt": "Energetic early morning martial arts and tactical emergency defense drill by handsome Asian security officers dressed in sleek modern tactical security uniforms inside a pristine contemporary upscale apartment complex plaza, crisp morning dawn light, disciplined formations."
+      }
+    ],
+    "backgroundImages": [],
+    "tables": []
+  },
+  "services": {
+    "expenses": [],
+    "textareas": [],
+    "images": [
+      {
+        "src": "/assets/e4d14ce3e2ae4f3adeb2.jpg",
+        "alt": "Fresh handmade Chinese dumplings on a bamboo steamer and artisanal home-baked pastries"
+      },
+      {
+        "src": "/assets/eb4e6e18f50fd7671e8d.jpg",
+        "alt": "A professional HVAC technician in a crisp emerald-trimmed uniform cleaning an indoor central air conditioning unit using steam equipment inside a clean modern living room, bright morning natural lighting, crisp details, high-end residential aesthetic."
+      },
+      {
+        "src": "/assets/d0bd6943b8f2d4513e3c.jpg",
+        "alt": "A modern apartment window installation showing sleek stainless steel anti-mosquito wire mesh screen, pristine finish, soft blurred residential park greenery background, warm afternoon daylight."
+      },
+      {
+        "src": "/assets/e4d14ce3e2ae4f3adeb2.jpg",
+        "alt": "A premium gift box of freshly picked pink honey peaches nestled in clean straw packaging on a wooden table, dewdrops visible, high quality gourmet food photography, bright soft warm lighting."
+      }
+    ],
+    "backgroundImages": [],
+    "tables": []
+  },
+  "bills": {
+    "expenses": [],
+    "textareas": [],
+    "images": [],
+    "backgroundImages": [],
+    "tables": []
+  },
+  "repair": {
+    "expenses": [],
+    "textareas": [
+      ""
+    ],
+    "images": [
+      {
+        "src": "/assets/237eabbfdd058c36fde8.jpg",
+        "alt": "Close up photography of a domestic bathroom water pipe elbow joint with tiny droplets of fresh leaking water on glossy jade ceramic tiles, shot in clean natural morning soft ambient light with sharp mechanical details and high focus fidelity."
+      }
+    ],
+    "backgroundImages": [],
+    "tables": []
+  },
+  "profile": {
+    "expenses": [],
+    "textareas": [],
+    "images": [
+      {
+        "src": "/assets/1171588081b4f9785ab0.jpg",
+        "alt": "Warm friendly portrait of middle-aged male Chinese maintenance technician in neat emerald work uniform with polite smile, clean daylight background"
+      },
+      {
+        "src": "/assets/a481d394a10a5f9c9105.jpg",
+        "alt": "Portrait of pleasant young female Asian property manager in professional suit, warm natural smile, emerald necktie accent"
+      }
+    ],
+    "backgroundImages": [],
+    "tables": []
+  },
+  "billing": {
+    "expenses": [],
+    "textareas": [],
+    "images": [],
+    "backgroundImages": [],
+    "tables": []
+  },
+  "points": {
+    "expenses": [],
+    "textareas": [],
+    "images": [
+      {
+        "src": "/assets/3c4b083f0f26f1b2e0d9.jpg",
+        "alt": "A professional home appliance maintenance technician wearing clean uniform with green accents meticulously cleaning a kitchen range hood, bright clean kitchen lighting, professional lifestyle photography, soft green aesthetic."
+      },
+      {
+        "src": "/assets/c605669a6d3ba919c008.jpg",
+        "alt": "An organized open household tool set with drills, screwdrivers, wrenches, hammer neatly aligned inside a sturdy emerald green carrying case, warm studio lighting, crisp product view."
+      },
+      {
+        "src": "/assets/a8a3a99bea797f5a30ae.jpg",
+        "alt": "A premium 5kg cloth bag of organic Wuchang rice resting on a rustic wooden table with natural morning light and gentle green botanical leaves nearby, clean organic food packaging."
+      },
+      {
+        "src": "/assets/a959d5ab1d24c9f868b5.jpg",
+        "alt": "An elegant glass bottle of cold pressed camellia oil with golden liquid glowing under soft natural sunlight, surrounded by delicate camellia seeds on an emerald textured background."
+      },
+      {
+        "src": "/assets/aa380591b2a2ec2e9097.jpg",
+        "alt": "A trendy minimalist art toy collectible vinyl figure designed with emerald headphones, holding a small radio, studio lighting on soft mint pastel background, collectible designer toy."
+      },
+      {
+        "src": "/assets/d79a519c668725edd237.jpg",
+        "alt": "Cozy neighborhood outdoor cinema lawn at dusk with fairy string lights, comfortable emerald deck chairs, a large projection screen displaying a warm movie scene, happy community ambiance."
+      }
+    ],
+    "backgroundImages": [],
+    "tables": []
+  }
+}
