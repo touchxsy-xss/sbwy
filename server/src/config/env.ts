@@ -1,5 +1,11 @@
 import { z } from 'zod';
 
+const booleanEnv = z.preprocess(value => {
+  if (value === 'true') return true;
+  if (value === 'false') return false;
+  return value;
+}, z.boolean());
+
 const envSchema = z.object({
   NODE_ENV: z.enum(['development', 'test', 'production']).default('development'),
   HOST: z.string().min(1).default('127.0.0.1'),
@@ -7,7 +13,7 @@ const envSchema = z.object({
   DATABASE_URL: z.string().min(1),
   SESSION_SECRET: z.string().min(32),
   APP_ORIGIN: z.string().url().default('http://localhost:5173'),
-  COOKIE_SECURE: z.coerce.boolean().default(false),
+  COOKIE_SECURE: booleanEnv.default(false),
   SEED_ADMIN_PASSWORD: z.string().min(8).optional(),
   SEED_MANAGER_PASSWORD: z.string().min(8).optional(),
   SEED_ENGINEER_PASSWORD: z.string().min(8).optional(),
