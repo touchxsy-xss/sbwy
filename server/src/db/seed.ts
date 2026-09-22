@@ -1,13 +1,21 @@
-import { eq } from 'drizzle-orm';
+import { and, eq, isNull } from 'drizzle-orm';
 import { createConfiguredDb } from './client.js';
 import { companyMemberships, communities, permissions, propertyCompanies, rolePermissions, roles, userRoleAssignments, users, employeeProfiles } from './schema/index.js';
 import { hashPassword } from '../modules/auth/service.js';
 import { loadEnv } from '../config/env.js';
 
 const env = loadEnv();
-const password = env.SEED_ADMIN_PASSWORD;
-if (!password) throw new Error('SEED_ADMIN_PASSWORD is required for database seed');
+const defaultPassword = env.SEED_ADMIN_PASSWORD;
+if (!defaultPassword) throw new Error('SEED_ADMIN_PASSWORD is required for database seed');
+
+const passwords = {
+  manager: env.SEED_MANAGER_PASSWORD || defaultPassword,
+  engineer: env.SEED_ENGINEER_PASSWORD || defaultPassword,
+  bAdmin: env.SEED_B_ADMIN_PASSWORD || defaultPassword
+};
+
 const { db, client } = createConfiguredDb();
+
 const roleSeed = [
   ['PLATFORM_ADMIN', '平台管理员', 'PLATFORM'],
   ['PROPERTY_ADMIN', '物业公司管理员', 'COMPANY'],
@@ -15,37 +23,100 @@ const roleSeed = [
   ['PROPERTY_STAFF', '物业员工', 'COMMUNITY'],
   ['ENGINEER', '工程员工', 'COMMUNITY']
 ] as const;
+
 const permissionSeed = [
-  ['company:read', '查看物业公司', 'company', 'read'], ['community:read', '查看小区', 'community', 'read'], ['community:write', '管理小区', 'community', 'write'],
-  ['employee:read', '查看员工', 'employee', 'read'], ['employee:write', '管理员工', 'employee', 'write'], ['role:read', '查看角色权限', 'role', 'read'], ['access:read', '查看授权', 'access', 'read'], ['access:write', '管理授权', 'access', 'write']
+  ['company:read', '查看物业公司', 'company', 'read'],
+  ['community:read', '查看小区', 'community', 'read'],
+  ['community:write', '管理小区', 'community', 'write'],
+  ['employee:read', '查看员工', 'employee', 'read'],
+  ['employee:write', '管理员工', 'employee', 'write'],
+  ['role:read', '查看角色权限', 'role', 'read'],
+  ['access:read', '查看授权', 'access', 'read'],
+  ['access:write', '管理授权', 'access', 'write']
+] as const;
+
+const companySeed = [
+  { code: 'property-a', name: '物业公司 A' },
+  { code: 'property-b', name: '物业公司 B' }
+] as const;
+
+const communitySeed = [
+  { companyCode: 'property-a', code: 'community-a1', name: '小区 A1' },
+  { companyCode: 'property-a', code: 'community-a2', name: '小区 A2' },
+  { companyCode: 'property-b', code: 'community-b1', name: '小区 B1' }
 ] as const;
 
 try {
   await db.transaction(async tx => {
-    const [company] = await tx.insert(propertyCompanies).values({ code: 'shengbian-demo', name: '声边演示物业', status: 'ACTIVE' }).onConflictDoNothing({ target: propertyCompanies.code }).returning();
-    const companyRow = company || (await tx.select().from(propertyCompanies).where(eq(propertyCompanies.code, 'shengbian-demo')).limit(1))[0];
-    const [community] = await tx.insert(communities).values({ propertyCompanyId: companyRow.id, code: 'pengyi', name: '彭一小区', address: '上海市示范地址', status: 'ACTIVE' }).onConflictDoNothing().returning();
-    const communityRow = community || (await tx.select().from(communities).where(eq(communities.code, 'pengyi')).limit(1))[0];
-    const roleRows = [] as any[];
+    const companies = new Map<string, any>();
+    for (const item of companySeed) {
+      const [existing] = await tx.select().from(propertyCompanies).where(eq(propertyCompanies.code, item.code)).limit(1);
+      const [row] = existing ? [existing] : await tx.insert(propertyCompanies).values({ ...item, status: 'ACTIVE' }).returning();
+      companies.set(item.code, row);
+    }
+
+    const communitiesByCode = new Map<string, any>();
+    for (const item of communitySeed) {
+      const company = companies.get(item.companyCode);
+      const [existing] = await tx.select().from(communities).where(and(eq(communities.propertyCompanyId, company.id), eq(communities.code, item.code))).limit(1);
+      const [row] = existing ? [existing] : await tx.insert(communities).values({ propertyCompanyId: company.id, code: item.code, name: item.name, status: 'ACTIVE' }).returning();
+      communitiesByCode.set(item.code, row);
+    }
+
+    const rolesByCode = new Map<string, any>();
     for (const [code, name, scopeType] of roleSeed) {
-      const [row] = await tx.insert(roles).values({ code, name, scopeType }).onConflictDoNothing({ target: roles.code }).returning();
-      roleRows.push(row || (await tx.select().from(roles).where(eq(roles.code, code)).limit(1))[0]);
+      const [existing] = await tx.select().from(roles).where(eq(roles.code, code)).limit(1);
+      const [row] = existing ? [existing] : await tx.insert(roles).values({ code, name, scopeType }).returning();
+      rolesByCode.set(code, row);
     }
-    const permissionRows = [] as any[];
+
+    const permissionsByCode = new Map<string, any>();
     for (const [code, name, resource, action] of permissionSeed) {
-      const [row] = await tx.insert(permissions).values({ code, name, resource, action }).onConflictDoNothing({ target: permissions.code }).returning();
-      permissionRows.push(row || (await tx.select().from(permissions).where(eq(permissions.code, code)).limit(1))[0]);
+      const [existing] = await tx.select().from(permissions).where(eq(permissions.code, code)).limit(1);
+      const [row] = existing ? [existing] : await tx.insert(permissions).values({ code, name, resource, action }).returning();
+      permissionsByCode.set(code, row);
     }
-    const propertyAdmin = roleRows.find(row => row.code === 'PROPERTY_ADMIN');
-    for (const permission of permissionRows) await tx.insert(rolePermissions).values({ roleId: propertyAdmin.id, permissionId: permission.id }).onConflictDoNothing();
-    const passwordHash = await hashPassword(password);
-    const [user] = await tx.insert(users).values({ name: '李明', phone: '13800000001', email: 'admin@shengbian.local', passwordHash, status: 'ACTIVE' }).onConflictDoNothing({ target: users.phone }).returning();
-    const userRow = user || (await tx.select().from(users).where(eq(users.phone, '13800000001')).limit(1))[0];
-    const [membership] = await tx.insert(companyMemberships).values({ userId: userRow.id, propertyCompanyId: companyRow.id, membershipType: 'PROPERTY_ADMIN', status: 'ACTIVE' }).onConflictDoNothing().returning();
-    const membershipRow = membership || (await tx.select().from(companyMemberships).where(eq(companyMemberships.userId, userRow.id)).limit(1))[0];
-    await tx.insert(employeeProfiles).values({ companyMembershipId: membershipRow.id, employeeNo: 'SB-ADMIN-001', department: '物业运营', position: '物业高级主管', employeeType: 'ADMIN' }).onConflictDoNothing();
-    await tx.insert(userRoleAssignments).values({ userId: userRow.id, roleId: propertyAdmin.id, propertyCompanyId: companyRow.id }).onConflictDoNothing();
-    console.log(`Seeded company ${companyRow.code}, community ${communityRow.code}, admin ${userRow.phone}.`);
+
+    const permissionCodesByRole: Record<string, string[]> = {
+      PROPERTY_ADMIN: permissionSeed.map(item => item[0]),
+      COMMUNITY_MANAGER: ['community:read', 'community:write', 'employee:read', 'access:read'],
+      PROPERTY_STAFF: ['community:read', 'employee:read'],
+      ENGINEER: ['community:read']
+    };
+    for (const [roleCode, codes] of Object.entries(permissionCodesByRole)) {
+      const role = rolesByCode.get(roleCode);
+      for (const code of codes) {
+        const permission = permissionsByCode.get(code);
+        await tx.insert(rolePermissions).values({ roleId: role.id, permissionId: permission.id }).onConflictDoNothing();
+      }
+    }
+
+    const userSeed = [
+      { name: '物业公司 A 管理员', phone: '13800000001', email: 'a-admin@shengbian.local', password: defaultPassword, companyCode: 'property-a', membershipType: 'PROPERTY_ADMIN' as const, roleCode: 'PROPERTY_ADMIN', employeeNo: 'A-ADMIN-001', department: '物业运营', position: '物业公司管理员', employeeType: 'ADMIN', communityCode: null },
+      { name: '物业公司 A 项目经理', phone: '13800000002', email: 'a-manager@shengbian.local', password: passwords.manager, companyCode: 'property-a', membershipType: 'PROPERTY_EMPLOYEE' as const, roleCode: 'COMMUNITY_MANAGER', employeeNo: 'A-MANAGER-001', department: '项目管理', position: '项目经理', employeeType: 'MANAGER', communityCode: 'community-a1' },
+      { name: '物业公司 A 工程员工', phone: '13800000003', email: 'a-engineer@shengbian.local', password: passwords.engineer, companyCode: 'property-a', membershipType: 'PROPERTY_EMPLOYEE' as const, roleCode: 'ENGINEER', employeeNo: 'A-ENGINEER-001', department: '工程维修', position: '工程员工', employeeType: 'ENGINEER', communityCode: 'community-a1' },
+      { name: '物业公司 B 管理员', phone: '13800000004', email: 'b-admin@shengbian.local', password: passwords.bAdmin, companyCode: 'property-b', membershipType: 'PROPERTY_ADMIN' as const, roleCode: 'PROPERTY_ADMIN', employeeNo: 'B-ADMIN-001', department: '物业运营', position: '物业公司管理员', employeeType: 'ADMIN', communityCode: null }
+    ];
+
+    for (const item of userSeed) {
+      const company = companies.get(item.companyCode);
+      const community = item.communityCode ? communitiesByCode.get(item.communityCode) : null;
+      const passwordHash = await hashPassword(item.password);
+      const [existingUser] = await tx.select().from(users).where(eq(users.phone, item.phone)).limit(1);
+      const [user] = existingUser ? [existingUser] : await tx.insert(users).values({ name: item.name, phone: item.phone, email: item.email, passwordHash, status: 'ACTIVE' }).returning();
+      const [existingMembership] = await tx.select().from(companyMemberships).where(and(eq(companyMemberships.userId, user.id), eq(companyMemberships.propertyCompanyId, company.id))).limit(1);
+      const [membership] = existingMembership ? [existingMembership] : await tx.insert(companyMemberships).values({ userId: user.id, propertyCompanyId: company.id, membershipType: item.membershipType, status: 'ACTIVE' }).returning();
+      const [existingEmployee] = await tx.select().from(employeeProfiles).where(eq(employeeProfiles.companyMembershipId, membership.id)).limit(1);
+      if (!existingEmployee) await tx.insert(employeeProfiles).values({ companyMembershipId: membership.id, employeeNo: item.employeeNo, department: item.department, position: item.position, employeeType: item.employeeType });
+      const role = rolesByCode.get(item.roleCode);
+      const assignmentFilter = [eq(userRoleAssignments.userId, user.id), eq(userRoleAssignments.roleId, role.id), eq(userRoleAssignments.propertyCompanyId, company.id), isNull(userRoleAssignments.revokedAt)];
+      if (community) assignmentFilter.push(eq(userRoleAssignments.communityId, community.id));
+      else assignmentFilter.push(isNull(userRoleAssignments.communityId));
+      const [existingAssignment] = await tx.select().from(userRoleAssignments).where(and(...assignmentFilter)).limit(1);
+      if (!existingAssignment) await tx.insert(userRoleAssignments).values({ userId: user.id, roleId: role.id, propertyCompanyId: company.id, communityId: community?.id || null });
+    }
+
+    console.log('Seeded property-a/property-b, communities A1/A2/B1, and admin/manager/engineer test users.');
   });
 } finally {
   await client.end();

@@ -8,12 +8,16 @@ import type { CommunityRecord, CompanyRecord, MembershipRecord, PermissionRecord
 
 const env: AppOptions['env'] = {
   NODE_ENV: 'test',
+  HOST: '127.0.0.1',
   PORT: 3001,
   DATABASE_URL: 'postgres://test.invalid/shengbian',
   SESSION_SECRET: 'test-session-secret-with-at-least-32-characters',
   APP_ORIGIN: 'http://localhost:5173',
   COOKIE_SECURE: false,
-  SEED_ADMIN_PASSWORD: undefined
+  SEED_ADMIN_PASSWORD: undefined,
+  SEED_MANAGER_PASSWORD: undefined,
+  SEED_ENGINEER_PASSWORD: undefined,
+  SEED_B_ADMIN_PASSWORD: undefined
 };
 
 const date = new Date('2026-01-01T00:00:00.000Z');

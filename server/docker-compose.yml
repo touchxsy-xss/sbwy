@@ -7,7 +7,7 @@ services:
       POSTGRES_PASSWORD: shengbian_dev
       POSTGRES_DB: shengbian
     ports:
-      - "5433:5432"
+      - "127.0.0.1:5433:5432"
     volumes:
       - shengbian-postgres:/var/lib/postgresql/data
 
