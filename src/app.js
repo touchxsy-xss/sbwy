@@ -262,7 +262,14 @@ async function showFile(file) {
 function showOrders(filter) {
   const orders = state().orders.filter(o => !filter || filter(o));
   const canReview = o => route.group === 'mobile' && o.status === 'completed' && !state().reviews.some(r => r.orderId === o.id);
-  const dlg = modal('我的工单记录', list(orders, o => `<article><button data-order="${escape(o.id)}"><strong>${escape(o.title)}</strong><small>${escape(o.id)} · ${escape(o.room)} · ${canReview(o) ? '服务已完成，待评价' : statuses[o.status]}</small></button>${canReview(o) ? `<button class="demo-button" data-review-order="${escape(o.id)}">评价服务</button>` : ''}</article>`), [{ label: '新建报修', run: () => go('/mobile/repair') }]);
+  const reviewFor = order => state().reviews.find(review => review.orderId === order.id);
+  const orderStatus = order => {
+    const review = reviewFor(order);
+    if (canReview(order)) return '服务已完成，待评价';
+    if (review) return `已评价 · ${review.rating} 星`;
+    return statuses[order.status];
+  };
+  const dlg = modal('我的工单记录', list(orders, o => `<article><button data-order="${escape(o.id)}"><strong>${escape(o.title)}</strong><small>${escape(o.id)} · ${escape(o.room)} · ${escape(orderStatus(o))}</small></button>${canReview(o) ? `<button class="demo-button" data-review-order="${escape(o.id)}">评价服务</button>` : ''}</article>`), [{ label: '新建报修', run: () => go('/mobile/repair') }]);
   $$('[data-order]', dlg).forEach(btn => bind(btn, '工单详情', () => go(`/${route.group}/orders/${btn.dataset.order}`)));
   $$('[data-review-order]', dlg).forEach(btn => bind(btn, '评价维修服务', () => go('/mobile/review?id=' + btn.dataset.reviewOrder)));
 }
@@ -281,9 +288,14 @@ function orderDetail(orderId) {
   if (route.group === 'mobile' && ['completed', 'closed'].includes(order.status) && !state().reviews.some(r => r.orderId === order.id)) actions.push({ label: '评价服务', run: () => go(`/mobile/review?id=${order.id}`) });
   if (route.group === 'mobile' && order.amount > 0 && !order.paid) actions.push({ label: '缴纳维修费', run: () => go(`/mobile/billing?tab=others&bill=repair-${order.id}`) });
   actions.push({ label: '返回', secondary: true, run: back });
+  const review = state().reviews.find(item => item.orderId === order.id);
+  const reviewStatus = ['completed', 'closed'].includes(order.status) ? review ? `已评价 · ${review.rating} 星` : '服务已完成，待居民评价' : '尚未进入评价阶段';
+  const reviewContent = review
+    ? `<section class="demo-review-detail"><h4>居民服务评价 · ${escape(review.rating)} 星</h4><p>${escape((review.tags || []).join(' · ') || '未选择服务标签')}</p><p>${escape(review.comment || '居民未填写文字评价')}</p><small>${new Date(review.at).toLocaleString('zh-CN')}${review.followUp?.status === 'followed_up' ? ` · 物业已回访：${escape(review.followUp.note)}` : ''}</small></section>`
+    : '';
   const sla = arrivalStatus(order);
   const due = order.arrivalDueAt ? new Date(order.arrivalDueAt).toLocaleString('zh-CN') : '接单后生成';
-  const dlg = modal('工单详情', `<h3>${escape(order.title)}</h3><dl class="demo-meta"><dt>工单号</dt><dd>${escape(order.id)}</dd><dt>状态</dt><dd>${statuses[order.status]}</dd><dt>房屋/位置</dt><dd>${escape(order.room)}</dd><dt>预约时间</dt><dd>${escape(order.appointment)}</dd><dt>到岗时限</dt><dd>${escape(order.sla?.arrivalMinutes || (order.urgent ? 30 : 120))} 分钟；截止 ${escape(due)}</dd><dt>履约状态</dt><dd>${escape(sla.text)}</dd><dt>维修师傅</dt><dd>${escape(order.technician || '等待派工')}</dd><dt>应付金额</dt><dd>¥${money(order.amount)} ${order.amount ? order.paid ? '已缴清' : '待缴费' : ''}</dd></dl><p>${escape(order.description)}</p><ol class="demo-timeline">${order.timeline.map(t => `<li>${escape(t.label)}<time>${new Date(t.at).toLocaleString('zh-CN')}</time></li>`).join('')}</ol><div class="demo-inline">${(order.photos || []).map((f, i) => f.src ? `<img src="${escape(f.src)}" alt="报修照片">` : `<button data-file-index="${i}" class="demo-button secondary">${escape(f.name)}</button>`).join('')}</div>`, actions);
+  const dlg = modal('工单详情', `<h3>${escape(order.title)}</h3><dl class="demo-meta"><dt>工单号</dt><dd>${escape(order.id)}</dd><dt>状态</dt><dd>${statuses[order.status]}</dd><dt>评价状态</dt><dd>${escape(reviewStatus)}</dd><dt>房屋/位置</dt><dd>${escape(order.room)}</dd><dt>预约时间</dt><dd>${escape(order.appointment)}</dd><dt>到岗时限</dt><dd>${escape(order.sla?.arrivalMinutes || (order.urgent ? 30 : 120))} 分钟；截止 ${escape(due)}</dd><dt>履约状态</dt><dd>${escape(sla.text)}</dd><dt>维修师傅</dt><dd>${escape(order.technician || '等待派工')}</dd><dt>应付金额</dt><dd>¥${money(order.amount)} ${order.amount ? order.paid ? '已缴清' : '待缴费' : ''}</dd></dl>${reviewContent}<p>${escape(order.description)}</p><ol class="demo-timeline">${order.timeline.map(t => `<li>${escape(t.label)}<time>${new Date(t.at).toLocaleString('zh-CN')}</time></li>`).join('')}</ol><div class="demo-inline">${(order.photos || []).map((f, i) => f.src ? `<img src="${escape(f.src)}" alt="报修照片">` : `<button data-file-index="${i}" class="demo-button secondary">${escape(f.name)}</button>`).join('')}</div>`, actions);
   $$('[data-file-index]', dlg).forEach(btn => bind(btn, '查看工单附件', () => showFile(order.photos[btn.dataset.fileIndex])));
 }
 function assign(order) {

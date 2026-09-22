@@ -225,6 +225,7 @@ function createStore(storage, notify2 = () => {
 }) {
   function migrate(state2) {
     state2.version = 2;
+    state2.reviews ||= [];
     state2.organization ||= structuredClone(organization);
     const legacyCompanyNames = { "\u793A\u8303\u7269\u4E1A\u516C\u53F8 A": "\u7269\u4E1A\u516C\u53F8 A", "\u5408\u4F5C\u7269\u4E1A\u516C\u53F8 B": "\u7269\u4E1A\u516C\u53F8 B" };
     state2.organization.companies?.forEach((company) => {
@@ -246,6 +247,9 @@ function createStore(storage, notify2 = () => {
         order.checkinAt = order.timeline?.find((t) => t.status === "arrived")?.at || order.acceptedAt;
       }
       if (order.checkinAt && !order.arrivalResult) order.arrivalResult = arrivalStatus(order, new Date(order.checkinAt).getTime());
+    });
+    state2.reviews.forEach((review) => {
+      review.followUp ||= { status: "none", note: "", at: null, by: "" };
     });
     state2.articles.forEach((article) => {
       if (!article.audience && ["elevator", "safety"].includes(article.id)) article.audience = "platform";
@@ -382,7 +386,13 @@ function createStore(storage, notify2 = () => {
         if (s.reviews.some((r) => r.orderId === orderId)) throw new Error("\u8BE5\u5DE5\u5355\u5DF2\u8BC4\u4EF7\uFF0C\u79EF\u5206\u4E0D\u4F1A\u91CD\u590D\u53D1\u653E");
         if (!(input.rating >= 1 && input.rating <= 5)) throw new Error("\u8BF7\u9009\u62E91\u81F35\u661F\u8BC4\u5206");
         if (input.comment?.length > 300) throw new Error("\u8BC4\u4EF7\u4E0D\u80FD\u8D85\u8FC7300\u5B57");
-        const review = { ...input, id: id("REV"), orderId, at: now() };
+        const review = {
+          ...input,
+          id: id("REV"),
+          orderId,
+          at: now(),
+          followUp: { status: "none", note: "", at: null, by: "" }
+        };
         s.reviews.push(review);
         points(s, 20, "\u5B8C\u6210\u7EF4\u4FEE\u670D\u52A1\u8BC4\u4EF7", "review-" + orderId);
         order.status = "closed";
@@ -1407,6 +1417,7 @@ function initResident(ctx) {
       if (title) title.textContent = activeOrder.title;
       bind(card, "\u67E5\u770B\u8FDB\u884C\u4E2D\u5DE5\u5355", () => go2("/mobile/orders/" + activeOrder.id));
     }
+    renderPendingReviews(ctx, card);
     const buttons3 = document.createElement("div");
     buttons3.className = "demo-inline";
     buttons3.innerHTML = `<button class="demo-button secondary" data-profile="bookings">${icon("event_note")}\u9884\u7EA6\u8BB0\u5F55</button><button class="demo-button secondary" data-profile="account">${icon("manage_accounts")}\u8D26\u53F7\u8BBE\u7F6E</button><button class="demo-button secondary" data-profile="bills">${icon("receipt_long")}\u5386\u53F2\u8D26\u671F</button>`;
@@ -1422,6 +1433,22 @@ function initResident(ctx) {
     on(/去逛邻里圈/, () => go2("/mobile/services?panel=community-feed"));
     if (qs2.get("panel") === "community-feed") communityFeed(ctx);
   }
+}
+function renderPendingReviews(ctx, activeCard) {
+  const { state: state2, go: go2 } = ctx;
+  const snapshot = state2();
+  const pending = snapshot.orders.filter(
+    (order) => order.room === snapshot.user.room && order.communityId === snapshot.user.communityId && order.status === "completed" && !snapshot.reviews.some((review) => review.orderId === order.id)
+  );
+  if (!pending.length) return;
+  const section = document.createElement("section");
+  section.className = "demo-pending-reviews";
+  section.setAttribute("aria-label", "\u5F85\u8BC4\u4EF7\u670D\u52A1");
+  section.innerHTML = `<div class="demo-pending-reviews-heading"><div><span class="material-symbols-outlined" aria-hidden="true">rate_review</span><div><h2>\u5F85\u8BC4\u4EF7\u670D\u52A1</h2><p>\u7EF4\u4FEE\u5DF2\u5B8C\u6210\uFF0C\u60A8\u7684\u53CD\u9988\u5C06\u5E2E\u52A9\u7269\u4E1A\u6539\u8FDB\u670D\u52A1</p></div></div><span>${pending.length} \u9879\u5F85\u529E</span></div><div class="demo-pending-review-list">${pending.map((order) => `<article><div><strong>${escape(order.title)}</strong><small>${escape(order.room)} \xB7 ${escape(order.technician || "\u7EF4\u4FEE\u5E08\u5085")} \xB7 ${new Date(order.timeline?.at(-1)?.at || order.createdAt).toLocaleDateString("zh-CN")} \u5B8C\u5DE5</small></div><button class="demo-button" data-pending-review="${escape(order.id)}">\u7ACB\u5373\u8BC4\u4EF7 ${icon("arrow_forward")}</button></article>`).join("")}</div>`;
+  const mainContent = $("main > div");
+  if (activeCard?.parentElement === mainContent) activeCard.after(section);
+  else mainContent?.prepend(section);
+  $$("[data-pending-review]", section).forEach((button) => bind(button, "\u7ACB\u5373\u8BC4\u4EF7\u670D\u52A1", () => go2("/mobile/review?id=" + button.dataset.pendingReview)));
 }
 function loginPage(ctx) {
   const { route: route2, qs: qs2, safeNext: safeNext2, go: go2, state: state2, role: role2 } = ctx;
@@ -1950,6 +1977,50 @@ function initOperations(ctx) {
   if (ctx.route.key === "finance") finance(ctx);
   if (ctx.route.key === "group") group(ctx);
 }
+function reviewDashboard(ctx) {
+  const { state: state2, store: store2 } = ctx;
+  let mode = "all";
+  const host = document.createElement("section");
+  host.id = "service-review-dashboard";
+  host.className = "demo-review-dashboard";
+  $("main > div")?.before(host);
+  function render() {
+    const snapshot = state2();
+    const communityId = snapshot.contexts.property?.communityId || snapshot.user.communityId;
+    const completed = snapshot.orders.filter((order) => order.communityId === communityId && ["completed", "closed"].includes(order.status));
+    const reviews = snapshot.reviews.map((review) => ({ ...review, order: completed.find((order) => order.id === review.orderId) })).filter((review) => review.order).sort((a, b) => new Date(b.at) - new Date(a.at));
+    const lowReviews = reviews.filter((review) => Number(review.rating) <= 3);
+    const visibleReviews = mode === "follow-up" ? lowReviews : reviews;
+    const average = reviews.length ? reviews.reduce((total, review) => total + Number(review.rating), 0) / reviews.length : 0;
+    const pending = completed.filter((order) => !snapshot.reviews.some((review) => review.orderId === order.id));
+    host.innerHTML = `<div class="demo-review-dashboard-heading"><div><span class="material-symbols-outlined" aria-hidden="true">sentiment_satisfied</span><div><h2>\u5C45\u6C11\u670D\u52A1\u8BC4\u4EF7</h2><p>\u5F53\u524D\u5C0F\u533A\u5DF2\u5B8C\u5DE5\u5DE5\u5355\u7684\u5C45\u6C11\u53CD\u9988\u4E0E\u56DE\u8BBF\u5904\u7406</p></div></div><button class="demo-button secondary" data-review-export>\u5BFC\u51FA\u8BC4\u4EF7</button></div><div class="demo-review-metrics"><article><strong>${reviews.length}/${completed.length}</strong><span>\u5DF2\u8BC4\u4EF7 / \u5DF2\u5B8C\u5DE5</span></article><article><strong>${reviews.length ? average.toFixed(1) : "--"} ${reviews.length ? "\u661F" : ""}</strong><span>\u5E73\u5747\u6EE1\u610F\u5EA6</span></article><article><strong>${pending.length}</strong><span>\u5F85\u5C45\u6C11\u8BC4\u4EF7</span></article><article><strong>${lowReviews.filter((review) => review.followUp?.status !== "followed_up").length}</strong><span>\u4F4E\u5206\u5F85\u56DE\u8BBF</span></article></div><div class="demo-review-tabs"><button class="${mode === "all" ? "demo-selected" : ""}" data-review-filter="all">\u5168\u90E8\u8BC4\u4EF7 (${reviews.length})</button><button class="${mode === "follow-up" ? "demo-selected" : ""}" data-review-filter="follow-up">\u5F85\u8DDF\u8FDB (${lowReviews.length})</button></div><div class="demo-review-list">${visibleReviews.length ? visibleReviews.map((review) => {
+      const followUp = review.followUp || { status: "none" };
+      const low = Number(review.rating) <= 3;
+      return `<article data-review-card="${escape(review.id)}"><div class="demo-review-card-top"><div><strong>${escape(review.order.title)}</strong><small>${escape(review.order.id)} \xB7 ${escape(review.order.room)} \xB7 ${escape(review.order.technician || "\u672A\u8BB0\u5F55\u5E08\u5085")}</small></div><span class="demo-rating">${icon("star")} ${escape(review.rating)} \u661F</span></div><p class="demo-review-tags">${escape((review.tags || []).join(" \xB7 ") || "\u672A\u9009\u62E9\u670D\u52A1\u6807\u7B7E")}</p><p class="demo-review-comment">${escape(review.comment || "\u5C45\u6C11\u672A\u586B\u5199\u6587\u5B57\u8BC4\u4EF7")}</p><div class="demo-review-card-foot"><small>${new Date(review.at).toLocaleString("zh-CN")}</small>${low ? followUp.status === "followed_up" ? `<span class="demo-review-followed">\u5DF2\u56DE\u8BBF</span>` : `<button class="demo-button secondary" data-follow-up="${escape(review.id)}">\u53D1\u8D77\u56DE\u8BBF</button>` : `<span class="demo-review-archived">\u5DF2\u5F52\u6863</span>`}</div></article>`;
+    }).join("") : empty(mode === "follow-up" ? "\u5F53\u524D\u6CA1\u6709\u5F85\u56DE\u8BBF\u7684\u4F4E\u5206\u8BC4\u4EF7" : "\u5F53\u524D\u8FD8\u6CA1\u6709\u5C45\u6C11\u63D0\u4EA4\u670D\u52A1\u8BC4\u4EF7")}</div>`;
+    $$("[data-review-filter]", host).forEach((button) => bind(button, "\u8BC4\u4EF7\u7B5B\u9009" + label(button), () => {
+      mode = button.dataset.reviewFilter;
+      render();
+    }));
+    $$("[data-follow-up]", host).forEach((button) => bind(button, "\u53D1\u8D77\u670D\u52A1\u56DE\u8BBF", () => {
+      const review = state2().reviews.find((item) => item.id === button.dataset.followUp);
+      if (!review) throw new Error("\u8BC4\u4EF7\u8BB0\u5F55\u4E0D\u5B58\u5728\uFF0C\u8BF7\u5237\u65B0\u540E\u91CD\u8BD5");
+      formModal("\u53D1\u8D77\u670D\u52A1\u56DE\u8BBF", `<p>${escape(review.orderId)} \xB7 ${escape(review.comment || "\u5C45\u6C11\u672A\u586B\u5199\u6587\u5B57\u8BC4\u4EF7")}</p>` + field("note", "\u56DE\u8BBF\u8BB0\u5F55", "", { type: "textarea", maxLength: 300 }), (values) => {
+        store2.change((snapshot2) => {
+          const current = snapshot2.reviews.find((item) => item.id === review.id);
+          if (!current) throw new Error("\u8BC4\u4EF7\u8BB0\u5F55\u4E0D\u5B58\u5728\uFF0C\u8BF7\u5237\u65B0\u540E\u91CD\u8BD5");
+          current.followUp = { status: "followed_up", note: values.note.trim(), at: now(), by: "\u674E\u660E" };
+          snapshot2.logs.unshift({ id: id("LOG"), action: "\u5B8C\u6210\u4F4E\u5206\u8BC4\u4EF7\u56DE\u8BBF", target: current.orderId, at: now() });
+        });
+        render();
+        toast("\u56DE\u8BBF\u8BB0\u5F55\u5DF2\u4FDD\u5B58");
+      }, "\u4FDD\u5B58\u56DE\u8BBF\u8BB0\u5F55");
+    }));
+    bind($("[data-review-export]", host), "\u5BFC\u51FA\u670D\u52A1\u8BC4\u4EF7", () => csv("\u5C45\u6C11\u670D\u52A1\u8BC4\u4EF7.csv", [["\u5DE5\u5355\u53F7", "\u623F\u5C4B", "\u7EF4\u4FEE\u5E08\u5085", "\u8BC4\u5206", "\u6807\u7B7E", "\u8BC4\u4EF7\u5185\u5BB9", "\u8BC4\u4EF7\u65F6\u95F4", "\u56DE\u8BBF\u72B6\u6001", "\u56DE\u8BBF\u8BB0\u5F55"], ...reviews.map((review) => [review.order.id, review.order.room, review.order.technician, review.rating, (review.tags || []).join("\u3001"), review.comment || "", review.at, review.followUp?.status === "followed_up" ? "\u5DF2\u56DE\u8BBF" : "\u65E0\u9700/\u5F85\u56DE\u8BBF", review.followUp?.note || ""])]));
+  }
+  render();
+  return { render };
+}
 function orders(ctx) {
   const { route: route2, state: state2, store: store2, go: go2 } = ctx;
   const overview = route2.key === "overview";
@@ -1960,6 +2031,13 @@ function orders(ctx) {
   const template = overview ? $("tr", queue).cloneNode(true) : originalArticles[0].cloneNode(true);
   const pagination = overview ? queue.parentElement.parentElement.nextElementSibling : originalArticles.at(-1).nextElementSibling;
   const cardKeys = [];
+  const reviewBadge = (order) => {
+    const review = state2().reviews.find((item) => item.orderId === order.id);
+    if (review) return `<span class="demo-order-review-status reviewed">\u5DF2\u8BC4\u4EF7 ${escape(review.rating)} \u661F</span>`;
+    if (order.status === "completed") return `<span class="demo-order-review-status pending">\u5F85\u5C45\u6C11\u8BC4\u4EF7</span>`;
+    return "";
+  };
+  const reviewBoard = reviewDashboard(ctx);
   function render() {
     let all = state2().orders.filter((o) => (!status || (status === "completed" ? ["completed", "closed"].includes(o.status) : status === o.status)) && (!category || o.category === category || category === "\u6C34\u6696\u536B\u6D74" && /管|水/.test(o.category)) && (!urgent || o.urgent) && (!technician || o.technician === technician) && (!day || o.createdAt.slice(0, 10) === day) && (!term || `${o.id} ${o.room} ${o.title} ${o.contact}`.toLowerCase().includes(term.toLowerCase())));
     const totalPages = Math.max(1, Math.ceil(all.length / size));
@@ -1975,7 +2053,7 @@ function orders(ctx) {
         cells[0].innerHTML = `<strong class="text-headline-sm">#${escape(o.id)}</strong><div class="text-label-sm">${escape(o.room)} \xB7 ${escape(o.contact)}</div>`;
         cells[1].innerHTML = `<div>${escape(o.title)}</div><small>${escape(o.appointment)}</small>`;
         cells[2].innerHTML = o.photos?.[0]?.src ? `<img class="w-10 h-10 rounded-lg object-cover" src="${escape(o.photos[0].src)}" alt="\u62A5\u4FEE\u73B0\u573A">` : `<span class="text-label-sm">${o.photos?.length || 0} \u4EFD\u9644\u4EF6</span>`;
-        cells[3].innerHTML = `<span class="px-2 py-1 rounded-full bg-surface-container text-primary">${statuses[o.status]}</span>`;
+        cells[3].innerHTML = `<span class="px-2 py-1 rounded-full bg-surface-container text-primary">${statuses[o.status]}</span>${reviewBadge(o)}`;
         cells[4].innerHTML = `<button class="px-3 py-1 rounded-full bg-primary text-on-primary text-label-md" data-dispatch>${o.status === "pending" ? "\u6D3E\u5DE5" : "\u67E5\u770B\u8BE6\u60C5"}</button>`;
         queue.append(card);
       } else {
@@ -1987,7 +2065,7 @@ function orders(ctx) {
         if (address) address.textContent = o.room;
         const pillRow = identity.parentElement;
         $$(":scope > span", pillRow).slice(1).forEach((e) => e.remove());
-        pillRow.insertAdjacentHTML("beforeend", `<span class="px-2 py-1 rounded bg-surface-container text-primary text-label-sm">${escape(o.category)}</span><span class="px-2 py-1 rounded bg-secondary-container text-on-secondary-container text-label-sm">${statuses[o.status]}</span>`);
+        pillRow.insertAdjacentHTML("beforeend", `<span class="px-2 py-1 rounded bg-surface-container text-primary text-label-sm">${escape(o.category)}</span><span class="px-2 py-1 rounded bg-secondary-container text-on-secondary-container text-label-sm">${statuses[o.status]}</span>${reviewBadge(o)}`);
         const snapshot = card.lastElementChild;
         snapshot.innerHTML = `<div class="flex items-center gap-2"><div class="w-10 h-10 rounded-full bg-primary text-on-primary flex items-center justify-center">${escape((o.technician || "\u5F85")[0])}</div><div><strong>${escape(o.technician || "\u7B49\u5F85\u6307\u6D3E")}</strong><p class="text-label-sm">${escape(o.appointment)}</p></div></div><div class="flex gap-2"><button class="px-3 py-1 rounded bg-primary text-on-primary text-label-md" data-dispatch>${o.status === "pending" ? "\u7ACB\u5373\u6307\u6D3E\u5E08\u5085" : "\u67E5\u770B\u8F68\u8FF9\u8BE6\u60C5"}</button></div>`;
         queue.insertBefore(card, pagination);
@@ -2074,9 +2152,13 @@ function orders(ctx) {
   });
   on2(/进入财务对账专区/, () => go2("/web/finance"));
   on2(/导出调度表/, () => csv("\u5DE5\u5355\u8C03\u5EA6\u8868.csv", [["\u5DE5\u5355\u53F7", "\u623F\u53F7", "\u5185\u5BB9", "\u72B6\u6001", "\u5E08\u5085"], ...state2().orders.map((o) => [o.id, o.room, o.title, statuses[o.status], o.technician])]));
+  const refresh = () => {
+    render();
+    reviewBoard.render();
+  };
   render();
-  window.addEventListener("demo:orders", render);
-  window.addEventListener("demo:external", render);
+  window.addEventListener("demo:orders", refresh);
+  window.addEventListener("demo:external", refresh);
 }
 function tasks(ctx) {
   const { state: state2, store: store2, go: go2, qs: qs2 } = ctx;
@@ -3155,7 +3237,14 @@ async function showFile(file) {
 function showOrders(filter) {
   const orders2 = state().orders.filter((o) => !filter || filter(o));
   const canReview = (o) => route.group === "mobile" && o.status === "completed" && !state().reviews.some((r) => r.orderId === o.id);
-  const dlg = modal("\u6211\u7684\u5DE5\u5355\u8BB0\u5F55", list(orders2, (o) => `<article><button data-order="${escape(o.id)}"><strong>${escape(o.title)}</strong><small>${escape(o.id)} \xB7 ${escape(o.room)} \xB7 ${canReview(o) ? "\u670D\u52A1\u5DF2\u5B8C\u6210\uFF0C\u5F85\u8BC4\u4EF7" : statuses[o.status]}</small></button>${canReview(o) ? `<button class="demo-button" data-review-order="${escape(o.id)}">\u8BC4\u4EF7\u670D\u52A1</button>` : ""}</article>`), [{ label: "\u65B0\u5EFA\u62A5\u4FEE", run: () => go("/mobile/repair") }]);
+  const reviewFor = (order) => state().reviews.find((review) => review.orderId === order.id);
+  const orderStatus = (order) => {
+    const review = reviewFor(order);
+    if (canReview(order)) return "\u670D\u52A1\u5DF2\u5B8C\u6210\uFF0C\u5F85\u8BC4\u4EF7";
+    if (review) return `\u5DF2\u8BC4\u4EF7 \xB7 ${review.rating} \u661F`;
+    return statuses[order.status];
+  };
+  const dlg = modal("\u6211\u7684\u5DE5\u5355\u8BB0\u5F55", list(orders2, (o) => `<article><button data-order="${escape(o.id)}"><strong>${escape(o.title)}</strong><small>${escape(o.id)} \xB7 ${escape(o.room)} \xB7 ${escape(orderStatus(o))}</small></button>${canReview(o) ? `<button class="demo-button" data-review-order="${escape(o.id)}">\u8BC4\u4EF7\u670D\u52A1</button>` : ""}</article>`), [{ label: "\u65B0\u5EFA\u62A5\u4FEE", run: () => go("/mobile/repair") }]);
   $$("[data-order]", dlg).forEach((btn) => bind(btn, "\u5DE5\u5355\u8BE6\u60C5", () => go(`/${route.group}/orders/${btn.dataset.order}`)));
   $$("[data-review-order]", dlg).forEach((btn) => bind(btn, "\u8BC4\u4EF7\u7EF4\u4FEE\u670D\u52A1", () => go("/mobile/review?id=" + btn.dataset.reviewOrder)));
 }
@@ -3173,9 +3262,12 @@ function orderDetail(orderId) {
   if (route.group === "mobile" && ["completed", "closed"].includes(order.status) && !state().reviews.some((r) => r.orderId === order.id)) actions.push({ label: "\u8BC4\u4EF7\u670D\u52A1", run: () => go(`/mobile/review?id=${order.id}`) });
   if (route.group === "mobile" && order.amount > 0 && !order.paid) actions.push({ label: "\u7F34\u7EB3\u7EF4\u4FEE\u8D39", run: () => go(`/mobile/billing?tab=others&bill=repair-${order.id}`) });
   actions.push({ label: "\u8FD4\u56DE", secondary: true, run: back });
+  const review = state().reviews.find((item) => item.orderId === order.id);
+  const reviewStatus = ["completed", "closed"].includes(order.status) ? review ? `\u5DF2\u8BC4\u4EF7 \xB7 ${review.rating} \u661F` : "\u670D\u52A1\u5DF2\u5B8C\u6210\uFF0C\u5F85\u5C45\u6C11\u8BC4\u4EF7" : "\u5C1A\u672A\u8FDB\u5165\u8BC4\u4EF7\u9636\u6BB5";
+  const reviewContent = review ? `<section class="demo-review-detail"><h4>\u5C45\u6C11\u670D\u52A1\u8BC4\u4EF7 \xB7 ${escape(review.rating)} \u661F</h4><p>${escape((review.tags || []).join(" \xB7 ") || "\u672A\u9009\u62E9\u670D\u52A1\u6807\u7B7E")}</p><p>${escape(review.comment || "\u5C45\u6C11\u672A\u586B\u5199\u6587\u5B57\u8BC4\u4EF7")}</p><small>${new Date(review.at).toLocaleString("zh-CN")}${review.followUp?.status === "followed_up" ? ` \xB7 \u7269\u4E1A\u5DF2\u56DE\u8BBF\uFF1A${escape(review.followUp.note)}` : ""}</small></section>` : "";
   const sla = arrivalStatus(order);
   const due = order.arrivalDueAt ? new Date(order.arrivalDueAt).toLocaleString("zh-CN") : "\u63A5\u5355\u540E\u751F\u6210";
-  const dlg = modal("\u5DE5\u5355\u8BE6\u60C5", `<h3>${escape(order.title)}</h3><dl class="demo-meta"><dt>\u5DE5\u5355\u53F7</dt><dd>${escape(order.id)}</dd><dt>\u72B6\u6001</dt><dd>${statuses[order.status]}</dd><dt>\u623F\u5C4B/\u4F4D\u7F6E</dt><dd>${escape(order.room)}</dd><dt>\u9884\u7EA6\u65F6\u95F4</dt><dd>${escape(order.appointment)}</dd><dt>\u5230\u5C97\u65F6\u9650</dt><dd>${escape(order.sla?.arrivalMinutes || (order.urgent ? 30 : 120))} \u5206\u949F\uFF1B\u622A\u6B62 ${escape(due)}</dd><dt>\u5C65\u7EA6\u72B6\u6001</dt><dd>${escape(sla.text)}</dd><dt>\u7EF4\u4FEE\u5E08\u5085</dt><dd>${escape(order.technician || "\u7B49\u5F85\u6D3E\u5DE5")}</dd><dt>\u5E94\u4ED8\u91D1\u989D</dt><dd>\xA5${money(order.amount)} ${order.amount ? order.paid ? "\u5DF2\u7F34\u6E05" : "\u5F85\u7F34\u8D39" : ""}</dd></dl><p>${escape(order.description)}</p><ol class="demo-timeline">${order.timeline.map((t) => `<li>${escape(t.label)}<time>${new Date(t.at).toLocaleString("zh-CN")}</time></li>`).join("")}</ol><div class="demo-inline">${(order.photos || []).map((f, i) => f.src ? `<img src="${escape(f.src)}" alt="\u62A5\u4FEE\u7167\u7247">` : `<button data-file-index="${i}" class="demo-button secondary">${escape(f.name)}</button>`).join("")}</div>`, actions);
+  const dlg = modal("\u5DE5\u5355\u8BE6\u60C5", `<h3>${escape(order.title)}</h3><dl class="demo-meta"><dt>\u5DE5\u5355\u53F7</dt><dd>${escape(order.id)}</dd><dt>\u72B6\u6001</dt><dd>${statuses[order.status]}</dd><dt>\u8BC4\u4EF7\u72B6\u6001</dt><dd>${escape(reviewStatus)}</dd><dt>\u623F\u5C4B/\u4F4D\u7F6E</dt><dd>${escape(order.room)}</dd><dt>\u9884\u7EA6\u65F6\u95F4</dt><dd>${escape(order.appointment)}</dd><dt>\u5230\u5C97\u65F6\u9650</dt><dd>${escape(order.sla?.arrivalMinutes || (order.urgent ? 30 : 120))} \u5206\u949F\uFF1B\u622A\u6B62 ${escape(due)}</dd><dt>\u5C65\u7EA6\u72B6\u6001</dt><dd>${escape(sla.text)}</dd><dt>\u7EF4\u4FEE\u5E08\u5085</dt><dd>${escape(order.technician || "\u7B49\u5F85\u6D3E\u5DE5")}</dd><dt>\u5E94\u4ED8\u91D1\u989D</dt><dd>\xA5${money(order.amount)} ${order.amount ? order.paid ? "\u5DF2\u7F34\u6E05" : "\u5F85\u7F34\u8D39" : ""}</dd></dl>${reviewContent}<p>${escape(order.description)}</p><ol class="demo-timeline">${order.timeline.map((t) => `<li>${escape(t.label)}<time>${new Date(t.at).toLocaleString("zh-CN")}</time></li>`).join("")}</ol><div class="demo-inline">${(order.photos || []).map((f, i) => f.src ? `<img src="${escape(f.src)}" alt="\u62A5\u4FEE\u7167\u7247">` : `<button data-file-index="${i}" class="demo-button secondary">${escape(f.name)}</button>`).join("")}</div>`, actions);
   $$("[data-file-index]", dlg).forEach((btn) => bind(btn, "\u67E5\u770B\u5DE5\u5355\u9644\u4EF6", () => showFile(order.photos[btn.dataset.fileIndex])));
 }
 function assign(order) {

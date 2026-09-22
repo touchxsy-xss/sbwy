@@ -28,6 +28,57 @@ export function initOperations(ctx) {
   if (ctx.route.key === 'group') group(ctx);
 }
 
+function reviewDashboard(ctx) {
+  const { state, store } = ctx;
+  let mode = 'all';
+  const host = document.createElement('section');
+  host.id = 'service-review-dashboard';
+  host.className = 'demo-review-dashboard';
+  $('main > div')?.before(host);
+
+  function render() {
+    const snapshot = state();
+    const communityId = snapshot.contexts.property?.communityId || snapshot.user.communityId;
+    const completed = snapshot.orders.filter(order =>
+      ['completed', 'closed'].includes(order.status) &&
+      (!communityId || !order.communityId || order.communityId === communityId)
+    );
+    const reviews = snapshot.reviews
+      .map(review => ({ ...review, order: completed.find(order => order.id === review.orderId) }))
+      .filter(review => review.order)
+      .sort((a, b) => new Date(b.at) - new Date(a.at));
+    const lowReviews = reviews.filter(review => Number(review.rating) <= 3);
+    const visibleReviews = mode === 'follow-up' ? lowReviews : reviews;
+    const average = reviews.length ? reviews.reduce((total, review) => total + Number(review.rating), 0) / reviews.length : 0;
+    const pending = completed.filter(order => !snapshot.reviews.some(review => review.orderId === order.id));
+
+    host.innerHTML = `<div class="demo-review-dashboard-heading"><div><span class="material-symbols-outlined" aria-hidden="true">sentiment_satisfied</span><div><h2>居民服务评价</h2><p>当前小区已完工工单的居民反馈与回访处理</p></div></div><button class="demo-button secondary" data-review-export>导出评价</button></div><div class="demo-review-metrics"><article><strong>${reviews.length}/${completed.length}</strong><span>已评价 / 已完工</span></article><article><strong>${reviews.length ? average.toFixed(1) : '--'} ${reviews.length ? '星' : ''}</strong><span>平均满意度</span></article><article><strong>${pending.length}</strong><span>待居民评价</span></article><article><strong>${lowReviews.filter(review => review.followUp?.status !== 'followed_up').length}</strong><span>低分待回访</span></article></div><div class="demo-review-tabs"><button class="${mode === 'all' ? 'demo-selected' : ''}" data-review-filter="all">全部评价 (${reviews.length})</button><button class="${mode === 'follow-up' ? 'demo-selected' : ''}" data-review-filter="follow-up">待跟进 (${lowReviews.length})</button></div><div class="demo-review-list">${visibleReviews.length ? visibleReviews.map(review => {
+      const followUp = review.followUp || { status: 'none' };
+      const low = Number(review.rating) <= 3;
+      return `<article data-review-card="${escape(review.id)}"><div class="demo-review-card-top"><div><strong>${escape(review.order.title)}</strong><small>${escape(review.order.id)} · ${escape(review.order.room)} · ${escape(review.order.technician || '未记录师傅')}</small></div><span class="demo-rating">${icon('star')} ${escape(review.rating)} 星</span></div><p class="demo-review-tags">${escape((review.tags || []).join(' · ') || '未选择服务标签')}</p><p class="demo-review-comment">${escape(review.comment || '居民未填写文字评价')}</p><div class="demo-review-card-foot"><small>${new Date(review.at).toLocaleString('zh-CN')}</small>${low ? followUp.status === 'followed_up' ? `<span class="demo-review-followed">已回访</span>` : `<button class="demo-button secondary" data-follow-up="${escape(review.id)}">发起回访</button>` : `<span class="demo-review-archived">已归档</span>`}</div></article>`;
+    }).join('') : empty(mode === 'follow-up' ? '当前没有待回访的低分评价' : '当前还没有居民提交服务评价')}</div>`;
+
+    $$('[data-review-filter]', host).forEach(button => bind(button, '评价筛选' + label(button), () => { mode = button.dataset.reviewFilter; render(); }));
+    $$('[data-follow-up]', host).forEach(button => bind(button, '发起服务回访', () => {
+      const review = state().reviews.find(item => item.id === button.dataset.followUp);
+      if (!review) throw new Error('评价记录不存在，请刷新后重试');
+      formModal('发起服务回访', `<p>${escape(review.orderId)} · ${escape(review.comment || '居民未填写文字评价')}</p>` + field('note', '回访记录', '', { type: 'textarea', maxLength: 300 }), values => {
+        store.change(snapshot => {
+          const current = snapshot.reviews.find(item => item.id === review.id);
+          if (!current) throw new Error('评价记录不存在，请刷新后重试');
+          current.followUp = { status: 'followed_up', note: values.note.trim(), at: now(), by: '李明' };
+          snapshot.logs.unshift({ id: id('LOG'), action: '完成低分评价回访', target: current.orderId, at: now() });
+        });
+        render();
+        toast('回访记录已保存');
+      }, '保存回访记录');
+    }));
+    bind($('[data-review-export]', host), '导出服务评价', () => csv('居民服务评价.csv', [['工单号', '房屋', '维修师傅', '评分', '标签', '评价内容', '评价时间', '回访状态', '回访记录'], ...reviews.map(review => [review.order.id, review.order.room, review.order.technician, review.rating, (review.tags || []).join('、'), review.comment || '', review.at, review.followUp?.status === 'followed_up' ? '已回访' : '无需/待回访', review.followUp?.note || ''])]));
+  }
+  render();
+  return { render };
+}
+
 function orders(ctx) {
   const { route, state, store, go } = ctx;
   const overview = route.key === 'overview';
@@ -38,6 +89,13 @@ function orders(ctx) {
   const template = overview ? $('tr', queue).cloneNode(true) : originalArticles[0].cloneNode(true);
   const pagination = overview ? queue.parentElement.parentElement.nextElementSibling : originalArticles.at(-1).nextElementSibling;
   const cardKeys = [];
+  const reviewBadge = order => {
+    const review = state().reviews.find(item => item.orderId === order.id);
+    if (review) return `<span class="demo-order-review-status reviewed">已评价 ${escape(review.rating)} 星</span>`;
+    if (order.status === 'completed') return `<span class="demo-order-review-status pending">待居民评价</span>`;
+    return '';
+  };
+  const reviewBoard = reviewDashboard(ctx);
   function render() {
     let all = state().orders.filter(o => (!status || (status === 'completed' ? ['completed', 'closed'].includes(o.status) : status === o.status)) &&
       (!category || o.category === category || (category === '水暖卫浴' && /管|水/.test(o.category))) &&
@@ -55,7 +113,7 @@ function orders(ctx) {
         cells[0].innerHTML = `<strong class="text-headline-sm">#${escape(o.id)}</strong><div class="text-label-sm">${escape(o.room)} · ${escape(o.contact)}</div>`;
         cells[1].innerHTML = `<div>${escape(o.title)}</div><small>${escape(o.appointment)}</small>`;
         cells[2].innerHTML = o.photos?.[0]?.src ? `<img class="w-10 h-10 rounded-lg object-cover" src="${escape(o.photos[0].src)}" alt="报修现场">` : `<span class="text-label-sm">${o.photos?.length || 0} 份附件</span>`;
-        cells[3].innerHTML = `<span class="px-2 py-1 rounded-full bg-surface-container text-primary">${statuses[o.status]}</span>`;
+        cells[3].innerHTML = `<span class="px-2 py-1 rounded-full bg-surface-container text-primary">${statuses[o.status]}</span>${reviewBadge(o)}`;
         cells[4].innerHTML = `<button class="px-3 py-1 rounded-full bg-primary text-on-primary text-label-md" data-dispatch>${o.status === 'pending' ? '派工' : '查看详情'}</button>`;
         queue.append(card);
       } else {
@@ -64,7 +122,7 @@ function orders(ctx) {
         const address = $('.font-semibold.text-on-surface', card); if (address) address.textContent = o.room;
         const pillRow = identity.parentElement;
         $$(':scope > span', pillRow).slice(1).forEach(e => e.remove());
-        pillRow.insertAdjacentHTML('beforeend', `<span class="px-2 py-1 rounded bg-surface-container text-primary text-label-sm">${escape(o.category)}</span><span class="px-2 py-1 rounded bg-secondary-container text-on-secondary-container text-label-sm">${statuses[o.status]}</span>`);
+        pillRow.insertAdjacentHTML('beforeend', `<span class="px-2 py-1 rounded bg-surface-container text-primary text-label-sm">${escape(o.category)}</span><span class="px-2 py-1 rounded bg-secondary-container text-on-secondary-container text-label-sm">${statuses[o.status]}</span>${reviewBadge(o)}`);
         const snapshot = card.lastElementChild;
         snapshot.innerHTML = `<div class="flex items-center gap-2"><div class="w-10 h-10 rounded-full bg-primary text-on-primary flex items-center justify-center">${escape((o.technician || '待')[0])}</div><div><strong>${escape(o.technician || '等待指派')}</strong><p class="text-label-sm">${escape(o.appointment)}</p></div></div><div class="flex gap-2"><button class="px-3 py-1 rounded bg-primary text-on-primary text-label-md" data-dispatch>${o.status === 'pending' ? '立即指派师傅' : '查看轨迹详情'}</button></div>`;
         queue.insertBefore(card, pagination);
@@ -116,9 +174,10 @@ function orders(ctx) {
   });
   on(/进入财务对账专区/, () => go('/web/finance'));
   on(/导出调度表/, () => csv('工单调度表.csv', [['工单号', '房号', '内容', '状态', '师傅'], ...state().orders.map(o => [o.id, o.room, o.title, statuses[o.status], o.technician])]));
+  const refresh = () => { render(); reviewBoard.render(); };
   render();
-  window.addEventListener('demo:orders', render);
-  window.addEventListener('demo:external', render);
+  window.addEventListener('demo:orders', refresh);
+  window.addEventListener('demo:external', refresh);
 }
 
 function tasks(ctx) {
@@ -199,24 +258,31 @@ function checkin(ctx) {
   slaPanel.id = 'arrival-sla'; slaPanel.className = 'demo-arrival-sla';
   const checkinContainer = $('#checkin-container');
   checkinContainer?.before(slaPanel);
+  const timeText = value => value ? new Date(value).toLocaleString('zh-CN', {
+    year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit'
+  }) : '--';
   const update = () => {
     const order = getOrder();
     const checked = ['arrived', 'processing', 'completed', 'closed'].includes(order.status);
     const sla = arrivalStatus(order);
-    const due = order.arrivalDueAt ? new Date(order.arrivalDueAt).toLocaleTimeString('zh-CN', { hour: '2-digit', minute: '2-digit' }) : '';
-    slaPanel.innerHTML = `${icon('timer')}<div><strong>${escape(sla.text)}</strong><small>${due ? `到岗截止：${due}；以师傅成功接单时刻开始计算。` : '完成接单后系统会生成到岗截止时间。'}</small></div>`;
+    const timing = order.acceptedAt
+      ? `接单时间：${timeText(order.acceptedAt)}<br>到岗截止：${timeText(order.arrivalDueAt)}；以师傅成功接单时刻开始计算。${checked ? `<br>实际到岗：${timeText(order.checkinAt)}` : ''}`
+      : '完成接单后系统会生成到岗截止时间。';
+    slaPanel.innerHTML = `${icon('timer')}<div><strong>${escape(sla.text)}</strong><small>${timing}</small></div>`;
     slaPanel.dataset.state = sla.state;
     $('#checked-state').classList.toggle('hidden', !checked);
     $('#checkin-btn').classList.toggle('hidden', checked);
     $('#service-timer').textContent = checked ? sla.text : '等待到岗';
     if (checked) {
       const text = $$('span', $('#checked-state')).find(e => e.textContent.includes('已成功'));
-      if (text) text.textContent = `${new Date(order.checkinAt).toLocaleTimeString('zh-CN', { hour: '2-digit', minute: '2-digit' })} 已成功到岗打卡`;
+      if (text) text.textContent = `${timeText(order.checkinAt)} 已成功到岗打卡`;
     }
   };
   bind($('#checkin-btn'), '现场到岗打卡', () => {
-    const sla = arrivalStatus(getOrder());
-    confirm('现场到岗打卡', `确认已到达 ${getOrder().room}？${sla.text}。此次打卡为演示定位。`, () => store.transition(orderId, 'arrived', { checkinAt: now() }), { after: update });
+    const order = getOrder();
+    const checkinAt = now();
+    const sla = arrivalStatus(order, new Date(checkinAt).getTime());
+    confirm('现场到岗打卡', `<p>确认已到达 ${escape(order.room)}？</p><p>接单时间：${timeText(order.acceptedAt)}<br>到岗截止：${timeText(order.arrivalDueAt)}<br>当前打卡：${timeText(checkinAt)}<br>履约状态：${escape(sla.text)}</p><p>此次打卡为演示定位。</p>`, () => store.transition(orderId, 'arrived', { checkinAt }), { after: update });
   });
   $$('.payment-option').forEach(el => bind(el, label(el).split(' ')[0], () => {
     if (el.dataset.pay === 'public' && getOrder().scope !== 'public') throw new Error('居民室内专有维修不能记入公共维修基金');
