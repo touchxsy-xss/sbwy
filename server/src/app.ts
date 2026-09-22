@@ -53,8 +53,9 @@ function requireAuth(request: FastifyRequest) {
 export async function buildApp(options: AppOptions): Promise<FastifyInstance> {
   const app = Fastify({ logger: false, bodyLimit: 1024 * 1024, requestIdHeader: 'x-request-id' });
   const { env, repository } = options;
+  const allowedOrigins = env.APP_ORIGIN.split(',').map(origin => origin.trim());
   await app.register(cookie);
-  await app.register(cors, { origin: env.APP_ORIGIN, credentials: true, methods: ['GET', 'POST', 'PATCH', 'PUT', 'DELETE', 'OPTIONS'], allowedHeaders: ['Content-Type', 'X-CSRF-Token', 'X-Request-Id'] });
+  await app.register(cors, { origin: (origin, callback) => callback(null, origin ? allowedOrigins.includes(origin) : false), credentials: true, methods: ['GET', 'POST', 'PATCH', 'PUT', 'DELETE', 'OPTIONS'], allowedHeaders: ['Content-Type', 'X-CSRF-Token', 'X-Request-Id'] });
   await app.register(helmet, { global: true });
   await app.register(rateLimit, { global: false });
   await app.register(swagger, { openapi: { info: { title: '声边物业 API', version: '1.0.0' }, servers: [{ url: '/api/v1' }] } });
@@ -64,7 +65,7 @@ export async function buildApp(options: AppOptions): Promise<FastifyInstance> {
     reply.header('x-request-id', request.id);
     if (!request.cookies[CSRF_COOKIE]) setAuthCookie(reply, CSRF_COOKIE, createToken(), env, { httpOnly: false, maxAge: 3600 });
     const origin = request.headers.origin;
-    if (origin && origin !== env.APP_ORIGIN && origin !== 'null') throw new AppError(403, 'ORIGIN_FORBIDDEN', '请求来源不被允许');
+    if (origin && !allowedOrigins.includes(origin) && origin !== 'null') throw new AppError(403, 'ORIGIN_FORBIDDEN', '请求来源不被允许');
     if (['POST', 'PUT', 'PATCH', 'DELETE'].includes(request.method) && request.cookies[SESSION_COOKIE] && request.url !== '/api/v1/auth/login') {
       const csrf = request.headers['x-csrf-token'];
       if (!csrf || csrf !== request.cookies[CSRF_COOKIE]) throw new AppError(403, 'CSRF_FAILED', 'CSRF 校验失败');

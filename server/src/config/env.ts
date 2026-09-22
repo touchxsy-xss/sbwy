@@ -6,13 +6,15 @@ const booleanEnv = z.preprocess(value => {
   return value;
 }, z.boolean());
 
+const originsEnv = z.string().min(1).refine(value => value.split(',').every(origin => z.string().url().safeParse(origin.trim()).success), 'APP_ORIGIN 必须是一个或多个逗号分隔的有效 URL');
+
 const envSchema = z.object({
   NODE_ENV: z.enum(['development', 'test', 'production']).default('development'),
   HOST: z.string().min(1).default('127.0.0.1'),
   PORT: z.coerce.number().int().min(1).max(65535).default(3001),
   DATABASE_URL: z.string().min(1),
   SESSION_SECRET: z.string().min(32),
-  APP_ORIGIN: z.string().url().default('http://localhost:5173'),
+  APP_ORIGIN: originsEnv.default('http://localhost:5173'),
   COOKIE_SECURE: booleanEnv.default(false),
   SEED_ADMIN_PASSWORD: z.string().min(8).optional(),
   SEED_MANAGER_PASSWORD: z.string().min(8).optional(),

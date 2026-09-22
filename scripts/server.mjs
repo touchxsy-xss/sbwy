@@ -9,6 +9,12 @@ const server = http.createServer(async (req, res) => {
   try {
     const url = new URL(req.url, 'http://localhost');
     const pathname = decodeURIComponent(url.pathname).replace(/\/$/, '') || '/';
+    if (pathname === '/api-config.js') {
+      const apiBase = process.env.SHENGBIAN_API_BASE || '';
+      res.writeHead(200, { 'Content-Type': 'text/javascript; charset=utf-8', 'Cache-Control': 'no-cache' });
+      res.end(`globalThis.__SHENGBIAN_API_BASE__ = ${JSON.stringify(apiBase)};\n`);
+      return;
+    }
     if (pathname === '/web/media/weekly') {
       res.writeHead(302, { Location: '/web/media' + url.search }); res.end(); return;
     }
