@@ -1,3 +1,85 @@
+var __defProp = Object.defineProperty;
+var __getOwnPropNames = Object.getOwnPropertyNames;
+var __esm = (fn, res) => function __init() {
+  return fn && (res = (0, fn[__getOwnPropNames(fn)[0]])(fn = 0)), res;
+};
+var __export = (target, all) => {
+  for (var name in all)
+    __defProp(target, name, { get: all[name], enumerable: true });
+};
+
+// src/api/client.js
+function apiBaseUrl() {
+  return (globalThis.__SHENGBIAN_API_BASE__ || defaultBaseUrl).replace(/\/$/, "");
+}
+function cookie(name) {
+  return document.cookie.split("; ").find((item) => item.startsWith(`${name}=`))?.slice(name.length + 1) || "";
+}
+function requestId() {
+  return globalThis.crypto?.randomUUID?.() || `web-${Date.now()}-${Math.random().toString(36).slice(2)}`;
+}
+async function apiRequest(path, options = {}) {
+  const method = options.method || "GET";
+  const headers = new Headers(options.headers || {});
+  headers.set("Accept", "application/json");
+  headers.set("X-Request-Id", requestId());
+  if (options.body !== void 0) {
+    headers.set("Content-Type", "application/json");
+    options = { ...options, body: JSON.stringify(options.body) };
+  }
+  const csrf = cookie("sb_csrf");
+  if (csrf && !["GET", "HEAD", "OPTIONS"].includes(method)) headers.set("X-CSRF-Token", decodeURIComponent(csrf));
+  const response = await fetch(`${apiBaseUrl()}${path}`, { ...options, method, headers, credentials: "include" });
+  let payload = null;
+  try {
+    payload = await response.json();
+  } catch {
+  }
+  if (!response.ok) {
+    const error = payload?.error || {};
+    if (response.status === 401) globalThis.dispatchEvent?.(new CustomEvent("shengbian:api-unauthorized"));
+    throw new ApiError(error.message || `\u8BF7\u6C42\u5931\u8D25\uFF08${response.status}\uFF09`, { status: response.status, code: error.code, details: error.details, requestId: payload?.meta?.requestId });
+  }
+  return payload?.data;
+}
+var defaultBaseUrl, ApiError;
+var init_client = __esm({
+  "src/api/client.js"() {
+    defaultBaseUrl = "http://localhost:3001/api/v1";
+    ApiError = class extends Error {
+      constructor(message, { status, code, details, requestId: requestId2 } = {}) {
+        super(message);
+        this.name = "ApiError";
+        this.status = status;
+        this.code = code;
+        this.details = details;
+        this.requestId = requestId2;
+      }
+    };
+  }
+});
+
+// src/api/auth.js
+var auth_exports = {};
+__export(auth_exports, {
+  currentUser: () => currentUser,
+  login: () => login,
+  logout: () => logout,
+  revokeSession: () => revokeSession,
+  sessions: () => sessions
+});
+var login, logout, currentUser, sessions, revokeSession;
+var init_auth = __esm({
+  "src/api/auth.js"() {
+    init_client();
+    login = (phone, password) => apiRequest("/auth/login", { method: "POST", body: { phone, password } });
+    logout = () => apiRequest("/auth/logout", { method: "POST" });
+    currentUser = () => apiRequest("/auth/me");
+    sessions = () => apiRequest("/auth/sessions");
+    revokeSession = (id2) => apiRequest(`/auth/sessions/${encodeURIComponent(id2)}`, { method: "DELETE" });
+  }
+});
+
 // src/routes.js
 var pages = [
   { key: "overview", path: "/web/overview", file: "web/_1/code.html", name: "\u8C03\u5EA6\u6982\u89C8\u5DE5\u4F5C\u53F0", group: "web", level: 1 },
@@ -427,13 +509,13 @@ function createStore(storage, notify2 = () => {
         return notice;
       });
     },
-    redeem(rewardId, delivery, requestId, options = {}) {
+    redeem(rewardId, delivery, requestId2, options = {}) {
       return change((s) => {
-        if (s.redemptions.some((r) => r.requestId === requestId)) return s.redemptions.find((r) => r.requestId === requestId);
+        if (s.redemptions.some((r) => r.requestId === requestId2)) return s.redemptions.find((r) => r.requestId === requestId2);
         const reward = rewards.find((r) => r.id === rewardId);
         if (!reward) throw new Error("\u5151\u6362\u5546\u54C1\u4E0D\u5B58\u5728");
         if (reward.cash && options.cashPayment !== "success") throw new Error("\u6A21\u62DF\u652F\u4ED8\u5931\u8D25\uFF0C\u79EF\u5206\u4E0E\u5151\u6362\u8BB0\u5F55\u5747\u672A\u6263\u51CF");
-        const redemption = { ...reward, rewardId, id: id("EXCHANGE"), requestId, delivery, at: now(), code: String(Math.floor(1e5 + Math.random() * 9e5)), status: "\u5F85\u6838\u9500" };
+        const redemption = { ...reward, rewardId, id: id("EXCHANGE"), requestId: requestId2, delivery, at: now(), code: String(Math.floor(1e5 + Math.random() * 9e5)), status: "\u5F85\u6838\u9500" };
         points(s, -reward.points, "\u5151\u6362" + reward.name, redemption.id);
         if (reward.cash) {
           const payment = { id: id("PAY"), billIds: [], redemptionId: redemption.id, amount: reward.cash, discount: 0, at: now(), status: "paid", kind: "redemption" };
@@ -447,15 +529,15 @@ function createStore(storage, notify2 = () => {
         return redemption;
       });
     },
-    book(productId, input, requestId) {
+    book(productId, input, requestId2) {
       if (!isPhone(input.phone)) throw new Error("\u8BF7\u8F93\u5165\u6B63\u786E\u7684\u624B\u673A\u53F7\u7801");
       if (!Number.isInteger(Number(input.quantity)) || Number(input.quantity) < 1 || Number(input.quantity) > 99) throw new Error("\u6570\u91CF\u987B\u4E3A1\u81F399\u7684\u6574\u6570");
       if (!input.date || input.date < (/* @__PURE__ */ new Date()).toLocaleDateString("en-CA")) throw new Error("\u9884\u7EA6\u65E5\u671F\u4E0D\u80FD\u65E9\u4E8E\u4ECA\u5929");
       return change((s) => {
-        if (s.bookings.some((b) => b.requestId === requestId)) return s.bookings.find((b) => b.requestId === requestId);
+        if (s.bookings.some((b) => b.requestId === requestId2)) return s.bookings.find((b) => b.requestId === requestId2);
         const product = products.find((p) => p.id === productId);
         if (!product) throw new Error("\u670D\u52A1\u5DF2\u4E0B\u67B6");
-        const booking = { ...input, productId, title: product.name, amount: Number((product.price * input.quantity).toFixed(2)), id: id("BOOK"), requestId, at: now(), status: "\u5F85\u786E\u8BA4" };
+        const booking = { ...input, productId, title: product.name, amount: Number((product.price * input.quantity).toFixed(2)), id: id("BOOK"), requestId: requestId2, at: now(), status: "\u5F85\u786E\u8BA4" };
         s.bookings.unshift(booking);
         log(s, "\u63D0\u4EA4\u670D\u52A1\u9884\u7EA6", booking.id);
         return booking;
@@ -1390,6 +1472,7 @@ function createRadio(onUpdate = () => {
 }
 
 // src/pages/resident.js
+init_auth();
 var find = (text, root = document) => $$('button,a,[role="button"],.cursor-pointer', root).filter((e) => typeof text === "string" ? label(e) === text : text.test(label(e)));
 var on = (text, fn) => find(text).forEach((el) => {
   if (!el.dataset.action) bind(el, label(el), () => fn(el));
@@ -1438,7 +1521,7 @@ function renderPendingReviews(ctx, activeCard) {
   const { state: state2, go: go2 } = ctx;
   const snapshot = state2();
   const pending = snapshot.orders.filter(
-    (order) => order.room === snapshot.user.room && order.communityId === snapshot.user.communityId && order.status === "completed" && !snapshot.reviews.some((review) => review.orderId === order.id)
+    (order) => (order.room === snapshot.user.room || order.contact === snapshot.user.name || order.phone === snapshot.user.phone) && order.communityId === snapshot.user.communityId && order.status === "completed" && !snapshot.reviews.some((review) => review.orderId === order.id)
   );
   if (!pending.length) return;
   const section = document.createElement("section");
@@ -1486,15 +1569,21 @@ function loginPage(ctx) {
     sessionStorage.setItem("shengbian-password", v.password);
     toast("\u6F14\u793A\u5BC6\u7801\u5DF2\u66F4\u65B0");
   }));
-  const submit = (btn) => busy(btn, () => {
+  const submit = (btn) => busy(btn, async () => {
     if (!agreement.checked) throw new Error("\u8BF7\u5148\u9605\u8BFB\u5E76\u540C\u610F\u670D\u52A1\u534F\u8BAE\u4E0E\u9690\u79C1\u653F\u7B56");
     const validAccount = ["admin", "worker", "group-admin"].includes(account.value.trim()) || isPhone(account.value.trim());
     if (!validAccount) throw new Error("\u8BF7\u8F93\u5165\u6709\u6548\u624B\u673A\u53F7\u6216\u6F14\u793A\u8D26\u53F7");
-    if (mode === "password" && password.value !== (sessionStorage.getItem("shengbian-password") || "demo123")) throw new Error("\u8D26\u53F7\u6216\u5BC6\u7801\u4E0D\u6B63\u786E");
+    const usingApi = role2 !== "resident" && isPhone(account.value.trim());
+    if (!usingApi && mode === "password" && password.value !== (sessionStorage.getItem("shengbian-password") || "demo123")) throw new Error("\u8D26\u53F7\u6216\u5BC6\u7801\u4E0D\u6B63\u786E");
     if (mode === "sms" && password.value !== "123456") throw new Error("\u9A8C\u8BC1\u7801\u4E0D\u6B63\u786E");
-    if (role2 === "admin" && account.value !== "admin") throw new Error("\u8BF7\u4F7F\u7528\u7BA1\u7406\u5458\u6F14\u793A\u8D26\u53F7 admin");
-    if (role2 === "worker" && account.value !== "worker") throw new Error("\u8BF7\u4F7F\u7528\u7EF4\u4FEE\u5E08\u5085\u6F14\u793A\u8D26\u53F7 worker");
-    if (role2 === "group" && account.value !== "group-admin") throw new Error("\u8BF7\u4F7F\u7528\u96C6\u56E2\u7BA1\u7406\u5458\u6F14\u793A\u8D26\u53F7 group-admin");
+    if (role2 !== "resident" && isPhone(account.value.trim())) {
+      if (mode !== "password") throw new Error("\u6B63\u5F0F\u8D26\u53F7\u8BF7\u4F7F\u7528\u5BC6\u7801\u767B\u5F55");
+      await login(account.value.trim(), password.value);
+      sessionStorage.setItem("shengbian-api-auth-" + role2, "yes");
+    }
+    if (role2 === "admin" && !usingApi && account.value !== "admin") throw new Error("\u8BF7\u4F7F\u7528\u7BA1\u7406\u5458\u6F14\u793A\u8D26\u53F7 admin");
+    if (role2 === "worker" && !usingApi && account.value !== "worker") throw new Error("\u8BF7\u4F7F\u7528\u7EF4\u4FEE\u5E08\u5085\u6F14\u793A\u8D26\u53F7 worker");
+    if (role2 === "group" && !usingApi && account.value !== "group-admin") throw new Error("\u8BF7\u4F7F\u7528\u96C6\u56E2\u7BA1\u7406\u5458\u6F14\u793A\u8D26\u53F7 group-admin");
     sessionStorage.setItem("shengbian-auth-" + role2, "yes");
     go2(safeNext2(qs2.get("next") || (role2 === "group" ? "/web/group" : role2 === "admin" ? "/web/overview" : role2 === "worker" ? "/worker/tasks" : "/mobile/home")));
   });
@@ -1583,6 +1672,7 @@ function verifyPage(ctx) {
 function repairPage(ctx) {
   const { store: store2, state: state2, go: go2, upload: upload2 } = ctx;
   let scope = "private", category = "\u7BA1\u9053\u758F\u901A", date = today(), slot = "\u4E0A\u5348\u65F6\u6BB5 09:00 - 11:30", callConfirm = true;
+  renderRepairCenter(ctx);
   const draft = state2().drafts.repair || {};
   if (draft.description) $("#issue-text").value = draft.description;
   const save = () => store2.saveDraft("repair", { description: $("#issue-text").value, scope, category, date, slot, callConfirm });
@@ -1642,6 +1732,30 @@ function repairPage(ctx) {
       go2("/mobile/orders/" + order.id + "?submitted=1");
     }, "\u786E\u8BA4\u63D0\u4EA4\u62A5\u4FEE");
   });
+}
+function renderRepairCenter(ctx) {
+  const { state: state2, go: go2 } = ctx;
+  const snapshot = state2();
+  const ownerOrders = snapshot.orders.filter(
+    (order) => (!order.communityId || order.communityId === snapshot.user.communityId) && (order.room === snapshot.user.room || order.contact === snapshot.user.name || order.phone === snapshot.user.phone)
+  ).sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+  const active2 = ownerOrders.filter((order) => !["completed", "closed", "cancelled"].includes(order.status));
+  const history2 = ownerOrders.filter((order) => ["completed", "closed", "cancelled"].includes(order.status));
+  const pendingReviews = history2.filter((order) => order.status === "completed" && !snapshot.reviews.some((review) => review.orderId === order.id));
+  const statusText = (order) => {
+    const review = snapshot.reviews.find((item) => item.orderId === order.id);
+    if (order.status === "completed" && !review) return "\u5DF2\u5B8C\u5DE5\uFF0C\u5F85\u8BC4\u4EF7";
+    return review ? `\u5DF2\u8BC4\u4EF7 ${review.rating} \u661F` : statuses[order.status];
+  };
+  const section = document.createElement("section");
+  section.id = "resident-repair-center";
+  section.className = "demo-repair-center";
+  section.innerHTML = `<div class="demo-repair-center-heading"><div><span class="material-symbols-outlined" aria-hidden="true">assignment_turned_in</span><div><h2>\u6211\u7684\u62A5\u4FEE</h2><p>\u63D0\u4EA4\u540E\u53EF\u5728\u8FD9\u91CC\u67E5\u770B\u8FDB\u5EA6\u3001\u5386\u53F2\u548C\u670D\u52A1\u8BC4\u4EF7</p></div></div><button class="demo-button secondary" data-repair-all>\u5168\u90E8\u8BB0\u5F55</button></div><div class="demo-repair-metrics"><span>\u8FDB\u884C\u4E2D ${active2.length}</span><span>\u5386\u53F2 ${history2.length}</span><span>\u5F85\u8BC4\u4EF7 ${pendingReviews.length}</span></div><div class="demo-repair-section"><h3>\u8FDB\u884C\u4E2D</h3>${active2.length ? active2.slice(0, 1).map((order) => `<button class="demo-repair-order" data-repair-detail="${escape(order.id)}"><div><strong>${escape(order.title)}</strong><small>${escape(order.id)} \xB7 ${escape(order.appointment)}</small></div><span class="demo-repair-status active">${escape(statusText(order))}</span></button>`).join("") : '<div class="demo-repair-empty">\u6682\u65E0\u8FDB\u884C\u4E2D\u7684\u62A5\u4FEE</div>'}</div><div class="demo-repair-section"><h3>\u5F85\u8BC4\u4EF7</h3>${pendingReviews.length ? pendingReviews.slice(0, 1).map((order) => `<article class="demo-repair-order"><div><strong>${escape(order.title)}</strong><small>${escape(order.technician || "\u7EF4\u4FEE\u5E08\u5085")}\u5DF2\u5B8C\u6210\u670D\u52A1</small></div><button class="demo-button" data-repair-review="${escape(order.id)}">\u7ACB\u5373\u8BC4\u4EF7 ${icon("arrow_forward")}</button></article>`).join("") : '<div class="demo-repair-empty">\u6682\u65E0\u5F85\u8BC4\u4EF7\u7684\u5B8C\u5DE5\u5DE5\u5355</div>'}</div><div class="demo-repair-section"><h3>\u5386\u53F2\u62A5\u4FEE</h3>${history2.length ? history2.slice(0, 1).map((order) => `<button class="demo-repair-order" data-repair-detail="${escape(order.id)}"><div><strong>${escape(order.title)}</strong><small>${escape(order.id)} \xB7 ${new Date(order.createdAt).toLocaleDateString("zh-CN")}</small></div><span class="demo-repair-status">${escape(statusText(order))}</span></button>`).join("") : '<div class="demo-repair-empty">\u6682\u65E0\u5386\u53F2\u62A5\u4FEE\u8BB0\u5F55</div>'}</div>`;
+  const anchor = $("#tab-private")?.closest("section");
+  anchor?.after(section);
+  $$("[data-repair-detail]", section).forEach((button) => bind(button, "\u67E5\u770B\u62A5\u4FEE\u8BE6\u60C5", () => go2("/mobile/orders/" + button.dataset.repairDetail)));
+  $$("[data-repair-review]", section).forEach((button) => bind(button, "\u8BC4\u4EF7\u5DF2\u5B8C\u5DE5\u62A5\u4FEE", () => go2("/mobile/review?id=" + button.dataset.repairReview)));
+  bind($("[data-repair-all]", section), "\u67E5\u770B\u5168\u90E8\u62A5\u4FEE\u8BB0\u5F55", () => go2("/mobile/profile?panel=orders"));
 }
 function reviewPage(ctx) {
   const { state: state2, store: store2, qs: qs2, go: go2 } = ctx;
@@ -1829,10 +1943,10 @@ function pointsPage(ctx) {
     if (!reward) return;
     const btn = $("button", item);
     bind(btn, "\u5151\u6362" + reward.name, () => {
-      const requestId = id("REQ");
+      const requestId2 = id("REQ");
       const paymentField = reward.cash ? field("cashPayment", "\u652F\u4ED8\u7ED3\u679C", "success", { choices: [["success", "\u6A21\u62DF\u652F\u4ED8\u6210\u529F"], ["failure", "\u6A21\u62DF\u652F\u4ED8\u5931\u8D25"]] }) : "";
       formModal("\u786E\u8BA4\u79EF\u5206\u5151\u6362", `<h3>${escape(reward.name)}</h3><p>\u6263\u9664 ${reward.points}\u79EF\u5206${reward.cash ? ` + \xA5${reward.cash}\uFF08\u6A21\u62DF\u652F\u4ED8\uFF09` : ""}\uFF0C\u5F53\u524D\u53EF\u7528 ${state2().user.points}\u79EF\u5206</p>` + field("delivery", "\u9886\u53D6\u65B9\u5F0F", "\u7269\u4E1A\u670D\u52A1\u4E2D\u5FC3\u81EA\u63D0", { choices: ["\u7269\u4E1A\u670D\u52A1\u4E2D\u5FC3\u81EA\u63D0", "\u914D\u9001\u81F3\u5DF2\u7ED1\u5B9A\u623F\u5C4B"] }) + paymentField, (values) => {
-        const result = store2.redeem(reward.id, values.delivery, requestId, { cashPayment: values.cashPayment || "success" });
+        const result = store2.redeem(reward.id, values.delivery, requestId2, { cashPayment: values.cashPayment || "success" });
         if (balance) balance.textContent = state2().user.points.toLocaleString("zh-CN");
         const payment = result.paymentId && state2().payments.find((p) => p.id === result.paymentId);
         modal("\u5151\u6362\u6210\u529F", `<p>${escape(result.name)}</p><h3>\u6838\u9500\u7801\uFF1A${result.code}</h3><p>${escape(result.delivery)}</p>${payment ? `<p>\u6A21\u62DF\u652F\u4ED8\uFF1A\xA5${money(payment.amount)} \xB7 \u4EA4\u6613\u53F7 ${escape(payment.id)}</p>` : ""}`, [
@@ -1891,9 +2005,9 @@ function serviceDetail(ctx, productId) {
   if (!product) return modal("\u670D\u52A1\u4E0D\u5B58\u5728", empty("\u8BE5\u670D\u52A1\u4E0D\u5B58\u5728\u6216\u5DF2\u4E0B\u67B6"), [{ label: "\u8FD4\u56DE\u670D\u52A1\u5217\u8868", run: () => ctx.go("/mobile/services") }]);
   modal("\u670D\u52A1\u8BE6\u60C5", `<h3>${escape(product.name)}</h3><p>${escape(product.category)}</p><h3>\xA5${money(product.price)} / \u6B21\uFF08\u4EFD\uFF09</h3><p>\u7531\u7269\u4E1A\u670D\u52A1\u4E2D\u5FC3\u534F\u8C03\uFF0C\u63D0\u4EA4\u540E\u7BA1\u5BB6\u5C06\u786E\u8BA4\u65F6\u95F4\u53CA\u670D\u52A1\u8303\u56F4\u3002\u6750\u6599\u589E\u9879\u987B\u53E6\u884C\u786E\u8BA4\u3002</p>`, [
     { label: "\u7ACB\u5373\u9884\u7EA6", run: () => ctx.requireAuth(() => {
-      const requestId = id("REQ");
+      const requestId2 = id("REQ");
       formModal("\u786E\u8BA4\u9884\u7EA6", field("date", "\u9884\u7EA6\u65E5\u671F", today(), { type: "date", min: today() }) + field("time", "\u9884\u7EA6\u65F6\u6BB5", "14:00-16:30", { choices: ["09:00-11:30", "14:00-16:30", "17:30-19:30"] }) + field("quantity", "\u6570\u91CF", "1", { type: "number", min: 1, max: 99 }) + field("phone", "\u8054\u7CFB\u7535\u8BDD", ctx.state().user.phone, { type: "tel", pattern: "1[3-9][0-9]{9}" }) + field("address", "\u670D\u52A1/\u914D\u9001\u5730\u5740", ctx.state().user.room), (values) => {
-        const booking = ctx.store.book(productId, values, requestId);
+        const booking = ctx.store.book(productId, values, requestId2);
         modal("\u9884\u7EA6\u6210\u529F", `<p>${escape(booking.title)}</p><p>${escape(booking.date)} \xB7 ${escape(booking.time)}</p><p>\u9884\u7EA6\u91D1\u989D \xA5${money(booking.amount)}\uFF0C\u5F85\u7BA1\u5BB6\u786E\u8BA4\u3002</p><small>${booking.id}</small>`, [
           { label: "\u67E5\u770B\u9884\u7EA6\u8BB0\u5F55", run: () => ctx.panel("bookings") },
           { label: "\u8FD4\u56DE\u670D\u52A1\u5217\u8868", secondary: true, run: () => ctx.go("/mobile/services") }
@@ -1987,7 +2101,9 @@ function reviewDashboard(ctx) {
   function render() {
     const snapshot = state2();
     const communityId = snapshot.contexts.property?.communityId || snapshot.user.communityId;
-    const completed = snapshot.orders.filter((order) => order.communityId === communityId && ["completed", "closed"].includes(order.status));
+    const completed = snapshot.orders.filter(
+      (order) => ["completed", "closed"].includes(order.status) && (!communityId || !order.communityId || order.communityId === communityId)
+    );
     const reviews = snapshot.reviews.map((review) => ({ ...review, order: completed.find((order) => order.id === review.orderId) })).filter((review) => review.order).sort((a, b) => new Date(b.at) - new Date(a.at));
     const lowReviews = reviews.filter((review) => Number(review.rating) <= 3);
     const visibleReviews = mode === "follow-up" ? lowReviews : reviews;
@@ -2253,24 +2369,33 @@ function checkin(ctx) {
   slaPanel.className = "demo-arrival-sla";
   const checkinContainer = $("#checkin-container");
   checkinContainer?.before(slaPanel);
+  const timeText = (value) => value ? new Date(value).toLocaleString("zh-CN", {
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+    hour: "2-digit",
+    minute: "2-digit"
+  }) : "--";
   const update = () => {
     const order = getOrder();
     const checked = ["arrived", "processing", "completed", "closed"].includes(order.status);
     const sla = arrivalStatus(order);
-    const due = order.arrivalDueAt ? new Date(order.arrivalDueAt).toLocaleTimeString("zh-CN", { hour: "2-digit", minute: "2-digit" }) : "";
-    slaPanel.innerHTML = `${icon("timer")}<div><strong>${escape(sla.text)}</strong><small>${due ? `\u5230\u5C97\u622A\u6B62\uFF1A${due}\uFF1B\u4EE5\u5E08\u5085\u6210\u529F\u63A5\u5355\u65F6\u523B\u5F00\u59CB\u8BA1\u7B97\u3002` : "\u5B8C\u6210\u63A5\u5355\u540E\u7CFB\u7EDF\u4F1A\u751F\u6210\u5230\u5C97\u622A\u6B62\u65F6\u95F4\u3002"}</small></div>`;
+    const timing = order.acceptedAt ? `\u63A5\u5355\u65F6\u95F4\uFF1A${timeText(order.acceptedAt)}<br>\u5230\u5C97\u622A\u6B62\uFF1A${timeText(order.arrivalDueAt)}\uFF1B\u4EE5\u5E08\u5085\u6210\u529F\u63A5\u5355\u65F6\u523B\u5F00\u59CB\u8BA1\u7B97\u3002${checked ? `<br>\u5B9E\u9645\u5230\u5C97\uFF1A${timeText(order.checkinAt)}` : ""}` : "\u5B8C\u6210\u63A5\u5355\u540E\u7CFB\u7EDF\u4F1A\u751F\u6210\u5230\u5C97\u622A\u6B62\u65F6\u95F4\u3002";
+    slaPanel.innerHTML = `${icon("timer")}<div><strong>${escape(sla.text)}</strong><small>${timing}</small></div>`;
     slaPanel.dataset.state = sla.state;
     $("#checked-state").classList.toggle("hidden", !checked);
     $("#checkin-btn").classList.toggle("hidden", checked);
     $("#service-timer").textContent = checked ? sla.text : "\u7B49\u5F85\u5230\u5C97";
     if (checked) {
       const text = $$("span", $("#checked-state")).find((e) => e.textContent.includes("\u5DF2\u6210\u529F"));
-      if (text) text.textContent = `${new Date(order.checkinAt).toLocaleTimeString("zh-CN", { hour: "2-digit", minute: "2-digit" })} \u5DF2\u6210\u529F\u5230\u5C97\u6253\u5361`;
+      if (text) text.textContent = `${timeText(order.checkinAt)} \u5DF2\u6210\u529F\u5230\u5C97\u6253\u5361`;
     }
   };
   bind($("#checkin-btn"), "\u73B0\u573A\u5230\u5C97\u6253\u5361", () => {
-    const sla = arrivalStatus(getOrder());
-    confirm("\u73B0\u573A\u5230\u5C97\u6253\u5361", `\u786E\u8BA4\u5DF2\u5230\u8FBE ${getOrder().room}\uFF1F${sla.text}\u3002\u6B64\u6B21\u6253\u5361\u4E3A\u6F14\u793A\u5B9A\u4F4D\u3002`, () => store2.transition(orderId, "arrived", { checkinAt: now() }), { after: update });
+    const order = getOrder();
+    const checkinAt = now();
+    const sla = arrivalStatus(order, new Date(checkinAt).getTime());
+    confirm("\u73B0\u573A\u5230\u5C97\u6253\u5361", `<p>\u786E\u8BA4\u5DF2\u5230\u8FBE ${escape(order.room)}\uFF1F</p><p>\u63A5\u5355\u65F6\u95F4\uFF1A${timeText(order.acceptedAt)}<br>\u5230\u5C97\u622A\u6B62\uFF1A${timeText(order.arrivalDueAt)}<br>\u5F53\u524D\u6253\u5361\uFF1A${timeText(checkinAt)}<br>\u5C65\u7EA6\u72B6\u6001\uFF1A${escape(sla.text)}</p><p>\u6B64\u6B21\u6253\u5361\u4E3A\u6F14\u793A\u5B9A\u4F4D\u3002</p>`, () => store2.transition(orderId, "arrived", { checkinAt }), { after: update });
   });
   $$(".payment-option").forEach((el) => bind(el, label(el).split(" ")[0], () => {
     if (el.dataset.pay === "public" && getOrder().scope !== "public") throw new Error("\u5C45\u6C11\u5BA4\u5185\u4E13\u6709\u7EF4\u4FEE\u4E0D\u80FD\u8BB0\u5165\u516C\u5171\u7EF4\u4FEE\u57FA\u91D1");
@@ -2946,6 +3071,17 @@ function articleDetail(ctx, articleId) {
 }
 
 // src/app.js
+init_auth();
+
+// src/api/property-companies.js
+init_client();
+var currentPropertyCompany = () => apiRequest("/property-companies/current");
+
+// src/api/communities.js
+init_client();
+var listCommunities = () => apiRequest("/communities");
+
+// src/app.js
 var route = matchRoute(location.pathname) || pages.find((p) => p.key === document.documentElement.dataset.page);
 document.documentElement.dataset.group = route.group;
 var store = createStore(localStorage, () => window.dispatchEvent(new Event("demo:change")));
@@ -2960,12 +3096,12 @@ function safeNext(next) {
 function go(url) {
   location.assign(safeNext(url));
 }
-function login() {
+function login2() {
   const base = location.pathname === "/web/group" || role === "group" ? "/web/login?role=group&" : `/${route.group}/login?`;
   go(base + `next=${encodeURIComponent(location.pathname + location.search)}`);
 }
 function requireAuth(fn) {
-  if (!signedIn()) return login();
+  if (!signedIn()) return login2();
   return fn();
 }
 function back() {
@@ -2974,17 +3110,23 @@ function back() {
 }
 function signOut() {
   confirm("\u9000\u51FA\u767B\u5F55", "\u786E\u8BA4\u9000\u51FA\u5F53\u524D\u6F14\u793A\u8D26\u53F7\uFF1F\u4E1A\u52A1\u8BB0\u5F55\u4F1A\u7EE7\u7EED\u4FDD\u5B58\u5728\u6B64\u6D4F\u89C8\u5668\u3002", () => {
+    if (sessionStorage.getItem("shengbian-api-auth-" + role) === "yes") {
+      Promise.resolve().then(() => (init_auth(), auth_exports)).then(({ logout: logout2 }) => logout2().catch(() => {
+      }));
+      sessionStorage.removeItem("shengbian-api-auth-" + role);
+    }
     sessionStorage.removeItem(sessionKey);
   }, { after: () => go(role === "group" ? "/web/login?role=group" : `/${route.group}/login`) });
 }
 if (!route.public && !signedIn()) {
-  login();
+  login2();
 } else {
   start();
 }
 function start() {
   document.title = `${route.name} | \u58F0\u8FB9\u7269\u4E1A`;
-  const ctx = { route, qs, role, source: source_default, store, state, go, back, login, signedIn, requireAuth, panel, orderDetail, showOrders, upload, showFile, speech, share, contact, notify, signOut, safeNext };
+  const ctx = { route, qs, role, source: source_default, store, state, go, back, login: login2, signedIn, requireAuth, panel, orderDetail, showOrders, upload, showFile, speech, share, contact, notify, signOut, safeNext };
+  hydrateApiContext(role, store);
   if (!state().expenses.length && !state().logs.some((l) => l.action === "\u521D\u59CB\u5316\u652F\u51FA\u53F0\u8D26")) {
     store.change((s) => {
       s.expenses = source_default.expenses.expenses.map((a) => ({
@@ -3115,6 +3257,20 @@ function start() {
     unbound: $$('button,a,.cursor-pointer,[role="button"]').filter((e) => !e.dataset.action && !e.closest("dialog") && !e.closest("[data-action]") && !e.matches("input,select,label") && !e.getAttribute("href")?.startsWith("tel:")).map((e) => ({ text: label(e), id: e.id, tag: e.tagName })),
     deadLinks: $$("a").filter((e) => !e.getAttribute("href") || ["#", "javascript:void(0)"].includes(e.getAttribute("href"))).length
   });
+}
+async function hydrateApiContext(currentRole, currentStore) {
+  if (!sessionStorage.getItem("shengbian-api-auth-" + currentRole)) return;
+  try {
+    const [auth, company, communities] = await Promise.all([currentUser(), currentPropertyCompany(), listCommunities()]);
+    globalThis.__SHENGBIAN_API_CONTEXT__ = { user: auth.user, scope: auth.scope, memberships: auth.memberships, company, communities };
+    currentStore.change((snapshot) => {
+      if (auth.user?.name) snapshot.user.name = auth.user.name;
+      if (auth.user?.phone) snapshot.user.phone = auth.user.phone;
+    });
+    globalThis.dispatchEvent?.(new CustomEvent("shengbian:api-context", { detail: globalThis.__SHENGBIAN_API_CONTEXT__ }));
+  } catch (error) {
+    if (error?.status === 401) sessionStorage.removeItem("shengbian-api-auth-" + currentRole);
+  }
 }
 function hydrateProfile() {
   const s = state();
@@ -3376,7 +3532,7 @@ function common(ctx) {
     notifications: () => panel("messages"),
     lock: () => {
       sessionStorage.removeItem(sessionKey);
-      login();
+      login2();
     },
     logout: signOut,
     person: () => requireAuth(() => panel("account")),

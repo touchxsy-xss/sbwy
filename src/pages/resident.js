@@ -2,6 +2,7 @@ import { $, $$, bind, label, icon, escape, modal, closeModal, formModal, field, 
 import { isPhone, now, id, money } from '../services/store.js';
 import { products, rewards, statuses } from '../data/seed.js';
 import { createRadio } from '../services/audio.js';
+import { login as apiLogin } from '../api/auth.js';
 
 const find = (text, root = document) => $$('button,a,[role="button"],.cursor-pointer', root).filter(e => typeof text === 'string' ? label(e) === text : text.test(label(e)));
 const on = (text, fn) => find(text).forEach(el => { if (!el.dataset.action) bind(el, label(el), () => fn(el)); });
@@ -97,15 +98,21 @@ function loginPage(ctx) {
     sessionStorage.setItem('shengbian-password', v.password);
     toast('演示密码已更新');
   }));
-  const submit = btn => busy(btn, () => {
+  const submit = btn => busy(btn, async () => {
     if (!agreement.checked) throw new Error('请先阅读并同意服务协议与隐私政策');
     const validAccount = ['admin', 'worker', 'group-admin'].includes(account.value.trim()) || isPhone(account.value.trim());
     if (!validAccount) throw new Error('请输入有效手机号或演示账号');
-    if (mode === 'password' && password.value !== (sessionStorage.getItem('shengbian-password') || 'demo123')) throw new Error('账号或密码不正确');
+    const usingApi = role !== 'resident' && isPhone(account.value.trim());
+    if (!usingApi && mode === 'password' && password.value !== (sessionStorage.getItem('shengbian-password') || 'demo123')) throw new Error('账号或密码不正确');
     if (mode === 'sms' && password.value !== '123456') throw new Error('验证码不正确');
-    if (role === 'admin' && account.value !== 'admin') throw new Error('请使用管理员演示账号 admin');
-    if (role === 'worker' && account.value !== 'worker') throw new Error('请使用维修师傅演示账号 worker');
-    if (role === 'group' && account.value !== 'group-admin') throw new Error('请使用集团管理员演示账号 group-admin');
+    if (role !== 'resident' && isPhone(account.value.trim())) {
+      if (mode !== 'password') throw new Error('正式账号请使用密码登录');
+      await apiLogin(account.value.trim(), password.value);
+      sessionStorage.setItem('shengbian-api-auth-' + role, 'yes');
+    }
+    if (role === 'admin' && !usingApi && account.value !== 'admin') throw new Error('请使用管理员演示账号 admin');
+    if (role === 'worker' && !usingApi && account.value !== 'worker') throw new Error('请使用维修师傅演示账号 worker');
+    if (role === 'group' && !usingApi && account.value !== 'group-admin') throw new Error('请使用集团管理员演示账号 group-admin');
     sessionStorage.setItem('shengbian-auth-' + role, 'yes');
     go(safeNext(qs.get('next') || (role === 'group' ? '/web/group' : role === 'admin' ? '/web/overview' : role === 'worker' ? '/worker/tasks' : '/mobile/home')));
   });

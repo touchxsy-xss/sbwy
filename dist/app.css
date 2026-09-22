@@ -48,6 +48,28 @@ button:disabled { opacity: .55; cursor: not-allowed; }
 .demo-arrival-sla strong, .demo-arrival-sla small { display: block; }
 .demo-arrival-sla small { margin-top: 2px; color: #3e4942; font-size: 12px; }
 .demo-arrival-sla[data-state="overdue"] { background: #ffdad6; color: #93000a; }
+.demo-repair-center { margin: 0; padding: 14px; border: 1px solid #dff2e7; border-radius: 8px; background: #ffffff; }
+.demo-repair-center-heading, .demo-repair-center-heading > div, .demo-repair-order { display: flex; align-items: center; }
+.demo-repair-center-heading { justify-content: space-between; gap: 10px; }
+.demo-repair-center-heading > div { gap: 8px; min-width: 0; }
+.demo-repair-center-heading .material-symbols-outlined { color: #006544; }
+.demo-repair-center h2, .demo-repair-center h3, .demo-repair-center p { margin: 0; }
+.demo-repair-center h2 { font-size: 17px; }
+.demo-repair-center h3 { padding: 10px 0 5px; font-size: 14px; }
+.demo-repair-center p, .demo-repair-order small, .demo-repair-empty { color: #3e4942; font-size: 12px; }
+.demo-repair-metrics { display: flex; gap: 7px; margin-top: 11px; overflow-x: auto; }
+.demo-repair-metrics span { flex: 0 0 auto; padding: 5px 8px; border-radius: 999px; background: #e5f8ed; color: #005236; font-size: 12px; }
+.demo-repair-section { border-top: 1px solid #dff2e7; margin-top: 10px; }
+.demo-repair-order { width: 100%; justify-content: space-between; gap: 9px; padding: 10px 0; border: 0; border-top: 1px solid #edf3ef; background: transparent; color: inherit; text-align: left; }
+.demo-repair-section h3 + .demo-repair-order { border-top: 0; }
+.demo-repair-order > div { min-width: 0; }
+.demo-repair-order strong, .demo-repair-order small { display: block; }
+.demo-repair-order strong { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.demo-repair-order small { margin-top: 3px; }
+.demo-repair-status { flex: 0 0 auto; max-width: 106px; color: #3e4942; font-size: 12px; text-align: right; }
+.demo-repair-status.active { color: #006544; font-weight: 700; }
+.demo-repair-order .demo-button { flex: 0 0 auto; padding: 7px 9px; font-size: 12px; }
+.demo-repair-empty { margin-top: 12px; padding: 12px; border-radius: 6px; background: #f7fcf8; text-align: center; }
 .demo-pending-reviews { margin: 0; padding: 14px; border: 1px solid #ffddb8; border-radius: 8px; background: #fff8f2; }
 .demo-pending-reviews-heading, .demo-pending-reviews-heading > div, .demo-pending-review-list article, .demo-review-dashboard-heading, .demo-review-dashboard-heading > div, .demo-review-card-top, .demo-review-card-foot { display: flex; align-items: center; }
 .demo-pending-reviews-heading, .demo-review-dashboard-heading { justify-content: space-between; gap: 12px; }

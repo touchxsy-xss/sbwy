@@ -7,6 +7,9 @@ import { $, $$, bind, label, icon, escape, modal, closeModal, formModal, field, 
 import { initResident } from './pages/resident.js';
 import { initOperations } from './pages/operations.js';
 import { initContent } from './pages/content.js';
+import { currentUser } from './api/auth.js';
+import { currentPropertyCompany } from './api/property-companies.js';
+import { listCommunities } from './api/communities.js';
 
 const route = matchRoute(location.pathname) || pages.find(p => p.key === document.documentElement.dataset.page);
 document.documentElement.dataset.group = route.group;
@@ -29,6 +32,10 @@ function back() {
 }
 function signOut() {
   confirm('退出登录', '确认退出当前演示账号？业务记录会继续保存在此浏览器。', () => {
+    if (sessionStorage.getItem('shengbian-api-auth-' + role) === 'yes') {
+      import('./api/auth.js').then(({ logout }) => logout().catch(() => {}));
+      sessionStorage.removeItem('shengbian-api-auth-' + role);
+    }
     sessionStorage.removeItem(sessionKey);
   }, { after: () => go(role === 'group' ? '/web/login?role=group' : `/${route.group}/login`) });
 }
@@ -41,6 +48,7 @@ if (!route.public && !signedIn()) {
 function start() {
   document.title = `${route.name} | 声边物业`;
   const ctx = { route, qs, role, source, store, state, go, back, login, signedIn, requireAuth, panel, orderDetail, showOrders, upload, showFile, speech, share, contact, notify, signOut, safeNext };
+  hydrateApiContext(role, store);
   if (!state().expenses.length && !state().logs.some(l => l.action === '初始化支出台账')) {
     store.change(s => {
       s.expenses = source.expenses.expenses.map(a => ({
@@ -157,6 +165,21 @@ function start() {
     unbound: $$('button,a,.cursor-pointer,[role="button"]').filter(e => !e.dataset.action && !e.closest('dialog') && !e.closest('[data-action]') && !e.matches('input,select,label') && !e.getAttribute('href')?.startsWith('tel:')).map(e => ({ text: label(e), id: e.id, tag: e.tagName })),
     deadLinks: $$('a').filter(e => !e.getAttribute('href') || ['#', 'javascript:void(0)'].includes(e.getAttribute('href'))).length
   });
+}
+
+async function hydrateApiContext(currentRole, currentStore) {
+  if (!sessionStorage.getItem('shengbian-api-auth-' + currentRole)) return;
+  try {
+    const [auth, company, communities] = await Promise.all([currentUser(), currentPropertyCompany(), listCommunities()]);
+    globalThis.__SHENGBIAN_API_CONTEXT__ = { user: auth.user, scope: auth.scope, memberships: auth.memberships, company, communities };
+    currentStore.change(snapshot => {
+      if (auth.user?.name) snapshot.user.name = auth.user.name;
+      if (auth.user?.phone) snapshot.user.phone = auth.user.phone;
+    });
+    globalThis.dispatchEvent?.(new CustomEvent('shengbian:api-context', { detail: globalThis.__SHENGBIAN_API_CONTEXT__ }));
+  } catch (error) {
+    if (error?.status === 401) sessionStorage.removeItem('shengbian-api-auth-' + currentRole);
+  }
 }
 
 function hydrateProfile() {
