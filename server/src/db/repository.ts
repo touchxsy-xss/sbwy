@@ -52,6 +52,9 @@ export function createDrizzleRepository(db: AppDb): Repository {
     return company ? and(company, related) : related;
   };
   const repository: Repository = {
+    async transaction<T>(callback: (transactionRepository: Repository) => Promise<T>) {
+      return db.transaction(async tx => callback(createDrizzleRepository(tx as unknown as AppDb)));
+    },
     async findUserByPhone(phone) { const [row] = await db.select().from(users).where(eq(users.phone, phone)).limit(1); return row ? userMap(row) : null; },
     async findUserById(id) { const [row] = await db.select().from(users).where(eq(users.id, id)).limit(1); return row ? userMap(row) : null; },
     async hasCompanyMembership(userId, propertyCompanyId) { const [row] = await db.select({ id: companyMemberships.id }).from(companyMemberships).where(and(eq(companyMemberships.userId, userId), eq(companyMemberships.propertyCompanyId, propertyCompanyId), eq(companyMemberships.status, 'ACTIVE'))).limit(1); return Boolean(row); },
@@ -136,7 +139,7 @@ export function createDrizzleRepository(db: AppDb): Repository {
       const where = conditions.length ? and(...conditions) : undefined;
       const page = filters.page || 1; const pageSize = filters.pageSize || 20;
       const [totalRow] = await db.select({ total: sql<number>`count(*)` }).from(houses).innerJoin(buildings, eq(houses.buildingId, buildings.id)).innerJoin(communities, eq(buildings.communityId, communities.id)).where(where);
-      const rows = await db.select({ house: houses, building: buildings, unit: buildingUnits, community: communities }).from(houses).innerJoin(buildings, eq(houses.buildingId, buildings.id)).leftJoin(buildingUnits, eq(houses.buildingUnitId, buildingUnits.id)).innerJoin(communities, eq(buildings.communityId, communities.id)).where(where).orderBy(buildings.code, houses.code).limit(pageSize).offset((page - 1) * pageSize);
+      const rows = await db.select({ house: houses, building: buildings, unit: buildingUnits, community: communities }).from(houses).innerJoin(buildings, eq(houses.buildingId, buildings.id)).leftJoin(buildingUnits, eq(houses.buildingUnitId, buildingUnits.id)).innerJoin(communities, eq(buildings.communityId, communities.id)).where(where).orderBy(communities.code, buildings.code, buildingUnits.code, houses.code, houses.id).limit(pageSize).offset((page - 1) * pageSize);
       return { items: rows.map(houseDto), page, pageSize, total: Number(totalRow?.total || 0) };
     },
     async getHouse(id, scope) { const scoped = scopedCommunities(scope); const conditions = scoped ? and(eq(houses.id, id), scoped) : eq(houses.id, id); const [row] = await db.select({ house: houses, building: buildings, unit: buildingUnits, community: communities }).from(houses).innerJoin(buildings, eq(houses.buildingId, buildings.id)).leftJoin(buildingUnits, eq(houses.buildingUnitId, buildingUnits.id)).innerJoin(communities, eq(buildings.communityId, communities.id)).where(conditions).limit(1); return row ? houseDto(row) : null; },
@@ -160,7 +163,7 @@ export function createDrizzleRepository(db: AppDb): Repository {
       const where = conditions.length ? and(...conditions) : undefined;
       const page = filters.page || 1; const pageSize = filters.pageSize || 20;
       const [totalRow] = await db.select({ total: sql<number>`count(*)` }).from(people).where(where);
-      const rows = await db.select().from(people).where(where).orderBy(people.name).limit(pageSize).offset((page - 1) * pageSize);
+      const rows = await db.select().from(people).where(where).orderBy(people.name, people.id).limit(pageSize).offset((page - 1) * pageSize);
       return { items: rows.map(row => personDto(personMap(row))), page, pageSize, total: Number(totalRow?.total || 0) };
     },
     async getPerson(id, scope, options = {}) { const scoped = personScopeCondition(scope, options.includeHistory ?? false); const conditions = scoped ? and(eq(people.id, id), scoped) : eq(people.id, id); const [row] = await db.select().from(people).where(conditions).limit(1); return row ? personDto(personMap(row)) : null; },

@@ -62,6 +62,7 @@ export type AuditInput = {
 };
 
 export interface Repository {
+  transaction<T>(callback: (repository: Repository) => Promise<T>): Promise<T>;
   findUserByPhone(phone: string): Promise<UserRecord | null>;
   findUserById(id: string): Promise<UserRecord | null>;
   hasCompanyMembership(userId: string, propertyCompanyId: string): Promise<boolean>;

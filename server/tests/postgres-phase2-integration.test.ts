@@ -85,4 +85,50 @@ describe('Phase 2A PostgreSQL integration', { skip: !enabled }, () => {
   it('42 atomic new resident writes Person and relationship audits with scope', async () => { const manager = await login('13800000002', env.SEED_MANAGER_PASSWORD!); const result = await request(`/api/v1/houses/${fx.aNoUnitHouse.id}/residents`, body({ newPerson: { name: '原子审计住户', phone: '13922223333' }, relationship: { relationshipType: 'TENANT', startDate: '2028-01-01' } }), manager); assert.equal(result.response.status, 200); const personAudits = await db.select().from(auditLogs).where(and(eq(auditLogs.action, 'PERSON_CREATED'), eq(auditLogs.resourceId, result.body.data.person.id))); const relationshipAudits = await db.select().from(auditLogs).where(and(eq(auditLogs.action, 'HOUSE_RELATION_CREATED'), eq(auditLogs.resourceId, result.body.data.relationship.id))); assert.equal(personAudits.length, 1); assert.equal(relationshipAudits.length, 1); for (const audit of [...personAudits, ...relationshipAudits]) { assert.equal(audit.propertyCompanyId, fx.companyA.id); assert.equal(audit.communityId, fx.a1.id); assert.equal(JSON.stringify(audit).includes('13922223333'), false); } });
   it('43 failed atomic resident creation rolls back data and audits', async () => { const admin = await login('13800000001', env.SEED_ADMIN_PASSWORD!); const result = await request(`/api/v1/houses/${fx.aNoUnitHouse.id}/residents`, body({ newPerson: { name: '应回滚审计客户', phone: '13977778888' }, relationship: { relationshipType: 'TENANT', startDate: 'invalid-date' } }), admin); assert.equal(result.response.status, 422); assert.equal((await db.select().from(people).where(eq(people.name, '应回滚审计客户'))).length, 0); assert.equal((await db.select().from(auditLogs).where(sql`${auditLogs.afterData}::text ILIKE '%应回滚审计客户%'`)).length, 0); });
   it('44 contact audit records tenant scope without leaking phone', async () => { const rows = await db.select().from(auditLogs).where(and(eq(auditLogs.action, 'PERSON_PHONE_VIEWED'), eq(auditLogs.resourceId, fx.personA.id))); assert.ok(rows.length > 0); for (const row of rows) { assert.equal(row.actorUserId !== null, true); assert.equal(row.propertyCompanyId, fx.companyA.id); assert.equal(row.resourceType, 'person'); assert.equal(JSON.stringify(row).includes('13812345678'), false); } });
+  it('45 mandatory audit failure rolls back the Phase 2A business write', async () => {
+    await db.execute(sql`CREATE OR REPLACE FUNCTION phase2a_reject_person_audit() RETURNS trigger LANGUAGE plpgsql AS $$ BEGIN RAISE EXCEPTION 'forced audit failure'; END; $$`);
+    await db.execute(sql`CREATE TRIGGER phase2a_reject_person_audit_trigger BEFORE INSERT ON audit_logs FOR EACH ROW WHEN (NEW.action = 'PERSON_CREATED' AND NEW.after_data->>'name' = '审计失败回滚客户') EXECUTE FUNCTION phase2a_reject_person_audit()`);
+    try {
+      const admin = await login('13800000001', env.SEED_ADMIN_PASSWORD!);
+      const result = await request('/api/v1/people', body({ propertyCompanyId: fx.companyA.id, name: '审计失败回滚客户', phone: '13933334444' }), admin);
+      assert.equal(result.response.status, 500);
+      assert.equal((await db.select().from(people).where(eq(people.name, '审计失败回滚客户'))).length, 0);
+      assert.equal((await db.select().from(auditLogs).where(sql`${auditLogs.afterData}::text ILIKE '%审计失败回滚客户%'`)).length, 0);
+    } finally {
+      await db.execute(sql`DROP TRIGGER IF EXISTS phase2a_reject_person_audit_trigger ON audit_logs`);
+      await db.execute(sql`DROP FUNCTION IF EXISTS phase2a_reject_person_audit()`);
+    }
+  });
+  it('46 people pagination has a deterministic UUID tie-breaker', async () => {
+    const admin = await login('13800000001', env.SEED_ADMIN_PASSWORD!);
+    await db.insert(people).values([{ propertyCompanyId: fx.companyA.id, name: '同名分页客户' }, { propertyCompanyId: fx.companyA.id, name: '同名分页客户' }]);
+    const first = await request('/api/v1/people?keyword=同名分页客户&page=1&pageSize=1', {}, admin);
+    const second = await request('/api/v1/people?keyword=同名分页客户&page=2&pageSize=1', {}, admin);
+    assert.equal(first.response.status, 200);
+    assert.equal(second.response.status, 200);
+    assert.equal(first.body.data.total, 2);
+    assert.equal(second.body.data.total, 2);
+    assert.notEqual(first.body.data.items[0].id, second.body.data.items[0].id);
+    assert.ok(first.body.data.items[0].id < second.body.data.items[0].id);
+  });
+  it('47 houses pagination has a stable cross-community order', async () => {
+    const admin = await login('13800000001', env.SEED_ADMIN_PASSWORD!);
+    const [a1Building] = await db.insert(buildings).values({ communityId: fx.a1.id, code: 'TIE', name: 'A1 分页楼' }).returning();
+    const [a2Building] = await db.insert(buildings).values({ communityId: fx.a2.id, code: 'TIE', name: 'A2 分页楼' }).returning();
+    await db.insert(houses).values([{ buildingId: a1Building.id, code: '同码分页房' }, { buildingId: a2Building.id, code: '同码分页房' }]);
+    const first = await request('/api/v1/houses?keyword=同码分页房&page=1&pageSize=1', {}, admin);
+    const second = await request('/api/v1/houses?keyword=同码分页房&page=2&pageSize=1', {}, admin);
+    assert.equal(first.response.status, 200);
+    assert.equal(second.response.status, 200);
+    assert.equal(first.body.data.total, 2);
+    assert.equal(second.body.data.total, 2);
+    assert.equal(first.body.data.items[0].communityId, fx.a1.id);
+    assert.equal(second.body.data.items[0].communityId, fx.a2.id);
+  });
+  it('48 audit logs have no public enumeration or ID lookup surface', async () => {
+    const admin = await login('13800000001', env.SEED_ADMIN_PASSWORD!);
+    const [bAudit] = await db.insert(auditLogs).values({ action: 'RELEASE_GATE_AUDIT', propertyCompanyId: fx.companyB.id, communityId: fx.b1.id, resourceType: 'release_gate' }).returning();
+    assert.equal((await request('/api/v1/audit-logs?page=1&pageSize=100', {}, admin)).response.status, 404);
+    assert.equal((await request(`/api/v1/audit-logs/${bAudit.id}`, {}, admin)).response.status, 404);
+  });
 });

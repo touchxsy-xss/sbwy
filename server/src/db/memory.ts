@@ -18,6 +18,15 @@ export function createMemoryRepository(seed: Partial<MemoryState> = {}): Reposit
   };
   const allEmployees = () => state.employees.map(item => employee(item.id)).filter(Boolean) as Array<EmployeeRecord & { user: UserRecord; membership: MembershipRecord }>;
   const repository: Repository = {
+    async transaction<T>(callback: (transactionRepository: Repository) => Promise<T>) {
+      const snapshot = copy(state);
+      try {
+        return await callback(repository);
+      } catch (error) {
+        Object.assign(state, snapshot);
+        throw error;
+      }
+    },
     async findUserByPhone(phone) { return copy(state.users.find(item => item.phone === phone) || null); },
     async findUserById(id) { return copy(state.users.find(item => item.id === id) || null); },
     async hasCompanyMembership(userId, propertyCompanyId) { return state.memberships.some(item => item.userId === userId && item.propertyCompanyId === propertyCompanyId && item.status === 'ACTIVE'); },

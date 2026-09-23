@@ -1,45 +1,58 @@
-# 声边物业后端基础
+# 声边物业后端
 
-这是 Phase 1 的单体后端底座，当前只覆盖认证、物业公司、小区、内部员工、角色权限和审计日志。现有前端 Demo Store、居民业务和协同模块暂不迁移。
+当前后端包含 Phase 1 身份、RBAC、物业公司、小区、内部员工和审计底座，以及已冻结的 Phase 2A 楼栋、单元、房屋、客户和人与房屋关系 API。现有居民前端 Demo Store、报修、收费和协同模块未迁移。
 
 ## 本地运行
 
-1. 启动 PostgreSQL：
+1. 准备 PostgreSQL 16，并启动本地开发容器（或提供等价的外部 PostgreSQL）：
 
 ```bash
-docker compose up -d
+docker compose -f server/docker-compose.yml up -d
 ```
 
 2. 创建本地环境文件并设置随机的 `SESSION_SECRET`：
 
 ```bash
-cp .env.example .env
+cp server/.env.example server/.env
 ```
 
-3. 安装依赖、执行 migration 和开发种子：
+3. 安装依赖、执行全部 migration 和 Phase 1 开发种子：
 
 ```bash
-pnpm install --ignore-workspace
-pnpm run db:migrate
-pnpm run db:seed
+pnpm --dir server install --ignore-workspace
+pnpm --dir server run db:migrate
+pnpm --dir server run db:seed
 ```
 
-4. 启动 API：
+4. 编译并从停止状态启动 API：
 
 ```bash
-pnpm run dev
+pnpm --dir server run build
+pnpm --dir server run start
 ```
 
-默认地址为 `http://localhost:3001`，OpenAPI 页面为 `/api/docs`。
+默认健康检查为 `http://localhost:3001/api/v1/health`，OpenAPI 页面为 `/api/docs`。开发时可以用 `pnpm --dir server run dev` 代替 `pnpm --dir server run start`。
 
 ## 验证
 
 ```bash
-pnpm run build
-pnpm test
+pnpm --dir server run build
+pnpm --dir server test
 ```
 
-如果当前 shell 没有 Node.js，需要先把 Node.js 加入 `PATH`。测试使用内存仓储，不会连接或修改真实数据库。
+默认测试包含内存仓储测试。真实 PostgreSQL 集成测试必须使用独立数据库，先执行 migration 和 seed，再显式启用：
+
+```bash
+set -a; . server/.env; set +a
+(cd server && RUN_POSTGRES_INTEGRATION=1 node --import tsx --test tests/postgres-integration.test.ts)
+(cd server && RUN_POSTGRES_INTEGRATION=1 node --import tsx --test tests/postgres-phase2-integration.test.ts)
+```
+
+Phase 1 和 Phase 2 PostgreSQL suites 必须顺序独立执行，因为二者均会操作同一开发种子用户的 session。Phase 2 集成 fixture 只应在专用测试数据库执行；不要将其指向开发或生产数据库。
+
+## 环境变量
+
+以 `.env.example` 为准。运行 API 必须设置 `DATABASE_URL`、`SESSION_SECRET` 和 `APP_ORIGIN`；`PORT`、`HOST`、`NODE_ENV` 与 `COOKIE_SECURE` 有安全默认值但生产环境应显式设置。四个 `SEED_*_PASSWORD` 变量仅由本地开发种子使用，不是 API 启动必需项。
 
 ## 认证约定
 
