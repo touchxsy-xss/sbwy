@@ -27,6 +27,13 @@ export type BuildingUnitRecord = { id: string; buildingId: string; code: string;
 export type HouseRecord = { id: string; buildingId: string; buildingUnitId: string | null; code: string; floor: number | null; buildingArea: string | null; usableArea: string | null; displayName: string | null; legacyCode: string | null; status: 'ACTIVE' | 'RENOVATING' | 'INACTIVE'; disabledAt: Date | null; createdAt: Date; updatedAt: Date; communityId?: string; propertyCompanyId?: string };
 export type PersonRecord = { id: string; propertyCompanyId: string; userId: string | null; name: string; phone: string | null; gender: 'MALE' | 'FEMALE' | 'OTHER' | 'UNKNOWN' | null; status: 'ACTIVE' | 'DISABLED'; disabledAt: Date | null; createdAt: Date; updatedAt: Date };
 export type HouseRelationshipRecord = { id: string; houseId: string; personId: string; relationshipType: 'OWNER' | 'TENANT' | 'FAMILY_MEMBER' | 'OCCUPANT'; ownershipShare: string | null; isPrimaryContact: boolean; startDate: string; endDate: string | null; verificationStatus: 'UNVERIFIED' | 'PENDING' | 'VERIFIED' | 'REJECTED'; reviewedAt: Date | null; reviewedByUserId: string | null; verificationNote: string | null; createdAt: Date; updatedAt: Date };
+export type WorkOrderStatus = 'PENDING_DISPATCH' | 'ASSIGNED' | 'ACCEPTED' | 'ARRIVED' | 'COMPLETED' | 'ARCHIVED' | 'CANCELLED';
+export type WorkOrderScope = 'PRIVATE' | 'PUBLIC';
+export type WorkOrderPriority = 'ROUTINE' | 'NORMAL' | 'URGENT';
+export type WorkOrderSnapshot = { personId?: string; name?: string; phone?: string | null; maskedPhone?: string | null; relationshipType?: HouseRelationshipRecord['relationshipType']; address?: string | null; houseId?: string | null; };
+export type WorkOrderRecord = { id: string; propertyCompanyId: string; communityId: string | null; houseId: string | null; requesterPersonId: string; requesterUserId: string | null; requesterRelationshipId: string | null; assignedUserId: string | null; orderNo: string; scope: WorkOrderScope; category: string; priority: WorkOrderPriority; title: string; description: string; status: WorkOrderStatus; contactSnapshot: WorkOrderSnapshot; locationSnapshot: WorkOrderSnapshot; assignedAt: Date | null; acceptedAt: Date | null; arrivedAt: Date | null; completedAt: Date | null; archivedAt: Date | null; cancelledAt: Date | null; createdAt: Date; updatedAt: Date };
+export type WorkOrderEventRecord = { id: string; workOrderId: string; propertyCompanyId: string; communityId: string | null; actorUserId: string | null; fromStatus: WorkOrderStatus | null; toStatus: WorkOrderStatus; action: string; note: string | null; metadata: unknown; createdAt: Date };
+export type WorkOrderDto = Omit<WorkOrderRecord, 'contactSnapshot' | 'locationSnapshot'> & { contactSnapshot: Omit<WorkOrderSnapshot, 'phone'> & { maskedPhone: string | null; phone?: string | null }; locationSnapshot: WorkOrderSnapshot };
 export type BuildingDto = BuildingRecord & { displayAddress: string };
 export type BuildingUnitDto = BuildingUnitRecord;
 export type HouseDto = HouseRecord & { displayCode: string; displayAddress: string };
@@ -35,6 +42,7 @@ export type PersonContactDto = Pick<PersonRecord, 'id' | 'name' | 'phone'>;
 export type PaginatedResult<T> = { items: T[]; page: number; pageSize: number; total: number };
 export type RelationshipFilters = { includeHistory?: boolean; houseId?: string; personId?: string };
 export type PropertyFilters = { page?: number; pageSize?: number; communityId?: string; buildingId?: string; unitId?: string; houseId?: string; keyword?: string; relationshipType?: HouseRelationshipRecord['relationshipType']; status?: string };
+export type WorkOrderFilters = { page?: number; pageSize?: number; communityId?: string; houseId?: string; status?: WorkOrderStatus; assignedUserId?: string; keyword?: string };
 
 export type Scope = {
   userId: string;
@@ -122,4 +130,10 @@ export interface Repository {
   endHouseRelationship(id: string, endDate: string, scope: Scope): Promise<HouseRelationshipRecord | null>;
   verifyHouseRelationship(id: string, status: 'VERIFIED' | 'REJECTED', note: string | null, reviewerUserId: string, scope: Scope): Promise<HouseRelationshipRecord | null>;
   createResidentAtomic(input: { houseId: string; existingPersonId?: string; newPerson?: { name: string; phone?: string | null; gender?: PersonRecord['gender'] }; relationship: { relationshipType: HouseRelationshipRecord['relationshipType']; ownershipShare?: string | null; isPrimaryContact?: boolean; startDate: string; endDate?: string | null }; actorUserId?: string; requestId?: string }, scope: Scope): Promise<{ person: PersonRecord; relationship: HouseRelationshipRecord }>;
+  listWorkOrders(scope: Scope, filters?: WorkOrderFilters): Promise<PaginatedResult<WorkOrderDto>>;
+  getWorkOrder(id: string, scope: Scope): Promise<WorkOrderDto | null>;
+  createWorkOrder(input: { propertyCompanyId: string; communityId?: string | null; houseId?: string | null; requesterPersonId: string; requesterUserId?: string | null; requesterRelationshipId?: string | null; actorUserId?: string | null; scope: WorkOrderScope; category: string; priority: WorkOrderPriority; title: string; description: string; contactSnapshot: WorkOrderSnapshot; locationSnapshot: WorkOrderSnapshot; }): Promise<WorkOrderRecord>;
+  assignWorkOrder(id: string, assignedUserId: string, actorUserId: string, scope: Scope, note?: string | null, requestId?: string): Promise<WorkOrderRecord | null>;
+  transitionWorkOrder(id: string, toStatus: WorkOrderStatus, actorUserId: string, scope: Scope, note?: string | null, requestId?: string): Promise<WorkOrderRecord | null>;
+  listWorkOrderEvents(id: string, scope: Scope): Promise<WorkOrderEventRecord[]>;
 }

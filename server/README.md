@@ -1,6 +1,6 @@
 # 声边物业后端
 
-当前后端包含 Phase 1 身份、RBAC、物业公司、小区、内部员工和审计底座，以及已冻结的 Phase 2A 楼栋、单元、房屋、客户和人与房屋关系 API。现有居民前端 Demo Store、报修、收费和协同模块未迁移。
+当前后端包含 Phase 1 身份、RBAC、物业公司、小区、内部员工和审计底座，已冻结的 Phase 2A 楼栋、单元、房屋、客户和人与房屋关系 API，以及 Phase 2B Work Order / Repair Workflow 后端。居民前端 Demo Store、收费、支付、协同和附件通知尚未迁移。
 
 ## 本地运行
 
@@ -46,6 +46,7 @@ pnpm --dir server test
 set -a; . server/.env; set +a
 (cd server && RUN_POSTGRES_INTEGRATION=1 node --import tsx --test tests/postgres-integration.test.ts)
 (cd server && RUN_POSTGRES_INTEGRATION=1 node --import tsx --test tests/postgres-phase2-integration.test.ts)
+(cd server && RUN_POSTGRES_INTEGRATION=1 node --import tsx --test tests/postgres-phase2b-work-order.test.ts)
 ```
 
 Phase 1 和 Phase 2 PostgreSQL suites 必须顺序独立执行，因为二者均会操作同一开发种子用户的 session。Phase 2 集成 fixture 只应在专用测试数据库执行；不要将其指向开发或生产数据库。
@@ -60,3 +61,11 @@ Phase 1 和 Phase 2 PostgreSQL suites 必须顺序独立执行，因为二者均
 - 写操作要求 `sb_csrf` Cookie 与 `X-CSRF-Token` 请求头匹配。
 - `APP_ORIGIN` 控制允许携带凭证的前端来源。
 - `SEED_ADMIN_PASSWORD` 只用于本地种子，不写入源码。
+- `SEED_ADMIN_PASSWORD` 只用于本地开发种子，不写入源码。
+
+## Phase 2B API
+
+工单 API 见 `../docs/phase2b-api-contract.md`。迁移会创建
+`work_orders` 和 `work_order_events`，但不会修改居民端页面或报修 Demo
+Store。正式状态流转为：待派工、已派工、已接单、已到岗、已完成、已归档；
+待派工和已派工允许取消。

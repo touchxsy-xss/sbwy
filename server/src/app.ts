@@ -33,6 +33,10 @@ const residentSchema = z.object({ existingPersonId: z.string().uuid().optional()
 const relationPatchSchema = relationSchema.omit({ personId: true }).partial().refine(input => Object.keys(input).length > 0, '至少提供一个修改字段');
 const verifyRelationSchema = z.object({ status: z.enum(['VERIFIED', 'REJECTED']), note: z.string().trim().max(500).optional().nullable() });
 const assignmentSchema = z.object({ userId: z.string().uuid(), roleId: z.string().uuid(), propertyCompanyId: z.string().uuid().optional().nullable(), communityId: z.string().uuid().optional().nullable() });
+const workOrderSchema = z.object({ scope: z.enum(['PRIVATE', 'PUBLIC']), communityId: z.string().uuid().optional().nullable(), houseId: z.string().uuid().optional().nullable(), requesterPersonId: z.string().uuid(), requesterRelationshipId: z.string().uuid().optional().nullable(), category: z.string().trim().min(1).max(80), priority: z.enum(['ROUTINE', 'NORMAL', 'URGENT']).default('NORMAL'), title: z.string().trim().min(2).max(160), description: z.string().trim().min(2).max(4000), location: z.string().trim().max(240).optional().nullable() }).superRefine((input, ctx) => { if (input.scope === 'PRIVATE' && (!input.houseId || !input.requesterRelationshipId)) ctx.addIssue({ code: z.ZodIssueCode.custom, message: '室内报修必须提供房屋和有效房屋关系', path: ['houseId'] }); if (input.scope === 'PUBLIC' && !input.communityId) ctx.addIssue({ code: z.ZodIssueCode.custom, message: '公共区域报修必须提供小区', path: ['communityId'] }); });
+const workOrderQuerySchema = z.object({ page: z.coerce.number().int().min(1).default(1), pageSize: z.coerce.number().int().min(1).max(100).default(20), communityId: z.string().uuid().optional(), houseId: z.string().uuid().optional(), status: z.enum(['PENDING_DISPATCH', 'ASSIGNED', 'ACCEPTED', 'ARRIVED', 'COMPLETED', 'ARCHIVED', 'CANCELLED']).optional(), assignedUserId: z.string().uuid().optional(), keyword: z.string().trim().min(1).max(120).optional() });
+const workOrderAssignSchema = z.object({ assignedUserId: z.string().uuid(), note: z.string().trim().max(500).optional().nullable() });
+const workOrderTransitionSchema = z.object({ toStatus: z.enum(['ACCEPTED', 'ARRIVED', 'COMPLETED', 'ARCHIVED', 'CANCELLED']), note: z.string().trim().max(500).optional().nullable() });
 const employeeOpenApiBody = {
   type: 'object',
   required: ['companyId', 'name', 'phone', 'password', 'employeeNo'],
@@ -250,6 +254,73 @@ export async function buildApp(options: AppOptions): Promise<FastifyInstance> {
   app.patch('/api/v1/house-relationships/:id', async (request, reply) => { const auth = requireAuth(request); requirePermission(auth.scope, 'house_relation:write'); const id = pathId(request); const input = parse(relationPatchSchema, request.body); const row = await repository.transaction(async tx => { const updated = await tx.updateHouseRelationship(id, input, auth.scope); if (!updated) throw notFound(); const house = await tx.getHouse(updated.houseId, auth.scope); if (!house) throw notFound(); await tx.audit({ action: 'HOUSE_RELATION_UPDATED', actorUserId: auth.user.id, propertyCompanyId: house.propertyCompanyId, communityId: house.communityId, resourceType: 'house_relationship', resourceId: updated.id, requestId: request.id }); return updated; }); return ok(reply, row); });
   app.post('/api/v1/house-relationships/:id/end', async (request, reply) => { const auth = requireAuth(request); requirePermission(auth.scope, 'house_relation:write'); const body = z.object({ endDate: z.string().date() }).parse(request.body); const id = pathId(request); const row = await repository.transaction(async tx => { const updated = await tx.endHouseRelationship(id, body.endDate, auth.scope); if (!updated) throw notFound(); const house = await tx.getHouse(updated.houseId, auth.scope); if (!house) throw notFound(); await tx.audit({ action: 'HOUSE_RELATION_ENDED', actorUserId: auth.user.id, propertyCompanyId: house.propertyCompanyId, communityId: house.communityId, resourceType: 'house_relationship', resourceId: updated.id, requestId: request.id }); return updated; }); return ok(reply, row); });
   app.post('/api/v1/house-relationships/:id/verify', async (request, reply) => { const auth = requireAuth(request); requirePermission(auth.scope, 'house_relation:write'); const body = parse(verifyRelationSchema, request.body); const id = pathId(request); const row = await repository.transaction(async tx => { const updated = await tx.verifyHouseRelationship(id, body.status, body.note || null, auth.user.id, auth.scope); if (!updated) throw notFound(); const house = await tx.getHouse(updated.houseId, auth.scope); if (!house) throw notFound(); await tx.audit({ action: body.status === 'VERIFIED' ? 'HOUSE_RELATION_VERIFIED' : 'HOUSE_RELATION_REJECTED', actorUserId: auth.user.id, propertyCompanyId: house.propertyCompanyId, communityId: house.communityId, resourceType: 'house_relationship', resourceId: updated.id, requestId: request.id }); return updated; }); return ok(reply, row); });
+
+  app.get('/api/v1/work-orders', async (request, reply) => {
+    const auth = requireAuth(request); requirePermission(auth.scope, 'work_order:read');
+    return ok(reply, await repository.listWorkOrders(auth.scope, parse(workOrderQuerySchema, request.query)));
+  });
+  app.get('/api/v1/work-orders/:id', async (request, reply) => {
+    const auth = requireAuth(request); requirePermission(auth.scope, 'work_order:read');
+    const row = await repository.getWorkOrder(pathId(request), auth.scope); if (!row) throw notFound(); return ok(reply, row);
+  });
+  app.post('/api/v1/work-orders', async (request, reply) => {
+    const auth = requireAuth(request); requirePermission(auth.scope, 'work_order:create');
+    const input = parse(workOrderSchema, request.body);
+    const house = input.houseId ? await repository.getHouse(input.houseId, auth.scope) : null;
+    if (input.houseId && !house) throw notFound('房屋不存在或无权访问');
+    if (house && input.communityId && house.communityId !== input.communityId) throw badRequest('房屋与小区不匹配');
+    const communityId = house?.communityId || input.communityId || null;
+    const community = communityId ? await repository.getCommunity(communityId, auth.scope) : null;
+    if (!community) throw notFound('小区不存在或无权访问');
+    const person = await repository.getPerson(input.requesterPersonId, auth.scope);
+    if (!person) throw notFound('报修人不存在或无权访问');
+    if (person.propertyCompanyId !== community.propertyCompanyId) throw forbidden('报修人与房屋不属于同一物业公司');
+    const contact = await repository.getPersonContact(person.id, auth.scope);
+    if (!contact) throw notFound('报修联系人不存在');
+    let relationshipType: string | undefined;
+    if (input.scope === 'PRIVATE') {
+      if (!house) throw badRequest('室内报修必须绑定房屋');
+      const relationships = await repository.listHouseRelationships(house.id, auth.scope, false);
+      const relationship = relationships.find(item => item.id === input.requesterRelationshipId && item.personId === person.id);
+      const today = new Date().toISOString().slice(0, 10);
+      if (!relationship || relationship.verificationStatus !== 'VERIFIED' || relationship.startDate > today || (relationship.endDate && relationship.endDate < today)) throw forbidden('报修人没有当前已核验的房屋关系');
+      relationshipType = relationship.relationshipType;
+    }
+    const row = await repository.transaction(async tx => {
+      const created = await tx.createWorkOrder({
+        propertyCompanyId: community.propertyCompanyId, communityId, houseId: house?.id || null,
+        requesterPersonId: person.id, requesterUserId: person.userId === auth.user.id ? auth.user.id : null, actorUserId: auth.user.id,
+        requesterRelationshipId: input.requesterRelationshipId || null, scope: input.scope, category: input.category,
+        priority: input.priority || 'NORMAL', title: input.title, description: input.description,
+        contactSnapshot: { personId: person.id, name: person.name, phone: contact.phone, relationshipType: relationshipType as 'OWNER' | 'TENANT' | 'FAMILY_MEMBER' | 'OCCUPANT' | undefined },
+        locationSnapshot: { houseId: house?.id || null, address: house?.displayAddress || input.location || community.name }
+      });
+      await tx.audit({ action: 'WORK_ORDER_CREATED', actorUserId: auth.user.id, propertyCompanyId: community.propertyCompanyId, communityId, resourceType: 'work_order', resourceId: created.id, requestId: request.id, afterData: { orderNo: created.orderNo, scope: created.scope, houseId: created.houseId, requesterPersonId: created.requesterPersonId } });
+      return tx.getWorkOrder(created.id, auth.scope);
+    });
+    return ok(reply, row);
+  });
+  app.post('/api/v1/work-orders/:id/assign', async (request, reply) => {
+    const auth = requireAuth(request); requirePermission(auth.scope, 'work_order:assign');
+    const input = parse(workOrderAssignSchema, request.body);
+    const row = await repository.assignWorkOrder(pathId(request), input.assignedUserId, auth.user.id, auth.scope, input.note || null, request.id);
+    if (!row) throw notFound(); return ok(reply, await repository.getWorkOrder(row.id, auth.scope));
+  });
+  app.post('/api/v1/work-orders/:id/transition', async (request, reply) => {
+    const auth = requireAuth(request); requirePermission(auth.scope, 'work_order:transition');
+    const input = parse(workOrderTransitionSchema, request.body);
+    const row = await repository.transitionWorkOrder(pathId(request), input.toStatus, auth.user.id, auth.scope, input.note || null, request.id);
+    if (!row) throw notFound(); return ok(reply, await repository.getWorkOrder(row.id, auth.scope));
+  });
+  app.post('/api/v1/work-orders/:id/cancel', async (request, reply) => {
+    const auth = requireAuth(request); requirePermission(auth.scope, 'work_order:transition');
+    const row = await repository.transitionWorkOrder(pathId(request), 'CANCELLED', auth.user.id, auth.scope, '用户取消工单', request.id);
+    if (!row) throw notFound(); return ok(reply, await repository.getWorkOrder(row.id, auth.scope));
+  });
+  app.get('/api/v1/work-orders/:id/events', async (request, reply) => {
+    const auth = requireAuth(request); requirePermission(auth.scope, 'work_order:read');
+    const events = await repository.listWorkOrderEvents(pathId(request), auth.scope); if (!events.length && !(await repository.getWorkOrder(pathId(request), auth.scope))) throw notFound(); return ok(reply, events);
+  });
 
   app.get('/api/v1/roles', async (request, reply) => { const auth = requireAuth(request); if (!can(auth.scope, 'role:read')) throw forbidden(); return ok(reply, await repository.listRoles()); });
   app.get('/api/v1/permissions', async (request, reply) => { const auth = requireAuth(request); if (!can(auth.scope, 'role:read')) throw forbidden(); return ok(reply, await repository.listPermissions()); });

@@ -12,6 +12,9 @@ export const personStatusEnum = pgEnum('person_status', ['ACTIVE', 'DISABLED']);
 export const genderEnum = pgEnum('person_gender', ['MALE', 'FEMALE', 'OTHER', 'UNKNOWN']);
 export const relationshipTypeEnum = pgEnum('house_relationship_type', ['OWNER', 'TENANT', 'FAMILY_MEMBER', 'OCCUPANT']);
 export const verificationStatusEnum = pgEnum('relationship_verification_status', ['UNVERIFIED', 'PENDING', 'VERIFIED', 'REJECTED']);
+export const workOrderStatusEnum = pgEnum('work_order_status', ['PENDING_DISPATCH', 'ASSIGNED', 'ACCEPTED', 'ARRIVED', 'COMPLETED', 'ARCHIVED', 'CANCELLED']);
+export const workOrderScopeEnum = pgEnum('work_order_scope', ['PRIVATE', 'PUBLIC']);
+export const workOrderPriorityEnum = pgEnum('work_order_priority', ['ROUTINE', 'NORMAL', 'URGENT']);
 
 const timestamps = {
   createdAt: timestamp('created_at', { withTimezone: true }).defaultNow().notNull(),
@@ -223,9 +226,62 @@ export const housePersonRelationships = pgTable('house_person_relationships', {
   reviewFields: check('house_person_relationships_review_fields', sql`(${table.verificationStatus} IN ('UNVERIFIED', 'PENDING') AND ${table.reviewedAt} IS NULL AND ${table.reviewedByUserId} IS NULL) OR (${table.verificationStatus} IN ('VERIFIED', 'REJECTED') AND ${table.reviewedAt} IS NOT NULL AND ${table.reviewedByUserId} IS NOT NULL)`)
 }));
 
+export const workOrders = pgTable('work_orders', {
+  id: uuid('id').defaultRandom().primaryKey(),
+  propertyCompanyId: uuid('property_company_id').notNull().references(() => propertyCompanies.id),
+  communityId: uuid('community_id').references(() => communities.id),
+  houseId: uuid('house_id').references(() => houses.id),
+  requesterPersonId: uuid('requester_person_id').notNull().references(() => people.id),
+  requesterUserId: uuid('requester_user_id').references(() => users.id),
+  requesterRelationshipId: uuid('requester_relationship_id').references(() => housePersonRelationships.id),
+  assignedUserId: uuid('assigned_user_id').references(() => users.id),
+  orderNo: text('order_no').notNull(),
+  scope: workOrderScopeEnum('scope').notNull(),
+  category: text('category').notNull(),
+  priority: workOrderPriorityEnum('priority').default('NORMAL').notNull(),
+  title: text('title').notNull(),
+  description: text('description').notNull(),
+  status: workOrderStatusEnum('status').default('PENDING_DISPATCH').notNull(),
+  contactSnapshot: jsonb('contact_snapshot').notNull(),
+  locationSnapshot: jsonb('location_snapshot').notNull(),
+  assignedAt: timestamp('assigned_at', { withTimezone: true }),
+  acceptedAt: timestamp('accepted_at', { withTimezone: true }),
+  arrivedAt: timestamp('arrived_at', { withTimezone: true }),
+  completedAt: timestamp('completed_at', { withTimezone: true }),
+  archivedAt: timestamp('archived_at', { withTimezone: true }),
+  cancelledAt: timestamp('cancelled_at', { withTimezone: true }),
+  ...timestamps
+}, table => ({
+  privateRequiresHouse: check('work_orders_private_requires_house', sql`${table.scope} = 'PUBLIC' OR ${table.houseId} IS NOT NULL`),
+  companyOrderNoUnique: uniqueIndex('work_orders_company_order_no_uq').on(table.propertyCompanyId, table.orderNo),
+  companyIndex: index('work_orders_company_idx').on(table.propertyCompanyId),
+  communityIndex: index('work_orders_community_idx').on(table.communityId),
+  houseIndex: index('work_orders_house_idx').on(table.houseId),
+  requesterIndex: index('work_orders_requester_idx').on(table.requesterPersonId),
+  assigneeIndex: index('work_orders_assignee_idx').on(table.assignedUserId),
+  statusIndex: index('work_orders_status_idx').on(table.status)
+}));
+
+export const workOrderEvents = pgTable('work_order_events', {
+  id: uuid('id').defaultRandom().primaryKey(),
+  workOrderId: uuid('work_order_id').notNull().references(() => workOrders.id),
+  propertyCompanyId: uuid('property_company_id').notNull().references(() => propertyCompanies.id),
+  communityId: uuid('community_id').references(() => communities.id),
+  actorUserId: uuid('actor_user_id').references(() => users.id),
+  fromStatus: workOrderStatusEnum('from_status'),
+  toStatus: workOrderStatusEnum('to_status').notNull(),
+  action: text('action').notNull(),
+  note: text('note'),
+  metadata: jsonb('metadata'),
+  createdAt: timestamp('created_at', { withTimezone: true }).defaultNow().notNull()
+}, table => ({
+  workOrderIndex: index('work_order_events_order_idx').on(table.workOrderId, table.createdAt),
+  tenantIndex: index('work_order_events_tenant_idx').on(table.propertyCompanyId, table.communityId)
+}));
+
 export const usersRelations = relations(users, ({ many }) => ({ memberships: many(companyMemberships), sessions: many(sessions), roleAssignments: many(userRoleAssignments) }));
 export const propertyCompaniesRelations = relations(propertyCompanies, ({ many }) => ({ communities: many(communities), memberships: many(companyMemberships), sessions: many(sessions) }));
 export const communitiesRelations = relations(communities, ({ one, many }) => ({ company: one(propertyCompanies, { fields: [communities.propertyCompanyId], references: [propertyCompanies.id] }), roleAssignments: many(userRoleAssignments) }));
 export const companyMembershipsRelations = relations(companyMemberships, ({ one }) => ({ user: one(users, { fields: [companyMemberships.userId], references: [users.id] }), company: one(propertyCompanies, { fields: [companyMemberships.propertyCompanyId], references: [propertyCompanies.id] }) }));
 
-export const schema = { propertyCompanies, communities, users, companyMemberships, employeeProfiles, roles, permissions, rolePermissions, userRoleAssignments, sessions, auditLogs, buildings, buildingUnits, houses, people, housePersonRelationships };
+export const schema = { propertyCompanies, communities, users, companyMemberships, employeeProfiles, roles, permissions, rolePermissions, userRoleAssignments, sessions, auditLogs, buildings, buildingUnits, houses, people, housePersonRelationships, workOrders, workOrderEvents };

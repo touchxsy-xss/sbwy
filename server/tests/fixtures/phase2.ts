@@ -1,6 +1,6 @@
 import { and, eq, isNull } from 'drizzle-orm';
 import type { AppDb } from '../../src/db/client.js';
-import { buildingUnits, buildings, communities, housePersonRelationships, people, propertyCompanies, roles, userRoleAssignments, users } from '../../src/db/schema/index.js';
+import { buildingUnits, buildings, communities, housePersonRelationships, people, propertyCompanies, roles, userRoleAssignments, users, workOrderEvents, workOrders } from '../../src/db/schema/index.js';
 import { houses } from '../../src/db/schema/index.js';
 import { hashPassword } from '../../src/modules/auth/service.js';
 
@@ -61,6 +61,8 @@ export async function cleanupPhase2Fixture(db: AppDb, fixture: Awaited<ReturnTyp
   const personIds = [fixture.personA.id, fixture.personB.id, fixture.unbound.id, fixture.a2Person.id, fixture.historyPerson.id];
   await db.transaction(async tx => {
     // The integration database is dedicated to this suite; remove only Phase 2 tables.
+    await tx.delete(workOrderEvents);
+    await tx.delete(workOrders);
     await tx.delete(housePersonRelationships);
     await tx.delete(people);
     await tx.delete(houses);
