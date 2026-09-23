@@ -1,11 +1,11 @@
 import assert from 'node:assert/strict';
 import { after, before, describe, it } from 'node:test';
 import { createDb } from '../src/db/client.js';
-import { users, sessions, auditLogs } from '../src/db/schema/index.js';
+import { users, sessions, auditLogs, userRoleAssignments } from '../src/db/schema/index.js';
 import { createDrizzleRepository } from '../src/db/repository.js';
 import { buildApp } from '../src/app.js';
 import { loadEnv } from '../src/config/env.js';
-import { eq } from 'drizzle-orm';
+import { and, eq, isNull } from 'drizzle-orm';
 
 const enabled = process.env.RUN_POSTGRES_INTEGRATION === '1';
 
@@ -98,11 +98,19 @@ describe('PostgreSQL integration', { skip: !enabled }, () => {
     const managerCommunities = await request('/api/v1/communities', {}, manager.jar);
     assert.equal(managerCommunities.response.status, 200);
     assert.deepEqual(managerCommunities.body.data.map((row: any) => row.code), ['community-a1']);
+    const a1 = communities.body.data.find((row: any) => row.code === 'community-a1').id as string;
+    const managerCreate = await request('/api/v1/communities', { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ propertyCompanyId: companyA, code: `manager-create-${Date.now()}`, name: '项目经理不应创建的小区' }) }, manager.jar);
+    assert.equal(managerCreate.response.status, 403);
+    const managerPatch = await request(`/api/v1/communities/${a1}`, { method: 'PATCH', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ address: '项目经理可更新的 A1 地址' }) }, manager.jar);
+    assert.equal(managerPatch.response.status, 200);
     assert.equal((await request(`/api/v1/communities/${a2}`, {}, manager.jar)).response.status, 404);
+    assert.equal((await request(`/api/v1/communities/${a1}/disable`, { method: 'POST' }, manager.jar)).response.status, 403);
+    assert.equal((await request('/api/v1/roles', {}, manager.jar)).response.status, 403);
 
     const engineer = await login('13800000003', env.SEED_ENGINEER_PASSWORD!);
     const engineerMe = await request('/api/v1/auth/me', {}, engineer.jar);
     assert.equal(engineerMe.response.status, 200);
+    assert.equal((await request(`/api/v1/users/${engineerMe.body.data.user.id}/roles`, {}, manager.jar)).response.status, 403);
     const selfEscalation = await request(`/api/v1/users/${engineerMe.body.data.user.id}/roles`, { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ roleId: propertyAdminRole, propertyCompanyId: companyA }) }, engineer.jar);
     assert.equal(selfEscalation.response.status, 403);
     const forbiddenWrite = await request('/api/v1/communities', { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ propertyCompanyId: companyA, code: `not-allowed-${Date.now()}`, name: '无权小区' }) }, engineer.jar);
@@ -113,7 +121,6 @@ describe('PostgreSQL integration', { skip: !enabled }, () => {
     assert.equal(created.response.status, 200);
     const employeeId = created.body.data.employee.id as string;
     const employeeUserId = created.body.data.user.id as string;
-    const a1 = communities.body.data.find((row: any) => row.code === 'community-a1').id as string;
     const staffRole = roles.body.data.find((role: any) => role.code === 'PROPERTY_STAFF').id as string;
     const assignment = await request(`/api/v1/users/${employeeUserId}/roles`, { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ roleId: staffRole, propertyCompanyId: companyA, communityId: a1 }) }, admin.jar);
     assert.equal(assignment.response.status, 200);
@@ -126,6 +133,29 @@ describe('PostgreSQL integration', { skip: !enabled }, () => {
     assert.equal(disabled.response.status, 200);
     assert.equal((await request('/api/v1/auth/me', {}, employeeLogin.jar)).response.status, 401);
     assert.equal((await request('/api/v1/auth/login', { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ phone, password: 'Integration-2026!' }) }, cookieJar())).response.status, 401);
+
+    const a2Phone = `139${String(Date.now() + 1).slice(-8)}`;
+    const a2Created = await request('/api/v1/employees', { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ companyId: companyA, name: 'A2 范围员工', phone: a2Phone, password: 'Integration-2026!', employeeNo: `A2-${Date.now()}`, department: 'A2', position: '测试员工', employeeType: 'STAFF' }) }, admin.jar);
+    assert.equal(a2Created.response.status, 200);
+    const a2EmployeeId = a2Created.body.data.employee.id as string;
+    const a2UserId = a2Created.body.data.user.id as string;
+    const a2Assignment = await request(`/api/v1/users/${a2UserId}/roles`, { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ roleId: staffRole, propertyCompanyId: companyA, communityId: a2 }) }, admin.jar);
+    assert.equal(a2Assignment.response.status, 200);
+    const managerEmployees = await request('/api/v1/employees', {}, manager.jar);
+    assert.equal(managerEmployees.response.status, 200);
+    assert.ok(managerEmployees.body.data.some((row: any) => row.id !== a2EmployeeId));
+    assert.equal(managerEmployees.body.data.some((row: any) => row.id === a2EmployeeId), false);
+    assert.equal((await request(`/api/v1/employees/${a2EmployeeId}`, {}, manager.jar)).response.status, 404);
+    const staff = await login(a2Phone, 'Integration-2026!');
+    const staffEmployees = await request('/api/v1/employees', {}, staff.jar);
+    assert.equal(staffEmployees.response.status, 200);
+    const a2AssignedUsers = await db.select({ userId: userRoleAssignments.userId }).from(userRoleAssignments).where(and(eq(userRoleAssignments.communityId, a2), isNull(userRoleAssignments.revokedAt)));
+    const a2UserIds = new Set(a2AssignedUsers.map(row => row.userId));
+    assert.ok(staffEmployees.body.data.some((row: any) => row.id === a2EmployeeId));
+    assert.equal(staffEmployees.body.data.every((row: any) => a2UserIds.has(row.user.id)), true);
+    assert.equal((await request(`/api/v1/users/${a2UserId}/roles`, {}, manager.jar)).response.status, 403);
+    assert.equal((await request(`/api/v1/users/${a2UserId}/roles/${a2Assignment.body.data.id}`, { method: 'DELETE' }, manager.jar)).response.status, 403);
+    assert.equal((await request(`/api/v1/users/${a2UserId}/roles`, {}, admin.jar)).response.status, 200);
 
     const sessionsResult = await request('/api/v1/auth/sessions', {}, admin.jar);
     assert.equal(sessionsResult.response.status, 200);

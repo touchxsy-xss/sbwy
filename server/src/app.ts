@@ -20,6 +20,18 @@ const communityPatchSchema = z.object({ name: z.string().trim().min(2).max(120).
 const employeeSchema = z.object({ companyId: z.string().uuid(), name: z.string().trim().min(2).max(80), phone: z.string().regex(/^1[3-9]\d{9}$/), email: z.string().email().optional().nullable(), password: z.string().min(8), employeeNo: z.string().trim().min(1).max(40), department: z.string().trim().max(80).optional().nullable(), position: z.string().trim().max(80).optional().nullable(), employeeType: z.string().trim().max(80).optional().nullable() });
 const employeePatchSchema = z.object({ name: z.string().trim().min(2).max(80).optional(), phone: z.string().regex(/^1[3-9]\d{9}$/).optional().nullable(), status: z.enum(['ACTIVE', 'DISABLED', 'INVITED']).optional(), department: z.string().trim().max(80).optional().nullable(), position: z.string().trim().max(80).optional().nullable(), employeeType: z.string().trim().max(80).optional().nullable() }).refine(input => Object.keys(input).length > 0, '至少提供一个修改字段');
 const assignmentSchema = z.object({ userId: z.string().uuid(), roleId: z.string().uuid(), propertyCompanyId: z.string().uuid().optional().nullable(), communityId: z.string().uuid().optional().nullable() });
+const employeeOpenApiBody = {
+  type: 'object',
+  required: ['companyId', 'name', 'phone', 'password', 'employeeNo'],
+  properties: {
+    companyId: { type: 'string', format: 'uuid' }, name: { type: 'string' }, phone: { type: 'string' }, email: { type: 'string', format: 'email' }, password: { type: 'string', minLength: 8 }, employeeNo: { type: 'string' }, department: { type: 'string' }, position: { type: 'string' }, employeeType: { type: 'string' }
+  }
+};
+const employeePatchOpenApiBody = {
+  type: 'object',
+  minProperties: 1,
+  properties: { name: { type: 'string' }, phone: { type: 'string' }, status: { type: 'string', enum: ['ACTIVE', 'DISABLED', 'INVITED'] }, department: { type: 'string' }, position: { type: 'string' }, employeeType: { type: 'string' } }
+};
 
 function parse<T>(schema: z.ZodType<T>, value: unknown): T {
   const result = schema.safeParse(value);
@@ -59,7 +71,7 @@ export async function buildApp(options: AppOptions): Promise<FastifyInstance> {
   await app.register(helmet, { global: true });
   await app.register(rateLimit, { global: false });
   await app.register(swagger, { openapi: { info: { title: '声边物业 API', version: '1.0.0' }, servers: [{ url: '/api/v1' }] } });
-  await app.register(swaggerUi, { routePrefix: '/api/docs' });
+  await app.register(swaggerUi, { routePrefix: '/api/docs', uiConfig: { requestInterceptor: function (request) { const csrf = document.cookie.split('; ').find(item => item.startsWith('sb_csrf='))?.slice(8); if (csrf) request.headers['X-CSRF-Token'] = decodeURIComponent(csrf); return request; } } });
 
   app.addHook('onRequest', async (request, reply) => {
     reply.header('x-request-id', request.id);
@@ -156,23 +168,23 @@ export async function buildApp(options: AppOptions): Promise<FastifyInstance> {
   app.get('/api/v1/communities', async (request, reply) => { const auth = requireAuth(request); return ok(reply, await repository.listCommunities(auth.scope)); });
   app.get('/api/v1/communities/:id', async (request, reply) => { const auth = requireAuth(request); const community = await repository.getCommunity(pathId(request), auth.scope); if (!community) throw notFound(); return ok(reply, community); });
   app.post('/api/v1/communities', async (request, reply) => {
-    const auth = requireAuth(request); const input = parse(communitySchema, request.body); requireCompany(auth.scope, input.propertyCompanyId); requirePermission(auth.scope, 'community:write');
+    const auth = requireAuth(request); const input = parse(communitySchema, request.body); requireCompany(auth.scope, input.propertyCompanyId); requirePermission(auth.scope, 'community:create');
     const community = await repository.createCommunity(input); await repository.audit({ action: 'COMMUNITY_CREATED', actorUserId: auth.user.id, propertyCompanyId: community.propertyCompanyId, communityId: community.id, resourceType: 'community', resourceId: community.id, requestId: request.id }); return ok(reply, community);
   });
   app.patch('/api/v1/communities/:id', async (request, reply) => {
-    const auth = requireAuth(request); const id = pathId(request); const current = await repository.getCommunity(id, auth.scope); if (!current) throw notFound(); requirePermission(auth.scope, 'community:write'); const updated = await repository.updateCommunity(id, parse(communityPatchSchema, request.body), auth.scope); await repository.audit({ action: 'COMMUNITY_UPDATED', actorUserId: auth.user.id, propertyCompanyId: current.propertyCompanyId, communityId: id, resourceType: 'community', resourceId: id, requestId: request.id, beforeData: current, afterData: updated }); return ok(reply, updated);
+    const auth = requireAuth(request); const id = pathId(request); const current = await repository.getCommunity(id, auth.scope); if (!current) throw notFound(); requirePermission(auth.scope, 'community:update'); const updated = await repository.updateCommunity(id, parse(communityPatchSchema, request.body), auth.scope); await repository.audit({ action: 'COMMUNITY_UPDATED', actorUserId: auth.user.id, propertyCompanyId: current.propertyCompanyId, communityId: id, resourceType: 'community', resourceId: id, requestId: request.id, beforeData: current, afterData: updated }); return ok(reply, updated);
   });
   app.post('/api/v1/communities/:id/disable', async (request, reply) => {
-    const auth = requireAuth(request); const id = pathId(request); const current = await repository.getCommunity(id, auth.scope); if (!current) throw notFound(); requirePermission(auth.scope, 'community:write'); const updated = await repository.disableCommunity(id, auth.scope); await repository.audit({ action: 'COMMUNITY_DISABLED', actorUserId: auth.user.id, propertyCompanyId: current.propertyCompanyId, communityId: id, resourceType: 'community', resourceId: id, requestId: request.id }); return ok(reply, updated);
+    const auth = requireAuth(request); const id = pathId(request); const current = await repository.getCommunity(id, auth.scope); if (!current) throw notFound(); requirePermission(auth.scope, 'community:disable'); const updated = await repository.disableCommunity(id, auth.scope); await repository.audit({ action: 'COMMUNITY_DISABLED', actorUserId: auth.user.id, propertyCompanyId: current.propertyCompanyId, communityId: id, resourceType: 'community', resourceId: id, requestId: request.id }); return ok(reply, updated);
   });
 
   app.get('/api/v1/employees', async (request, reply) => { const auth = requireAuth(request); requirePermission(auth.scope, 'employee:read'); return ok(reply, (await repository.listEmployees(auth.scope)).map(row => ({ ...row, user: hideSecrets(row.user), membership: row.membership }))); });
   app.get('/api/v1/employees/:id', async (request, reply) => { const auth = requireAuth(request); requirePermission(auth.scope, 'employee:read'); const employee = await repository.getEmployee(pathId(request), auth.scope); if (!employee) throw notFound(); return ok(reply, { ...employee, user: hideSecrets(employee.user) }); });
-  app.post('/api/v1/employees', async (request, reply) => {
+  app.post('/api/v1/employees', { schema: { body: employeeOpenApiBody } }, async (request, reply) => {
     const auth = requireAuth(request); const input = parse(employeeSchema, request.body); requireCompany(auth.scope, input.companyId); requirePermission(auth.scope, 'employee:write'); const result = await repository.createEmployee({ companyId: input.companyId, user: { name: input.name, phone: input.phone, email: input.email || null, passwordHash: await hashPassword(input.password), status: 'ACTIVE' }, employee: { employeeNo: input.employeeNo, department: input.department || null, position: input.position || null, employeeType: input.employeeType || null } }); await repository.audit({ action: 'EMPLOYEE_CREATED', actorUserId: auth.user.id, propertyCompanyId: input.companyId, resourceType: 'employee', resourceId: result.employee.id, requestId: request.id }); return ok(reply, { ...result, user: hideSecrets(result.user) });
   });
-  app.patch('/api/v1/employees/:id', async (request, reply) => { const auth = requireAuth(request); requirePermission(auth.scope, 'employee:write'); const id = pathId(request); const before = await repository.getEmployee(id, auth.scope); if (!before) throw notFound(); const result = await repository.updateEmployee(id, parse(employeePatchSchema, request.body), auth.scope); if (!result) throw notFound(); await repository.audit({ action: 'EMPLOYEE_UPDATED', actorUserId: auth.user.id, propertyCompanyId: before.membership.propertyCompanyId, resourceType: 'employee', resourceId: id, requestId: request.id, beforeData: { ...before, user: hideSecrets(before.user) }, afterData: { ...result, user: hideSecrets(result.user) } }); return ok(reply, { ...result, user: hideSecrets(result.user) }); });
-  app.post('/api/v1/employees/:id/disable', async (request, reply) => { const auth = requireAuth(request); requirePermission(auth.scope, 'employee:write'); const id = pathId(request); const result = await repository.disableEmployee(id, auth.scope); if (!result) throw notFound(); await repository.audit({ action: 'EMPLOYEE_DISABLED', actorUserId: auth.user.id, resourceType: 'employee', resourceId: id, requestId: request.id }); return ok(reply, { ...result, user: hideSecrets(result.user) }); });
+  app.patch('/api/v1/employees/:id', { schema: { params: { type: 'object', required: ['id'], properties: { id: { type: 'string', format: 'uuid' } } }, body: employeePatchOpenApiBody } }, async (request, reply) => { const auth = requireAuth(request); requirePermission(auth.scope, 'employee:write'); const id = pathId(request); const before = await repository.getEmployee(id, auth.scope); if (!before) throw notFound(); const result = await repository.updateEmployee(id, parse(employeePatchSchema, request.body), auth.scope); if (!result) throw notFound(); await repository.audit({ action: 'EMPLOYEE_UPDATED', actorUserId: auth.user.id, propertyCompanyId: before.membership.propertyCompanyId, resourceType: 'employee', resourceId: id, requestId: request.id, beforeData: { ...before, user: hideSecrets(before.user) }, afterData: { ...result, user: hideSecrets(result.user) } }); return ok(reply, { ...result, user: hideSecrets(result.user) }); });
+  app.post('/api/v1/employees/:id/disable', { schema: { params: { type: 'object', required: ['id'], properties: { id: { type: 'string', format: 'uuid' } } } } }, async (request, reply) => { const auth = requireAuth(request); requirePermission(auth.scope, 'employee:write'); const id = pathId(request); const result = await repository.disableEmployee(id, auth.scope); if (!result) throw notFound(); await repository.audit({ action: 'EMPLOYEE_DISABLED', actorUserId: auth.user.id, resourceType: 'employee', resourceId: id, requestId: request.id }); return ok(reply, { ...result, user: hideSecrets(result.user) }); });
 
   app.get('/api/v1/roles', async (request, reply) => { const auth = requireAuth(request); if (!can(auth.scope, 'role:read')) throw forbidden(); return ok(reply, await repository.listRoles()); });
   app.get('/api/v1/permissions', async (request, reply) => { const auth = requireAuth(request); if (!can(auth.scope, 'role:read')) throw forbidden(); return ok(reply, await repository.listPermissions()); });

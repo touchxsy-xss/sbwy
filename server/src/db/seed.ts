@@ -27,6 +27,9 @@ const roleSeed = [
 const permissionSeed = [
   ['company:read', '查看物业公司', 'company', 'read'],
   ['community:read', '查看小区', 'community', 'read'],
+  ['community:create', '创建小区', 'community', 'create'],
+  ['community:update', '修改小区', 'community', 'update'],
+  ['community:disable', '停用小区', 'community', 'disable'],
   ['community:write', '管理小区', 'community', 'write'],
   ['employee:read', '查看员工', 'employee', 'read'],
   ['employee:write', '管理员工', 'employee', 'write'],
@@ -79,12 +82,13 @@ try {
 
     const permissionCodesByRole: Record<string, string[]> = {
       PROPERTY_ADMIN: permissionSeed.map(item => item[0]),
-      COMMUNITY_MANAGER: ['community:read', 'community:write', 'employee:read', 'access:read'],
+      COMMUNITY_MANAGER: ['community:read', 'community:update', 'employee:read'],
       PROPERTY_STAFF: ['community:read', 'employee:read'],
       ENGINEER: ['community:read']
     };
     for (const [roleCode, codes] of Object.entries(permissionCodesByRole)) {
       const role = rolesByCode.get(roleCode);
+      await tx.delete(rolePermissions).where(eq(rolePermissions.roleId, role.id));
       for (const code of codes) {
         const permission = permissionsByCode.get(code);
         await tx.insert(rolePermissions).values({ roleId: role.id, permissionId: permission.id }).onConflictDoNothing();

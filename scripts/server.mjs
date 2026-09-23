@@ -1,16 +1,34 @@
 import http from 'node:http';
+import https from 'node:https';
 import fs from 'node:fs/promises';
 import path from 'node:path';
 import { pages, matchRoute } from '../src/routes.js';
 
 const root = path.resolve(import.meta.dirname, '../dist');
+const proxyTarget = process.env.SHENGBIAN_API_PROXY_TARGET || '';
 const types = { '.html': 'text/html; charset=utf-8', '.js': 'text/javascript; charset=utf-8', '.css': 'text/css; charset=utf-8', '.json': 'application/json', '.png': 'image/png', '.jpg': 'image/jpeg', '.webp': 'image/webp', '.woff2': 'font/woff2', '.mp3': 'audio/mpeg', '.wav': 'audio/wav' };
 const server = http.createServer(async (req, res) => {
   try {
     const url = new URL(req.url, 'http://localhost');
     const pathname = decodeURIComponent(url.pathname).replace(/\/$/, '') || '/';
+    if (proxyTarget && pathname.startsWith('/api/')) {
+      const target = new URL(pathname + url.search, proxyTarget);
+      const transport = target.protocol === 'https:' ? https : http;
+      const { host: _host, connection: _connection, ...forwardHeaders } = req.headers;
+      const headers = { ...forwardHeaders, host: target.host };
+      const upstream = transport.request(target, { method: req.method, headers }, upstreamResponse => {
+        res.writeHead(upstreamResponse.statusCode || 502, upstreamResponse.headers);
+        upstreamResponse.pipe(res);
+      });
+      upstream.on('error', error => {
+        if (!res.headersSent) res.writeHead(502, { 'content-type': 'application/json' });
+        res.end(JSON.stringify({ error: { code: 'API_PROXY_ERROR', message: '开发 API 代理连接失败' }, detail: error.message }));
+      });
+      req.pipe(upstream);
+      return;
+    }
     if (pathname === '/api-config.js') {
-      const apiBase = process.env.SHENGBIAN_API_BASE || '';
+      const apiBase = process.env.SHENGBIAN_API_BASE || (proxyTarget ? '/api/v1' : '');
       res.writeHead(200, { 'Content-Type': 'text/javascript; charset=utf-8', 'Cache-Control': 'no-cache' });
       res.end(`globalThis.__SHENGBIAN_API_BASE__ = ${JSON.stringify(apiBase)};\n`);
       return;

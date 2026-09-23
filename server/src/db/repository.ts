@@ -1,4 +1,4 @@
-import { and, desc, eq, inArray, isNull, or } from 'drizzle-orm';
+import { and, desc, eq, exists, inArray, isNull } from 'drizzle-orm';
 import type { AppDb } from './client.js';
 import { auditLogs, communities, companyMemberships, employeeProfiles, permissions, propertyCompanies, rolePermissions, roles, sessions, userRoleAssignments, users } from './schema/index.js';
 import type { AssignmentRecord, AuditInput, CommunityRecord, CompanyRecord, EmployeeRecord, MembershipRecord, PermissionRecord, Repository, RoleRecord, Scope, SessionRecord, Status, UserRecord } from '../shared/types.js';
@@ -49,7 +49,19 @@ export function createDrizzleRepository(db: AppDb): Repository {
     async createCommunity(input) { const [row] = await db.insert(communities).values(input).returning(); return communityMap(row); },
     async updateCommunity(id, input, scope) { const current = await repository.getCommunity(id, scope); if (!current) return null; const [row] = await db.update(communities).set({ ...input, updatedAt: new Date() }).where(eq(communities.id, id)).returning(); return row ? communityMap(row) : null; },
     async disableCommunity(id, scope) { const current = await repository.getCommunity(id, scope); if (!current) return null; const [row] = await db.update(communities).set({ status: 'DISABLED', disabledAt: new Date(), updatedAt: new Date() }).where(eq(communities.id, id)).returning(); return row ? communityMap(row) : null; },
-    async listEmployees(scope) { const rows = await db.select({ employee: employeeProfiles, membership: companyMemberships, user: users }).from(employeeProfiles).innerJoin(companyMemberships, eq(employeeProfiles.companyMembershipId, companyMemberships.id)).innerJoin(users, eq(companyMemberships.userId, users.id)); return rows.filter(row => scope.platform || scope.companyIds.includes(row.membership.propertyCompanyId)).map(row => ({ ...row.employee, user: userMap(row.user), membership: membershipMap(row.membership) })); },
+    async listEmployees(scope) {
+      const companyCondition = scope.companyIds.length
+        ? inArray(companyMemberships.propertyCompanyId, scope.companyIds)
+        : eq(companyMemberships.propertyCompanyId, '00000000-0000-0000-0000-000000000000');
+      const communityCondition = scope.communityIds.length
+        ? exists(db.select({ id: userRoleAssignments.id }).from(userRoleAssignments).where(and(eq(userRoleAssignments.userId, users.id), isNull(userRoleAssignments.revokedAt), inArray(userRoleAssignments.communityId, scope.communityIds))))
+        : eq(users.id, '00000000-0000-0000-0000-000000000000');
+      const range = scope.platform ? undefined : scope.companyWide ? companyCondition : and(companyCondition, communityCondition);
+      const rows = range
+        ? await db.select({ employee: employeeProfiles, membership: companyMemberships, user: users }).from(employeeProfiles).innerJoin(companyMemberships, eq(employeeProfiles.companyMembershipId, companyMemberships.id)).innerJoin(users, eq(companyMemberships.userId, users.id)).where(range)
+        : await db.select({ employee: employeeProfiles, membership: companyMemberships, user: users }).from(employeeProfiles).innerJoin(companyMemberships, eq(employeeProfiles.companyMembershipId, companyMemberships.id)).innerJoin(users, eq(companyMemberships.userId, users.id));
+      return rows.map(row => ({ ...row.employee, user: userMap(row.user), membership: membershipMap(row.membership) }));
+    },
     async getEmployee(id, scope) { const rows = await repository.listEmployees(scope); return rows.find(row => row.id === id) || null; },
     async createEmployee(input) { return db.transaction(async tx => { const [userRow] = await tx.insert(users).values(input.user).returning(); const [membershipRow] = await tx.insert(companyMemberships).values({ userId: userRow.id, propertyCompanyId: input.companyId, membershipType: 'PROPERTY_EMPLOYEE', status: 'ACTIVE' }).returning(); const [employeeRow] = await tx.insert(employeeProfiles).values({ ...input.employee, companyMembershipId: membershipRow.id }).returning(); return { user: userMap(userRow), membership: membershipMap(membershipRow), employee: employeeRow as EmployeeRecord }; }); },
     async updateEmployee(id, input, scope) { const current = await repository.getEmployee(id, scope); if (!current) return null; const disabledAt = input.status === 'DISABLED' ? new Date() : input.status === 'ACTIVE' ? null : undefined; await db.update(users).set({ ...(input.name !== undefined ? { name: input.name } : {}), ...(input.phone !== undefined ? { phone: input.phone } : {}), ...(input.status !== undefined ? { status: input.status } : {}), ...(disabledAt !== undefined ? { disabledAt } : {}), updatedAt: new Date() }).where(eq(users.id, current.user.id)); await db.update(employeeProfiles).set({ ...(input.department !== undefined ? { department: input.department } : {}), ...(input.position !== undefined ? { position: input.position } : {}), ...(input.employeeType !== undefined ? { employeeType: input.employeeType } : {}), updatedAt: new Date() }).where(eq(employeeProfiles.id, id)); return repository.getEmployee(id, scope); },
