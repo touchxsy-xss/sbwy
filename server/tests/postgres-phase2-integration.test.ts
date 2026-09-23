@@ -16,6 +16,7 @@ describe('Phase 2A PostgreSQL integration', { skip: !enabled }, () => {
   let app: Awaited<ReturnType<typeof buildApp>>;
   let baseUrl = '';
   let fx: Awaited<ReturnType<typeof createPhase2Fixture>>;
+  const sessions = new Map<string, Map<string, string>>();
   type Jar = Map<string, string>;
   const cookieHeader = (jar: Jar) => [...jar].map(([name, value]) => `${name}=${value}`).join('; ');
   const updateCookies = (jar: Jar, response: Response) => response.headers.getSetCookie().forEach(value => { const [pair] = value.split(';', 1); const i = pair.indexOf('='); if (i > 0) jar.set(pair.slice(0, i), pair.slice(i + 1)); });
@@ -27,8 +28,9 @@ describe('Phase 2A PostgreSQL integration', { skip: !enabled }, () => {
     return { response, body: await response.json() as any, jar };
   }
   async function login(phone: string, password: string) {
+    const cached = sessions.get(phone); if (cached) return cached;
     const jar = new Map<string, string>(); const result = await request('/api/v1/auth/login', { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ phone, password }) }, jar);
-    assert.equal(result.response.status, 200); return jar;
+    assert.equal(result.response.status, 200); sessions.set(phone, jar); return jar;
   }
   const body = (value: unknown) => ({ method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify(value) });
 
@@ -47,7 +49,7 @@ describe('Phase 2A PostgreSQL integration', { skip: !enabled }, () => {
   it('06 zero and negative areas are rejected', async () => { const admin = await login('13800000001', env.SEED_ADMIN_PASSWORD!); for (const buildingArea of ['0', '-1']) assert.equal((await request('/api/v1/houses', body({ buildingId: fx.aNoUnitBuilding.id, code: `A${Date.now()}${buildingArea.replace('-', '')}`, buildingArea }), admin)).response.status, 400); });
   it('07 one user can map to people in different companies', async () => { assert.equal(fx.personA.userId !== null && fx.personB.userId !== null, true); });
   it('08 one user cannot map to two people in one company', async () => { await assert.rejects(db.insert(people).values({ propertyCompanyId: fx.companyA.id, userId: fx.personA.userId, name: '重复绑定' }), /unique|duplicate/i); });
-  it('09 person cannot relate to a house in another tenant', async () => { const repository = createDrizzleRepository(db); await assert.rejects(repository.createHouseRelationship({ houseId: fx.bHouse.id, personId: fx.personA.id, relationshipType: 'TENANT', startDate: '2026-01-01' }), /same property company/i); });
+  it('09 person cannot relate to a house in another tenant', async () => { const repository = createDrizzleRepository(db); await assert.rejects(repository.createHouseRelationship({ houseId: fx.bHouse.id, personId: fx.personA.id, relationshipType: 'TENANT', startDate: '2026-01-01' }), /同一物业公司/); });
   it('10 one house accepts multiple owners', async () => { const [owner] = await db.insert(people).values({ propertyCompanyId: fx.companyA.id, name: '共同业主' }).returning(); const [row] = await db.insert(housePersonRelationships).values({ houseId: fx.aHouse.id, personId: owner.id, relationshipType: 'OWNER', startDate: '2020-01-01' }).returning(); assert.equal(row.relationshipType, 'OWNER'); });
   it('11 overlapping same relationship is rejected', async () => { await assert.rejects(db.insert(housePersonRelationships).values({ houseId: fx.aHouse.id, personId: fx.personA.id, relationshipType: 'OWNER', startDate: '2021-01-01' }), /exclude|conflict/i); });
   it('12 non-overlapping historical relation is accepted', async () => { const [row] = await db.insert(housePersonRelationships).values({ houseId: fx.aHouse.id, personId: fx.personA.id, relationshipType: 'TENANT', startDate: '2018-01-01', endDate: '2019-01-01' }).returning(); assert.equal(row.endDate, '2019-01-01'); });

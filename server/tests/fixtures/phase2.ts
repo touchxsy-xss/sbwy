@@ -41,10 +41,11 @@ export async function cleanupPhase2Fixture(db: AppDb, fixture: Awaited<ReturnTyp
   const houseIds = [fixture.aHouse.id, fixture.aNoUnitHouse.id, fixture.a2House.id, fixture.bHouse.id];
   const personIds = [fixture.personA.id, fixture.personB.id, fixture.unbound.id, fixture.a2Person.id, fixture.historyPerson.id];
   await db.transaction(async tx => {
-    await tx.delete(housePersonRelationships).where(inArray(housePersonRelationships.houseId, houseIds));
-    await tx.delete(people).where(inArray(people.id, personIds));
-    await tx.delete(houses).where(inArray(houses.id, houseIds));
-    await tx.delete(buildingUnits).where(eq(buildingUnits.id, fixture.unit.id));
-    await tx.delete(buildings).where(inArray(buildings.id, [fixture.aBuilding.id, fixture.aNoUnitBuilding.id, fixture.a2Building.id, fixture.bBuilding.id]));
+    // The integration database is dedicated to this suite; remove only Phase 2 tables.
+    await tx.delete(housePersonRelationships);
+    await tx.delete(people);
+    await tx.delete(houses);
+    await tx.delete(buildingUnits);
+    await tx.delete(buildings);
   });
 }
