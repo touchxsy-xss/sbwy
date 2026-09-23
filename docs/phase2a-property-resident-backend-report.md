@@ -2,7 +2,7 @@
 
 Date: 2026-09-23  
 Branch: `codex/phase2-property-resident-backend`  
-Implementation commits: `8df210d`, `3521e86`, `42aa1e9`, `bb4d0cc`
+Implementation commits: `8df210d`, `3521e86`, `42aa1e9`, `bb4d0cc`, `4cbbd83`
 
 ## Result Summary
 
@@ -20,7 +20,7 @@ Implementation commits: `8df210d`, `3521e86`, `42aa1e9`, `bb4d0cc`
 | Atomic resident creation | PASS | `POST /api/v1/houses/:id/residents` creates Person + relationship + audit in one transaction |
 | Phone privacy | PASS | Ordinary list/detail/history return `maskedPhone`; `/contact` requires `person:phone:read` and audits the view |
 | Audit | PASS | Phase 2 actions are recorded; full phone values are excluded |
-| PostgreSQL integration tests | PASS | 30/30 Phase 2A scenarios passed on Raspberry Pi `shengbian_test` |
+| PostgreSQL integration tests | PASS | 44/44 Phase 2A + 2A.1 scenarios passed on Raspberry Pi `shengbian_test` |
 | Phase 1 PostgreSQL regression | PASS | Existing PostgreSQL integration suite passed independently on Raspberry Pi |
 | Frontend existing build/tests | PASS | Existing frontend build and 8 Demo Store tests passed; no frontend business code was changed |
 | Phase 1 -> Phase 2 migration | PASS | Existing `shengbian_dev` upgraded incrementally; existing database/volume retained |
@@ -41,7 +41,23 @@ Phone values are canonicalized to mainland China numeric format at write time. N
 
 ## Test Coverage
 
-The Phase 2A integration suite covers 30 scenarios: cross-company and cross-community access, optional units, area validation, cross-company Person/House rejection, cross-tenant User mappings, relationship overlap and history, primary contacts, future residents, unbound People, Engineer denial, masked/full phone behavior, audit redaction, atomic creation/rollback, and UUID tampering. Tests run against real PostgreSQL, not the memory repository.
+The Phase 2A integration suite covers 44 scenarios: cross-company and cross-community access, optional units, area validation, cross-company Person/House rejection, same-User cross-tenant mappings, relationship overlap and history, primary contacts, future residents, unbound People, Engineer denial, masked/full phone behavior, audit redaction, atomic creation/rollback, UUID tampering, historical Person write scope, pagination, total scope, and invalid pagination. Tests run against real PostgreSQL, not the memory repository.
+
+## Phase 2A.1 Hardening
+
+| Hardening item | Result | Evidence |
+|---|---|---|
+| Historical Person write scope | PASS | `updatePerson`, `disablePerson`, and API pre-reads use current/future management scope only; historical read remains restricted to authorized house history |
+| Same User cross-tenant | PASS | One actual User maps to an A-company Person and a B-company Person; a second A-company mapping violates the partial unique index |
+| Houses pagination | PASS | `GET /houses` returns `items`, `page`, `pageSize`, and scope-safe `total`; page 1/page 2 are real `LIMIT/OFFSET` queries |
+| People pagination | PASS | `GET /people` uses the same tenant/community/filter condition for items and total; unbound and historical records remain hidden from community scope |
+| Pagination validation | PASS | Invalid/zero/negative/oversized page parameters return validation errors before SQL execution |
+| Atomic Person audit | PASS | New resident creation writes `PERSON_CREATED` and `HOUSE_RELATION_CREATED` in the same transaction; existing Person flow writes only the relationship audit |
+| Audit tenant scope | PASS | Resource-derived company/community IDs are written for units, houses, People, relationships, and contact views without full phone data |
+| Contact audit | PASS | `PERSON_PHONE_VIEWED` includes actor, property company, resource type/id, request ID, and no full phone value |
+| Health probe | PASS | A temporary Raspberry Pi Fastify process returned `GET /api/v1/health` successfully over `127.0.0.1:3313` and was then stopped |
+
+The scope boundary is intentionally asymmetric: a community manager can read historical name and masked phone through a House history endpoint for an authorized community, but cannot patch or disable a Person whose only relationship to that manager's community has ended. A current A2 relationship does not grant an A1 manager write access; the A2 manager and company administrator can manage that Person.
 
 ## Raspberry Pi Evidence
 
