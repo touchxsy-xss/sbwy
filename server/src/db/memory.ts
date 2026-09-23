@@ -69,7 +69,12 @@ export function createMemoryRepository(seed: Partial<MemoryState> = {}): Reposit
     async getAssignment(id) { const item = state.assignments.find(value => value.id === id && !value.revokedAt); if (!item) return null; const role = state.roles.find(value => value.id === item.roleId); return role ? { ...copy(item), role: copy(role) } : null; },
     async revokeRole(id) { const item = state.assignments.find(value => value.id === id); if (item) item.revokedAt = now(); },
     async listAssignments(userId) { return copy(state.assignments.filter(item => item.userId === userId && !item.revokedAt).map(item => ({ ...item, role: state.roles.find(role => role.id === item.roleId)! }))); },
-    async audit(input) { state.audits.push(copy(input)); }
+    async audit(input) { state.audits.push(copy(input)); },
+    async listBuildings() { return []; }, async getBuilding() { return null; }, async createBuilding() { throw new Error('Phase 2 property repository requires PostgreSQL'); }, async updateBuilding() { return null; }, async disableBuilding() { return null; },
+    async listBuildingUnits() { return []; }, async getBuildingUnit() { return null; }, async createBuildingUnit() { throw new Error('Phase 2 property repository requires PostgreSQL'); }, async updateBuildingUnit() { return null; }, async disableBuildingUnit() { return null; },
+    async listHouses() { return []; }, async getHouse() { return null; }, async createHouse() { throw new Error('Phase 2 property repository requires PostgreSQL'); }, async updateHouse() { return null; }, async disableHouse() { return null; },
+    async listPeople() { return []; }, async getPerson() { return null; }, async createPerson() { throw new Error('Phase 2 property repository requires PostgreSQL'); }, async updatePerson() { return null; }, async disablePerson() { return null; }, async getPersonContact() { return null; },
+    async listHouseRelationships() { return []; }, async listPersonRelationships() { return []; }, async createHouseRelationship() { throw new Error('Phase 2 property repository requires PostgreSQL'); }, async updateHouseRelationship() { return null; }, async endHouseRelationship() { return null; }, async verifyHouseRelationship() { return null; }, async createResidentAtomic() { throw new Error('Phase 2 property repository requires PostgreSQL'); }
   };
   return repository;
 }

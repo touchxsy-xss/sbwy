@@ -15,6 +15,13 @@
       "when": 1790070977750,
       "tag": "0001_young_chameleon",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1790127383581,
+      "tag": "0002_mixed_sinister_six",
+      "breakpoints": true
     }
   ]
 }

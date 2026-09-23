@@ -35,7 +35,16 @@ const permissionSeed = [
   ['employee:write', '管理员工', 'employee', 'write'],
   ['role:read', '查看角色权限', 'role', 'read'],
   ['access:read', '查看授权', 'access', 'read'],
-  ['access:write', '管理授权', 'access', 'write']
+  ['access:write', '管理授权', 'access', 'write'],
+  ['building:read', '查看楼栋', 'building', 'read'],
+  ['building:write', '管理楼栋', 'building', 'write'],
+  ['house:read', '查看房屋', 'house', 'read'],
+  ['house:write', '管理房屋', 'house', 'write'],
+  ['person:read', '查看客户', 'person', 'read'],
+  ['person:write', '管理客户', 'person', 'write'],
+  ['house_relation:read', '查看房屋关系', 'house_relation', 'read'],
+  ['house_relation:write', '管理房屋关系', 'house_relation', 'write'],
+  ['person:phone:read', '查看完整手机号', 'person', 'phone:read']
 ] as const;
 
 const companySeed = [
@@ -82,8 +91,8 @@ try {
 
     const permissionCodesByRole: Record<string, string[]> = {
       PROPERTY_ADMIN: permissionSeed.map(item => item[0]),
-      COMMUNITY_MANAGER: ['community:read', 'community:update', 'employee:read'],
-      PROPERTY_STAFF: ['community:read', 'employee:read'],
+      COMMUNITY_MANAGER: ['community:read', 'community:update', 'employee:read', 'building:read', 'building:write', 'house:read', 'house:write', 'person:read', 'person:write', 'house_relation:read', 'house_relation:write'],
+      PROPERTY_STAFF: ['community:read', 'employee:read', 'building:read', 'house:read', 'person:read', 'house_relation:read'],
       ENGINEER: ['community:read']
     };
     for (const [roleCode, codes] of Object.entries(permissionCodesByRole)) {

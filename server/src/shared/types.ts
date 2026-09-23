@@ -22,6 +22,18 @@ export type RoleRecord = { id: string; code: string; name: string; scopeType: Sc
 export type PermissionRecord = { id: string; code: string; name: string; resource: string; action: string; createdAt: Date; updatedAt: Date };
 export type AssignmentRecord = { id: string; userId: string; roleId: string; propertyCompanyId: string | null; communityId: string | null; createdAt: Date; revokedAt: Date | null };
 export type SessionRecord = { id: string; userId: string; tokenHash: string; activePropertyCompanyId: string | null; expiresAt: Date; lastSeenAt: Date; revokedAt: Date | null; userAgent: string | null; ipHash: string | null; createdAt: Date };
+export type BuildingRecord = { id: string; communityId: string; code: string; name: string; displayName: string | null; legacyCode: string | null; status: 'ACTIVE' | 'INACTIVE'; disabledAt: Date | null; createdAt: Date; updatedAt: Date };
+export type BuildingUnitRecord = { id: string; buildingId: string; code: string; name: string; displayName: string | null; status: 'ACTIVE' | 'INACTIVE'; disabledAt: Date | null; createdAt: Date; updatedAt: Date };
+export type HouseRecord = { id: string; buildingId: string; buildingUnitId: string | null; code: string; floor: number | null; buildingArea: string | null; usableArea: string | null; displayName: string | null; legacyCode: string | null; status: 'ACTIVE' | 'RENOVATING' | 'INACTIVE'; disabledAt: Date | null; createdAt: Date; updatedAt: Date; communityId?: string; propertyCompanyId?: string };
+export type PersonRecord = { id: string; propertyCompanyId: string; userId: string | null; name: string; phone: string | null; gender: 'MALE' | 'FEMALE' | 'OTHER' | 'UNKNOWN' | null; status: 'ACTIVE' | 'DISABLED'; disabledAt: Date | null; createdAt: Date; updatedAt: Date };
+export type HouseRelationshipRecord = { id: string; houseId: string; personId: string; relationshipType: 'OWNER' | 'TENANT' | 'FAMILY_MEMBER' | 'OCCUPANT'; ownershipShare: string | null; isPrimaryContact: boolean; startDate: string; endDate: string | null; verificationStatus: 'UNVERIFIED' | 'PENDING' | 'VERIFIED' | 'REJECTED'; reviewedAt: Date | null; reviewedByUserId: string | null; verificationNote: string | null; createdAt: Date; updatedAt: Date };
+export type BuildingDto = BuildingRecord & { displayAddress: string };
+export type BuildingUnitDto = BuildingUnitRecord;
+export type HouseDto = HouseRecord & { displayCode: string; displayAddress: string };
+export type PersonDto = Omit<PersonRecord, 'phone'> & { maskedPhone: string | null };
+export type PersonContactDto = Pick<PersonRecord, 'id' | 'name' | 'phone'>;
+export type RelationshipFilters = { includeHistory?: boolean; houseId?: string; personId?: string };
+export type PropertyFilters = { page?: number; pageSize?: number; communityId?: string; buildingId?: string; unitId?: string; houseId?: string; keyword?: string; relationshipType?: HouseRelationshipRecord['relationshipType']; status?: string };
 
 export type Scope = {
   userId: string;
@@ -80,4 +92,32 @@ export interface Repository {
   revokeRole(id: string): Promise<void>;
   listAssignments(userId: string): Promise<Array<AssignmentRecord & { role: RoleRecord }>>;
   audit(input: AuditInput): Promise<void>;
+  listBuildings(scope: Scope, filters?: PropertyFilters): Promise<BuildingDto[]>;
+  getBuilding(id: string, scope: Scope): Promise<BuildingDto | null>;
+  createBuilding(input: { communityId: string; code: string; name: string; displayName?: string | null; legacyCode?: string | null }): Promise<BuildingRecord>;
+  updateBuilding(id: string, input: Partial<Pick<BuildingRecord, 'code' | 'name' | 'displayName' | 'legacyCode'>>, scope: Scope): Promise<BuildingRecord | null>;
+  disableBuilding(id: string, scope: Scope): Promise<BuildingRecord | null>;
+  listBuildingUnits(buildingId: string, scope: Scope): Promise<BuildingUnitDto[]>;
+  getBuildingUnit(id: string, scope: Scope): Promise<BuildingUnitDto | null>;
+  createBuildingUnit(input: { buildingId: string; code: string; name: string; displayName?: string | null }): Promise<BuildingUnitRecord>;
+  updateBuildingUnit(id: string, input: Partial<Pick<BuildingUnitRecord, 'code' | 'name' | 'displayName'>>, scope: Scope): Promise<BuildingUnitRecord | null>;
+  disableBuildingUnit(id: string, scope: Scope): Promise<BuildingUnitRecord | null>;
+  listHouses(scope: Scope, filters?: PropertyFilters): Promise<HouseDto[]>;
+  getHouse(id: string, scope: Scope): Promise<HouseDto | null>;
+  createHouse(input: { buildingId: string; buildingUnitId?: string | null; code: string; floor?: number | null; buildingArea?: string | null; usableArea?: string | null; displayName?: string | null; legacyCode?: string | null }): Promise<HouseRecord>;
+  updateHouse(id: string, input: Partial<Pick<HouseRecord, 'buildingUnitId' | 'code' | 'floor' | 'buildingArea' | 'usableArea' | 'displayName' | 'legacyCode' | 'status'>>, scope: Scope): Promise<HouseRecord | null>;
+  disableHouse(id: string, scope: Scope): Promise<HouseRecord | null>;
+  listPeople(scope: Scope, filters?: PropertyFilters): Promise<PersonDto[]>;
+  getPerson(id: string, scope: Scope, options?: { includeHistory?: boolean }): Promise<PersonDto | null>;
+  createPerson(input: { propertyCompanyId: string; userId?: string | null; name: string; phone?: string | null; gender?: PersonRecord['gender'] }): Promise<PersonRecord>;
+  updatePerson(id: string, input: Partial<Pick<PersonRecord, 'name' | 'userId' | 'phone' | 'gender'>>, scope: Scope): Promise<PersonRecord | null>;
+  disablePerson(id: string, scope: Scope): Promise<PersonRecord | null>;
+  getPersonContact(id: string, scope: Scope): Promise<PersonContactDto | null>;
+  listHouseRelationships(houseId: string, scope: Scope, includeHistory?: boolean): Promise<Array<HouseRelationshipRecord & { person: PersonDto }>>;
+  listPersonRelationships(personId: string, scope: Scope, includeHistory?: boolean): Promise<Array<HouseRelationshipRecord & { house: HouseDto }>>;
+  createHouseRelationship(input: { houseId: string; personId: string; relationshipType: HouseRelationshipRecord['relationshipType']; ownershipShare?: string | null; isPrimaryContact?: boolean; startDate: string; endDate?: string | null }): Promise<HouseRelationshipRecord>;
+  updateHouseRelationship(id: string, input: Partial<Pick<HouseRelationshipRecord, 'relationshipType' | 'ownershipShare' | 'isPrimaryContact' | 'startDate' | 'endDate'>>, scope: Scope): Promise<HouseRelationshipRecord | null>;
+  endHouseRelationship(id: string, endDate: string, scope: Scope): Promise<HouseRelationshipRecord | null>;
+  verifyHouseRelationship(id: string, status: 'VERIFIED' | 'REJECTED', note: string | null, reviewerUserId: string, scope: Scope): Promise<HouseRelationshipRecord | null>;
+  createResidentAtomic(input: { houseId: string; existingPersonId?: string; newPerson?: { name: string; phone?: string | null; gender?: PersonRecord['gender'] }; relationship: { relationshipType: HouseRelationshipRecord['relationshipType']; ownershipShare?: string | null; isPrimaryContact?: boolean; startDate: string; endDate?: string | null }; actorUserId?: string; requestId?: string }, scope: Scope): Promise<{ person: PersonRecord; relationship: HouseRelationshipRecord }>;
 }
