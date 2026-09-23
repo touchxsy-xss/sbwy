@@ -103,8 +103,8 @@ try {
   });
   await test('Review persists and points awarded once', async () => {
     await navigate('/mobile/profile');
-    await page.locator('[data-action^="我的报修"]').filter({ visible: true }).first().click();
-    await page.locator(`[data-review-order="${orderId}"]`).click();
+    await page.getByRole('heading', { name: '待评价服务', exact: true }).waitFor();
+    await page.locator(`[data-pending-review="${orderId}"]`).click();
     await page.waitForURL(url => url.pathname === '/mobile/review' && url.searchParams.get('id') === orderId);
     const before = (await state()).user.points;
     await action('3星').click();
@@ -114,6 +114,18 @@ try {
     assert.equal((await state()).user.points, before + 20);
     await navigate('/mobile/review?id=' + orderId);
     assert.equal(await page.locator('#submit-review-btn').isDisabled(), true);
+    await page.setViewportSize({ width: 1440, height: 1000 });
+    await navigate('/web/work-orders');
+    await page.getByText('维修完成，整体满意，希望预约时间再精准一些。', { exact: true }).waitFor();
+    await action('发起服务回访').click();
+    await page.getByLabel('回访记录').fill('已电话联系居民，确认后续预约将提前提醒。');
+    await confirm('保存回访记录');
+    await page.getByText('已回访', { exact: true }).waitFor();
+    const reviewed = (await state()).reviews.find(review => review.orderId === orderId);
+    assert.equal(reviewed.followUp.status, 'followed_up');
+    assert.match(reviewed.followUp.note, /电话联系居民/);
+    await page.reload();
+    await page.getByText('已回访', { exact: true }).waitFor();
   });
   await test('Points redemption updates balance and coupon record', async () => {
     await navigate('/mobile/points');

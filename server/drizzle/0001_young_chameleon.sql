@@ -1,0 +1,1 @@
+DROP INDEX "employee_profiles_company_employee_no_uq";

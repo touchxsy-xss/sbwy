@@ -9,6 +9,7 @@ export const isAmount = value => /^\d+(\.\d{1,2})?$/.test(String(value)) && Numb
 export function createStore(storage, notify = () => {}) {
   function migrate(state) {
     state.version = 2;
+    state.reviews ||= [];
     state.organization ||= structuredClone(organization);
     const legacyCompanyNames = { '示范物业公司 A': '物业公司 A', '合作物业公司 B': '物业公司 B' };
     state.organization.companies?.forEach(company => { if (legacyCompanyNames[company.name]) company.name = legacyCompanyNames[company.name]; });
@@ -28,6 +29,9 @@ export function createStore(storage, notify = () => {}) {
         order.checkinAt = order.timeline?.find(t => t.status === 'arrived')?.at || order.acceptedAt;
       }
       if (order.checkinAt && !order.arrivalResult) order.arrivalResult = arrivalStatus(order, new Date(order.checkinAt).getTime());
+    });
+    state.reviews.forEach(review => {
+      review.followUp ||= { status: 'none', note: '', at: null, by: '' };
     });
     state.articles.forEach(article => {
       if (!article.audience && ['elevator', 'safety'].includes(article.id)) article.audience = 'platform';
@@ -155,7 +159,13 @@ export function createStore(storage, notify = () => {}) {
         if (s.reviews.some(r => r.orderId === orderId)) throw new Error('该工单已评价，积分不会重复发放');
         if (!(input.rating >= 1 && input.rating <= 5)) throw new Error('请选择1至5星评分');
         if (input.comment?.length > 300) throw new Error('评价不能超过300字');
-        const review = { ...input, id: id('REV'), orderId, at: now() };
+        const review = {
+          ...input,
+          id: id('REV'),
+          orderId,
+          at: now(),
+          followUp: { status: 'none', note: '', at: null, by: '' }
+        };
         s.reviews.push(review); points(s, 20, '完成维修服务评价', 'review-' + orderId);
         order.status = 'closed'; order.timeline.push({ status: 'closed', label: '居民评价并归档', at: now() });
         log(s, '提交评价', orderId); return review;

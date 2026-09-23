@@ -69,7 +69,7 @@ for (const page of pages) {
   $('html').attr('data-page', page.key).attr('data-group', page.group);
   const pageCss = `/pages/${page.key}.css?v=${buildVersion}`;
   const fontCss = `/assets/fonts.css?v=${buildVersion}`;
-  $('head').append(`<title>${page.name} | 声边物业</title><link rel="icon" href="data:,"><link rel="preload" href="${fontCss}" as="style"><link rel="preload" href="${pageCss}" as="style"><link rel="stylesheet" href="${fontCss}"><link rel="stylesheet" href="${pageCss}"><link rel="stylesheet" href="/app.css?v=${buildVersion}"><script type="module" src="/app.js?v=${buildVersion}"></script>`);
+  $('head').append(`<title>${page.name} | 声边物业</title><link rel="icon" href="data:,"><link rel="preload" href="${fontCss}" as="style"><link rel="preload" href="${pageCss}" as="style"><link rel="stylesheet" href="${fontCss}"><link rel="stylesheet" href="${pageCss}"><link rel="stylesheet" href="/app.css?v=${buildVersion}"><script src="/api-config.js"></script><script type="module" src="/app.js?v=${buildVersion}"></script>`);
   $('meta[name=viewport]').attr('content', 'width=device-width, initial-scale=1, viewport-fit=cover');
   await fs.writeFile(`dist/pages/${page.key}.html`, $.html());
 }

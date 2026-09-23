@@ -16,8 +16,13 @@ test('repair lifecycle and invalid transitions', () => {
   assert.equal(s.read().bills.find(b => b.orderId === o.id).amount, 68);
   s.pay(['repair-' + o.id]);
   assert.equal(s.read().orders.find(x => x.id === o.id).paid, true);
-  s.review(o.id, { rating: 3, comment: '已修复' });
+  const review = s.review(o.id, { rating: 3, comment: '已修复', tags: ['准时上门'] });
+  assert.equal(review.rating, 3);
+  assert.equal(review.comment, '已修复');
+  assert.deepEqual(review.followUp, { status: 'none', note: '', at: null, by: '' });
   assert.equal(s.read().orders.find(x => x.id === o.id).status, 'closed');
+  s.change(state => { state.reviews.find(item => item.id === review.id).followUp = { status: 'followed_up', note: '已电话回访', at: '2026-09-07T00:00:00.000Z', by: '李明' }; });
+  assert.equal(s.read().reviews.find(item => item.id === review.id).followUp.note, '已电话回访');
   assert.throws(() => s.review(o.id, { rating: 5 }));
 });
 test('arrival SLA starts on acceptance and records an overdue checkin', () => {

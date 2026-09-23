@@ -2,6 +2,7 @@ import { $, $$, bind, label, icon, escape, modal, closeModal, formModal, field, 
 import { isPhone, now, id, money } from '../services/store.js';
 import { products, rewards, statuses } from '../data/seed.js';
 import { createRadio } from '../services/audio.js';
+import { login as apiLogin } from '../api/auth.js';
 
 const find = (text, root = document) => $$('button,a,[role="button"],.cursor-pointer', root).filter(e => typeof text === 'string' ? label(e) === text : text.test(label(e)));
 const on = (text, fn) => find(text).forEach(el => { if (!el.dataset.action) bind(el, label(el), () => fn(el)); });
@@ -26,6 +27,7 @@ export function initResident(ctx) {
       if (title) title.textContent = activeOrder.title;
       bind(card, '查看进行中工单', () => go('/mobile/orders/' + activeOrder.id));
     }
+    renderPendingReviews(ctx, card);
     const buttons = document.createElement('div'); buttons.className = 'demo-inline';
     buttons.innerHTML = `<button class="demo-button secondary" data-profile="bookings">${icon('event_note')}预约记录</button><button class="demo-button secondary" data-profile="account">${icon('manage_accounts')}账号设置</button><button class="demo-button secondary" data-profile="bills">${icon('receipt_long')}历史账期</button>`;
     $('main > div').append(buttons);
@@ -40,6 +42,27 @@ export function initResident(ctx) {
     on(/去逛邻里圈/, () => go('/mobile/services?panel=community-feed'));
     if (qs.get('panel') === 'community-feed') communityFeed(ctx);
   }
+}
+
+function renderPendingReviews(ctx, activeCard) {
+  const { state, go } = ctx;
+  const snapshot = state();
+  const pending = snapshot.orders.filter(order =>
+    (order.room === snapshot.user.room || order.contact === snapshot.user.name || order.phone === snapshot.user.phone) &&
+    order.communityId === snapshot.user.communityId &&
+    order.status === 'completed' &&
+    !snapshot.reviews.some(review => review.orderId === order.id)
+  );
+  if (!pending.length) return;
+
+  const section = document.createElement('section');
+  section.className = 'demo-pending-reviews';
+  section.setAttribute('aria-label', '待评价服务');
+  section.innerHTML = `<div class="demo-pending-reviews-heading"><div><span class="material-symbols-outlined" aria-hidden="true">rate_review</span><div><h2>待评价服务</h2><p>维修已完成，您的反馈将帮助物业改进服务</p></div></div><span>${pending.length} 项待办</span></div><div class="demo-pending-review-list">${pending.map(order => `<article><div><strong>${escape(order.title)}</strong><small>${escape(order.room)} · ${escape(order.technician || '维修师傅')} · ${new Date(order.timeline?.at(-1)?.at || order.createdAt).toLocaleDateString('zh-CN')} 完工</small></div><button class="demo-button" data-pending-review="${escape(order.id)}">立即评价 ${icon('arrow_forward')}</button></article>`).join('')}</div>`;
+  const mainContent = $('main > div');
+  if (activeCard?.parentElement === mainContent) activeCard.after(section);
+  else mainContent?.prepend(section);
+  $$('[data-pending-review]', section).forEach(button => bind(button, '立即评价服务', () => go('/mobile/review?id=' + button.dataset.pendingReview)));
 }
 
 function loginPage(ctx) {
@@ -75,15 +98,21 @@ function loginPage(ctx) {
     sessionStorage.setItem('shengbian-password', v.password);
     toast('演示密码已更新');
   }));
-  const submit = btn => busy(btn, () => {
+  const submit = btn => busy(btn, async () => {
     if (!agreement.checked) throw new Error('请先阅读并同意服务协议与隐私政策');
     const validAccount = ['admin', 'worker', 'group-admin'].includes(account.value.trim()) || isPhone(account.value.trim());
     if (!validAccount) throw new Error('请输入有效手机号或演示账号');
-    if (mode === 'password' && password.value !== (sessionStorage.getItem('shengbian-password') || 'demo123')) throw new Error('账号或密码不正确');
+    const usingApi = role !== 'resident' && isPhone(account.value.trim());
+    if (!usingApi && mode === 'password' && password.value !== (sessionStorage.getItem('shengbian-password') || 'demo123')) throw new Error('账号或密码不正确');
     if (mode === 'sms' && password.value !== '123456') throw new Error('验证码不正确');
-    if (role === 'admin' && account.value !== 'admin') throw new Error('请使用管理员演示账号 admin');
-    if (role === 'worker' && account.value !== 'worker') throw new Error('请使用维修师傅演示账号 worker');
-    if (role === 'group' && account.value !== 'group-admin') throw new Error('请使用集团管理员演示账号 group-admin');
+    if (role !== 'resident' && isPhone(account.value.trim())) {
+      if (mode !== 'password') throw new Error('正式账号请使用密码登录');
+      await apiLogin(account.value.trim(), password.value);
+      sessionStorage.setItem('shengbian-api-auth-' + role, 'yes');
+    }
+    if (role === 'admin' && !usingApi && account.value !== 'admin') throw new Error('请使用管理员演示账号 admin');
+    if (role === 'worker' && !usingApi && account.value !== 'worker') throw new Error('请使用维修师傅演示账号 worker');
+    if (role === 'group' && !usingApi && account.value !== 'group-admin') throw new Error('请使用集团管理员演示账号 group-admin');
     sessionStorage.setItem('shengbian-auth-' + role, 'yes');
     go(safeNext(qs.get('next') || (role === 'group' ? '/web/group' : role === 'admin' ? '/web/overview' : role === 'worker' ? '/worker/tasks' : '/mobile/home')));
   });
@@ -156,6 +185,7 @@ function verifyPage(ctx) {
 function repairPage(ctx) {
   const { store, state, go, upload } = ctx;
   let scope = 'private', category = '管道疏通', date = today(), slot = '上午时段 09:00 - 11:30', callConfirm = true;
+  renderRepairCenter(ctx);
   const draft = state().drafts.repair || {};
   if (draft.description) $('#issue-text').value = draft.description;
   const save = () => store.saveDraft('repair', { description: $('#issue-text').value, scope, category, date, slot, callConfirm });
@@ -190,6 +220,38 @@ function repairPage(ctx) {
       go('/mobile/orders/' + order.id + '?submitted=1');
     }, '确认提交报修');
   });
+}
+
+function renderRepairCenter(ctx) {
+  const { state, go } = ctx;
+  const snapshot = state();
+  const ownerOrders = snapshot.orders
+    .filter(order =>
+      (!order.communityId || order.communityId === snapshot.user.communityId) &&
+      (order.room === snapshot.user.room || order.contact === snapshot.user.name || order.phone === snapshot.user.phone)
+    )
+    .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+  const active = ownerOrders.filter(order => !['completed', 'closed', 'cancelled'].includes(order.status));
+  const history = ownerOrders.filter(order => ['completed', 'closed', 'cancelled'].includes(order.status));
+  const pendingReviews = history.filter(order => order.status === 'completed' && !snapshot.reviews.some(review => review.orderId === order.id));
+  const statusText = order => {
+    const review = snapshot.reviews.find(item => item.orderId === order.id);
+    if (order.status === 'completed' && !review) return '已完工，待评价';
+    return review ? `已评价 ${review.rating} 星` : statuses[order.status];
+  };
+  const section = document.createElement('section');
+  section.id = 'resident-repair-center';
+  section.className = 'demo-repair-center';
+  section.innerHTML = `<div class="demo-repair-center-heading"><div><span class="material-symbols-outlined" aria-hidden="true">assignment_turned_in</span><div><h2>我的报修</h2><p>提交后可在这里查看进度、历史和服务评价</p></div></div><button class="demo-button secondary" data-repair-all>全部记录</button></div>` +
+    `<div class="demo-repair-metrics"><span>进行中 ${active.length}</span><span>历史 ${history.length}</span><span>待评价 ${pendingReviews.length}</span></div>` +
+    `<div class="demo-repair-section"><h3>进行中</h3>${active.length ? active.slice(0, 1).map(order => `<button class="demo-repair-order" data-repair-detail="${escape(order.id)}"><div><strong>${escape(order.title)}</strong><small>${escape(order.id)} · ${escape(order.appointment)}</small></div><span class="demo-repair-status active">${escape(statusText(order))}</span></button>`).join('') : '<div class="demo-repair-empty">暂无进行中的报修</div>'}</div>` +
+    `<div class="demo-repair-section"><h3>待评价</h3>${pendingReviews.length ? pendingReviews.slice(0, 1).map(order => `<article class="demo-repair-order"><div><strong>${escape(order.title)}</strong><small>${escape(order.technician || '维修师傅')}已完成服务</small></div><button class="demo-button" data-repair-review="${escape(order.id)}">立即评价 ${icon('arrow_forward')}</button></article>`).join('') : '<div class="demo-repair-empty">暂无待评价的完工工单</div>'}</div>` +
+    `<div class="demo-repair-section"><h3>历史报修</h3>${history.length ? history.slice(0, 1).map(order => `<button class="demo-repair-order" data-repair-detail="${escape(order.id)}"><div><strong>${escape(order.title)}</strong><small>${escape(order.id)} · ${new Date(order.createdAt).toLocaleDateString('zh-CN')}</small></div><span class="demo-repair-status">${escape(statusText(order))}</span></button>`).join('') : '<div class="demo-repair-empty">暂无历史报修记录</div>'}</div>`;
+  const anchor = $('#tab-private')?.closest('section');
+  anchor?.after(section);
+  $$('[data-repair-detail]', section).forEach(button => bind(button, '查看报修详情', () => go('/mobile/orders/' + button.dataset.repairDetail)));
+  $$('[data-repair-review]', section).forEach(button => bind(button, '评价已完工报修', () => go('/mobile/review?id=' + button.dataset.repairReview)));
+  bind($('[data-repair-all]', section), '查看全部报修记录', () => go('/mobile/profile?panel=orders'));
 }
 
 function reviewPage(ctx) {
