@@ -2,18 +2,51 @@ import { $, $$, bind, label, icon, escape, modal, closeModal, formModal, field, 
 import { isPhone, now, id, money } from '../services/store.js';
 import { products, rewards, statuses } from '../data/seed.js';
 import { createRadio } from '../services/audio.js';
-import { login as apiLogin } from '../api/auth.js';
+import { login as apiLogin, currentUser } from '../api/auth.js';
+import {
+  apiErrorMessage, residentStatusLabels, listWorkOrders, getWorkOrder, listWorkOrderEvents,
+  createWorkOrder, confirmCompletion, requestRework, submitReview,
+  listResidentPeople, listPersonRelationships
+} from '../api/work-orders.js';
 
 const find = (text, root = document) => $$('button,a,[role="button"],.cursor-pointer', root).filter(e => typeof text === 'string' ? label(e) === text : text.test(label(e)));
 const on = (text, fn) => find(text).forEach(el => { if (!el.dataset.action) bind(el, label(el), () => fn(el)); });
 const today = () => new Date().toLocaleDateString('en-CA');
+const realApiEnabled = () => Boolean(globalThis.__SHENGBIAN_API_BASE__) && sessionStorage.getItem('shengbian-api-auth-resident') === 'yes';
+const formatDate = value => value ? new Date(value).toLocaleString('zh-CN') : '—';
+const eventLabel = event => ({
+  CREATE: '已提交报修', WORK_ORDER_CREATED: '已提交报修', ASSIGN: '物业已派单', WORK_ORDER_ASSIGNED: '物业已派单',
+  ACCEPTED: '维修人员已接单', ARRIVED: '维修人员已到场', COMPLETED: '维修人员已完成处理',
+  RESIDENT_CONFIRMED_COMPLETION: '您已确认维修完成', REWORK_REQUESTED: '您反馈问题未解决', REVIEW_SUBMITTED: '您已提交服务评价'
+}[event.action] || ({ PENDING_DISPATCH: '已提交报修', ASSIGNED: '物业已派单', ACCEPTED: '维修人员已接单', ARRIVED: '维修人员已到场', COMPLETED: '维修人员已完成处理', ARCHIVED: '已完成', REWORK_REQUIRED: '已进入返工流程', CANCELLED: '工单已取消' }[event.toStatus] || '工单状态已更新'));
+
+async function residentIdentity() {
+  const context = globalThis.__SHENGBIAN_API_CONTEXT__ || await currentUser();
+  const user = context?.user;
+  if (!user?.id) throw new Error('居民身份尚未加载，请重新登录');
+  const people = await listResidentPeople(user.phone || '');
+  const person = (people?.items || []).find(item => item.userId === user.id) || (people?.items || []).find(item => item.maskedPhone && user.phone?.startsWith(item.maskedPhone.slice(0, 3)));
+  if (!person) throw new Error('当前账号尚未绑定居民档案，暂时无法提交报修');
+  const relationships = await listPersonRelationships(person.id);
+  return { user, person, relationships: relationships || [] };
+}
+
+function eligibleRelationships(identity) {
+  const todayValue = today();
+  return identity.relationships.filter(item => item.verificationStatus === 'VERIFIED' && item.startDate <= todayValue && (!item.endDate || item.endDate >= todayValue));
+}
+
+function apiFailure(target, error, retry) {
+  target.innerHTML = `<div class="resident-api-error" role="alert"><strong>${escape(apiErrorMessage(error))}</strong><button type="button" class="demo-button secondary" data-api-retry>重新加载</button></div>`;
+  bind($('[data-api-retry]', target), '重新加载', retry);
+}
 
 export function initResident(ctx) {
   const { route, store, state, go, qs, panel, requireAuth } = ctx;
   if (route.key === 'login') loginPage(ctx);
   if (route.key === 'verify') verifyPage(ctx);
-  if (route.key === 'repair') repairPage(ctx);
-  if (route.key === 'review') reviewPage(ctx);
+  if (route.key === 'repair') realApiEnabled() ? apiRepairPage(ctx) : repairPage(ctx);
+  if (route.key === 'review') realApiEnabled() ? apiReviewPage(ctx) : reviewPage(ctx);
   if (['bills', 'billing'].includes(route.key)) billingPage(ctx);
   if (route.key === 'points') pointsPage(ctx);
   if (route.key === 'services') servicesPage(ctx);
@@ -27,7 +60,7 @@ export function initResident(ctx) {
       if (title) title.textContent = activeOrder.title;
       bind(card, '查看进行中工单', () => go('/mobile/orders/' + activeOrder.id));
     }
-    renderPendingReviews(ctx, card);
+    if (!realApiEnabled()) renderPendingReviews(ctx, card);
     const buttons = document.createElement('div'); buttons.className = 'demo-inline';
     buttons.innerHTML = `<button class="demo-button secondary" data-profile="bookings">${icon('event_note')}预约记录</button><button class="demo-button secondary" data-profile="account">${icon('manage_accounts')}账号设置</button><button class="demo-button secondary" data-profile="bills">${icon('receipt_long')}历史账期</button>`;
     $('main > div').append(buttons);
@@ -102,10 +135,10 @@ function loginPage(ctx) {
     if (!agreement.checked) throw new Error('请先阅读并同意服务协议与隐私政策');
     const validAccount = ['admin', 'worker', 'group-admin'].includes(account.value.trim()) || isPhone(account.value.trim());
     if (!validAccount) throw new Error('请输入有效手机号或演示账号');
-    const usingApi = role !== 'resident' && isPhone(account.value.trim());
+    const usingApi = Boolean(globalThis.__SHENGBIAN_API_BASE__) && isPhone(account.value.trim());
     if (!usingApi && mode === 'password' && password.value !== (sessionStorage.getItem('shengbian-password') || 'demo123')) throw new Error('账号或密码不正确');
     if (mode === 'sms' && password.value !== '123456') throw new Error('验证码不正确');
-    if (role !== 'resident' && isPhone(account.value.trim())) {
+    if (usingApi) {
       if (mode !== 'password') throw new Error('正式账号请使用密码登录');
       await apiLogin(account.value.trim(), password.value);
       sessionStorage.setItem('shengbian-api-auth-' + role, 'yes');
@@ -180,6 +213,105 @@ function verifyPage(ctx) {
       sessionStorage.setItem('shengbian-auth-resident', 'yes');
     }, { after: () => go('/mobile/profile') });
   });
+}
+
+function apiRepairPage(ctx) {
+  const { go } = ctx;
+  const host = $('main > div');
+  const first = $('#tab-private')?.closest('section');
+  const picker = document.createElement('div');
+  picker.className = 'resident-api-house-picker';
+  picker.innerHTML = '<p class="demo-muted">正在加载您有权报修的房屋…</p>';
+  first?.append(picker);
+  $('#tab-public')?.remove();
+  $('#issue-text')?.setAttribute('maxlength', '1000');
+  const submitButton = find(/立即提交报修/)[0];
+  const categories = $$('#category-group button');
+  let category = label(categories.find(button => button.classList.contains('active')) || categories[0]) || '其他故障';
+  categories.forEach(button => bind(button, label(button), () => { category = label(button); active(categories, button); }));
+  let identity;
+  residentIdentity().then(result => {
+    identity = result;
+    const eligible = eligibleRelationships(result);
+    if (!eligible.length) throw new Error('当前账号没有可用于报修的有效房屋关系');
+    picker.innerHTML = `<label class="resident-api-field"><span>报修房屋</span><select id="api-house-select" required>${eligible.map(relation => `<option value="${escape(relation.id)}" data-house="${escape(relation.house.id)}">${escape(relation.house.displayAddress || relation.house.displayCode || relation.house.code)}</option>`).join('')}</select></label>`;
+  }).catch(error => {
+    picker.innerHTML = `<div class="resident-api-error" role="alert">${escape(apiErrorMessage(error))}</div>`;
+    if (submitButton) submitButton.disabled = true;
+  });
+  on(/立即提交报修/, button => busy(button, async () => {
+    if (!identity) throw new Error('房屋资料仍在加载，请稍候');
+    const description = $('#issue-text')?.value.trim() || '';
+    if (description.length < 5) throw new Error('请填写至少5个字的故障描述');
+    const relationSelect = $('#api-house-select');
+    const relation = identity.relationships.find(item => item.id === relationSelect?.value);
+    if (!relation) throw new Error('请选择有效报修房屋');
+    const order = await createWorkOrder({
+      scope: 'PRIVATE', houseId: relation.house.id, requesterPersonId: identity.person.id,
+      requesterRelationshipId: relation.id, category, priority: 'NORMAL',
+      title: `${category}报修`, description
+    });
+    go('/mobile/orders/' + order.id + '?submitted=1');
+  }));
+  if (!host) return;
+  const note = document.createElement('p'); note.className = 'demo-api-note'; note.textContent = '当前页面连接真实物业工单服务，提交后可在“我的报修”查看实时进度。';
+  host.prepend(note);
+}
+
+export async function renderResidentOrders(ctx, page = 1) {
+  const { go } = ctx;
+  const host = document.createElement('section'); host.id = 'resident-api-orders'; host.className = 'resident-api-orders demo-repair-center';
+  const anchor = $('main > div');
+  anchor?.prepend(host);
+  host.innerHTML = '<p class="demo-muted">正在加载我的报修…</p>';
+  try {
+    const result = await listWorkOrders({ page, pageSize: 20 });
+    const items = result?.items || [];
+    host.innerHTML = `<div class="demo-repair-center-heading"><div><h2>我的报修</h2><p>真实工单进度与处理记录</p></div><button type="button" class="demo-button secondary" data-api-new>我要报修</button></div>${items.length ? `<div class="resident-api-order-list">${items.map(order => `<button type="button" class="demo-repair-order" data-api-order="${escape(order.id)}"><div><strong>${escape(order.title)}</strong><small>${escape(order.orderNo || order.id)} · ${escape(order.locationSnapshot?.address || '房屋')}</small></div><span class="demo-repair-status">${escape(residentStatusLabels[order.status] || '处理中')}</span></button>`).join('')}</div>` : '<div class="demo-repair-empty">暂时还没有报修记录</div>'}<div class="resident-api-pagination"><button type="button" class="demo-button secondary" data-api-prev ${page <= 1 ? 'disabled' : ''}>上一页</button><span>第 ${page} 页 · 共 ${result?.total || 0} 条</span><button type="button" class="demo-button secondary" data-api-next ${(page * (result?.pageSize || 20) >= (result?.total || 0)) ? 'disabled' : ''}>下一页</button></div>`;
+    bind($('[data-api-new]', host), '我要报修', () => go('/mobile/repair'));
+    $$('[data-api-order]', host).forEach(button => bind(button, '查看真实报修详情', () => go('/mobile/orders/' + button.dataset.apiOrder)));
+    bind($('[data-api-prev]', host), '上一页', () => renderResidentOrders(ctx, page - 1));
+    bind($('[data-api-next]', host), '下一页', () => renderResidentOrders(ctx, page + 1));
+  } catch (error) { apiFailure(host, error, () => renderResidentOrders(ctx, page)); }
+}
+
+export async function renderResidentOrderDetail(ctx, orderId) {
+  const { go, back } = ctx;
+  let dlg = modal('工单详情', '<p class="demo-muted">正在加载工单详情…</p>', [{ label: '返回', secondary: true, run: back }]);
+  const reload = async () => {
+    try {
+      const [order, events] = await Promise.all([getWorkOrder(orderId), listWorkOrderEvents(orderId)]);
+      const actions = [];
+      const allowed = new Set(order.allowedActions || []);
+      if (allowed.has('CONFIRM_COMPLETION')) actions.push({ label: '确认已修好', run: () => confirm('确认维修完成', '确认问题已经解决并结束该工单？', async () => { try { await confirmCompletion(orderId); await reload(); } catch (error) { toast(apiErrorMessage(error), true); await reload(); } }, { label: '确认完成' }) });
+      if (allowed.has('REQUEST_REWORK')) actions.push({ label: '还没修好', run: () => formModal('反馈未修好', field('reason', '请说明哪里还没有修好', '', { type: 'textarea', maxLength: 1000 }), async values => { const reason = values.reason.trim(); if (!reason) throw new Error('请填写未修好原因'); try { await requestRework(orderId, reason); await reload(); } catch (error) { toast(apiErrorMessage(error), true); await reload(); } }) });
+      if (allowed.has('SUBMIT_REVIEW')) actions.push({ label: '评价服务', run: () => apiReviewPage({ ...ctx, qs: new URLSearchParams('id=' + encodeURIComponent(orderId)) }) });
+      actions.push({ label: '返回', secondary: true, run: back });
+      const timeline = (events || []).map(event => `<li><strong>${escape(eventLabel(event))}</strong><time>${escape(formatDate(event.createdAt))}</time>${event.note ? `<small>${escape(event.note)}</small>` : ''}</li>`).join('');
+      const review = order.review;
+      dlg = modal('工单详情', `<div class="resident-api-detail"><div class="resident-api-detail-heading"><h3>${escape(order.title)}</h3><span class="demo-repair-status">${escape(residentStatusLabels[order.status] || order.status)}</span></div><dl class="demo-meta"><dt>工单号</dt><dd>${escape(order.orderNo || order.id)}</dd><dt>房屋/位置</dt><dd>${escape(order.locationSnapshot?.address || '—')}</dd><dt>联系人</dt><dd>${escape(order.contactSnapshot?.name || '—')} · ${escape(order.contactSnapshot?.maskedPhone || '—')}</dd><dt>提交时间</dt><dd>${escape(formatDate(order.createdAt))}</dd></dl><p class="resident-api-description">${escape(order.description)}</p><h4>处理时间线</h4><ol class="demo-timeline">${timeline || '<li>暂无可展示的处理记录</li>'}</ol>${review ? `<section class="resident-api-review"><h4>已提交评价 · ${escape(review.rating)} 星</h4><p>${escape(review.comment || '未填写文字评价')}</p></section>` : ''}</div>`, actions);
+    } catch (error) {
+      dlg = modal('工单详情', `<div class="resident-api-error" role="alert">${escape(apiErrorMessage(error))}</div>`, [{ label: '重新加载', run: reload }, { label: '返回', secondary: true, run: back }]);
+    }
+  };
+  await reload();
+}
+
+async function apiReviewPage(ctx) {
+  const orderId = ctx.qs.get('id');
+  const host = $('main > div');
+  if (!host || !orderId) return;
+  host.innerHTML = '<p class="demo-muted">正在加载评价信息…</p>';
+  try {
+    const order = await getWorkOrder(orderId);
+    if (order.status !== 'ARCHIVED' || !order.allowedActions?.includes('SUBMIT_REVIEW')) throw new Error('该工单当前不可评价');
+    host.innerHTML = `<section class="resident-api-review-page"><h2>${escape(order.title)}</h2><p class="demo-muted">${escape(order.orderNo || order.id)} · ${escape(residentStatusLabels[order.status])}</p><div class="resident-api-rating" role="group" aria-label="服务评分">${[1, 2, 3, 4, 5].map(value => `<button type="button" data-rating="${value}" aria-label="${value}星">★</button>`).join('')}</div><label class="resident-api-field"><span>服务评价（可选）</span><textarea id="resident-review-comment" maxlength="2000" rows="4" placeholder="说说这次服务的感受"></textarea></label><button type="button" class="demo-button" id="resident-review-submit">提交评价</button></section>`;
+    let rating = 0;
+    const stars = $$('[data-rating]', host);
+    const paint = () => stars.forEach(star => { star.classList.toggle('selected', Number(star.dataset.rating) <= rating); });
+    stars.forEach(star => bind(star, `${star.dataset.rating}星`, () => { rating = Number(star.dataset.rating); paint(); }));
+    bind($('#resident-review-submit', host), '提交评价', button => busy(button, async () => { if (!rating) throw new Error('请选择1-5星评分'); try { await submitReview(orderId, { rating, comment: $('#resident-review-comment', host).value.trim() || undefined }); toast('评价已提交'); go('/mobile/orders/' + orderId); } catch (error) { if (error?.status === 409) toast('该工单已经评价过了', true); throw new Error(apiErrorMessage(error)); } }));
+  } catch (error) { apiFailure(host, error, () => apiReviewPage(ctx)); }
 }
 
 function repairPage(ctx) {

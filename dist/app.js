@@ -8,170 +8,7 @@ var __export = (target, all) => {
     __defProp(target, name, { get: all[name], enumerable: true });
 };
 
-// src/api/client.js
-function apiBaseUrl() {
-  return (globalThis.__SHENGBIAN_API_BASE__ || defaultBaseUrl).replace(/\/$/, "");
-}
-function cookie(name) {
-  return document.cookie.split("; ").find((item) => item.startsWith(`${name}=`))?.slice(name.length + 1) || "";
-}
-function requestId() {
-  return globalThis.crypto?.randomUUID?.() || `web-${Date.now()}-${Math.random().toString(36).slice(2)}`;
-}
-async function apiRequest(path, options = {}) {
-  const method = options.method || "GET";
-  const headers = new Headers(options.headers || {});
-  headers.set("Accept", "application/json");
-  headers.set("X-Request-Id", requestId());
-  if (options.body !== void 0) {
-    headers.set("Content-Type", "application/json");
-    options = { ...options, body: JSON.stringify(options.body) };
-  }
-  const csrf = cookie("sb_csrf");
-  if (csrf && !["GET", "HEAD", "OPTIONS"].includes(method)) headers.set("X-CSRF-Token", decodeURIComponent(csrf));
-  const response = await fetch(`${apiBaseUrl()}${path}`, { ...options, method, headers, credentials: "include" });
-  let payload = null;
-  try {
-    payload = await response.json();
-  } catch {
-  }
-  if (!response.ok) {
-    const error = payload?.error || {};
-    if (response.status === 401) globalThis.dispatchEvent?.(new CustomEvent("shengbian:api-unauthorized"));
-    throw new ApiError(error.message || `\u8BF7\u6C42\u5931\u8D25\uFF08${response.status}\uFF09`, { status: response.status, code: error.code, details: error.details, requestId: payload?.meta?.requestId });
-  }
-  return payload?.data;
-}
-var defaultBaseUrl, ApiError;
-var init_client = __esm({
-  "src/api/client.js"() {
-    defaultBaseUrl = "http://localhost:3001/api/v1";
-    ApiError = class extends Error {
-      constructor(message, { status, code, details, requestId: requestId2 } = {}) {
-        super(message);
-        this.name = "ApiError";
-        this.status = status;
-        this.code = code;
-        this.details = details;
-        this.requestId = requestId2;
-      }
-    };
-  }
-});
-
-// src/api/auth.js
-var auth_exports = {};
-__export(auth_exports, {
-  currentUser: () => currentUser,
-  login: () => login,
-  logout: () => logout,
-  revokeSession: () => revokeSession,
-  sessions: () => sessions
-});
-var login, logout, currentUser, sessions, revokeSession;
-var init_auth = __esm({
-  "src/api/auth.js"() {
-    init_client();
-    login = (phone, password) => apiRequest("/auth/login", { method: "POST", body: { phone, password } });
-    logout = () => apiRequest("/auth/logout", { method: "POST" });
-    currentUser = () => apiRequest("/auth/me");
-    sessions = () => apiRequest("/auth/sessions");
-    revokeSession = (id2) => apiRequest(`/auth/sessions/${encodeURIComponent(id2)}`, { method: "DELETE" });
-  }
-});
-
-// src/routes.js
-var pages = [
-  { key: "overview", path: "/web/overview", file: "web/_1/code.html", name: "\u8C03\u5EA6\u6982\u89C8\u5DE5\u4F5C\u53F0", group: "web", level: 1 },
-  { key: "work-orders", path: "/web/work-orders", file: "web/_2/code.html", name: "\u5DE5\u5355\u6D3E\u53D1\u4E0E\u8C03\u5EA6", group: "web", level: 1 },
-  { key: "expenses", path: "/web/expenses", file: "web/_3/code.html", name: "\u7269\u4E1A\u652F\u51FA\u7BA1\u7406", group: "web", level: 1 },
-  { key: "finance", path: "/web/finance", file: "web/_4/code.html", name: "\u7269\u4E1A\u8D22\u52A1\u6536\u7F34\u4E2D\u5FC3", group: "web", level: 1 },
-  { key: "weekly", path: "/web/media", file: "web/_6/code.html", name: "\u5468\u62A5\u9644\u4EF6\u4E0A\u4F20", group: "web", level: 1 },
-  { key: "broadcast", path: "/web/broadcast", file: "web/_7/code.html", name: "\u7D27\u6025\u901A\u77E5\u4E0E\u5E7F\u64AD", group: "web", level: 1 },
-  { key: "checkin", path: "/worker/checkin", file: "web/_8/code.html", name: "\u73B0\u573A\u6253\u5361\u4E0E\u5B8C\u5DE5\u7ED3\u7B97", group: "worker", level: 2 },
-  { key: "tasks", path: "/worker/tasks", file: "web/_9/code.html", name: "\u5E08\u5085\u4EFB\u52A1\u63A5\u5355", group: "worker", level: 1 },
-  { key: "group", path: "/web/group", file: "web/_10/code.html", name: "\u96C6\u56E2\u8FD0\u8425\u4E2D\u67A2", group: "web", level: 1 },
-  { key: "home", path: "/mobile/home", file: "\u5C0F\u7A0B\u5E8F/_1/code.html", name: "\u5C45\u6C11\u9996\u9875", group: "mobile", level: 1, public: true },
-  { key: "login", path: "/mobile/login", file: "\u5C0F\u7A0B\u5E8F/_2/code.html", name: "\u5C45\u6C11\u767B\u5F55", group: "mobile", level: 2, public: true },
-  { key: "verify", path: "/mobile/verify", file: "\u5C0F\u7A0B\u5E8F/_3/code.html", name: "\u5B9E\u540D\u4E0E\u623F\u5C4B\u786E\u6743", group: "mobile", level: 2, public: true },
-  { key: "review", path: "/mobile/review", file: "\u5C0F\u7A0B\u5E8F/_4/code.html", name: "\u7EF4\u4FEE\u670D\u52A1\u8BC4\u4EF7", group: "mobile", level: 3 },
-  { key: "media", path: "/mobile/media", file: "\u5C0F\u7A0B\u5E8F/_5/code.html", name: "\u58F0\u8FB9\u89C6\u542C", group: "mobile", level: 1, public: true },
-  { key: "services", path: "/mobile/services", file: "\u5C0F\u7A0B\u5E8F/_6/code.html", name: "\u7269\u4E1A\u4FBF\u5229\u4E0E\u90BB\u5C45\u95EA\u94FA", group: "mobile", level: 1, public: true },
-  { key: "bills", path: "/mobile/bills", file: "\u5C0F\u7A0B\u5E8F/_7/code.html", name: "\u5408\u5E76\u7F34\u8D39\u8D26\u5355", group: "mobile", level: 2 },
-  { key: "repair", path: "/mobile/repair", file: "\u5C0F\u7A0B\u5E8F/_8/code.html", name: "\u5728\u7EBF\u62A5\u4FEE", group: "mobile", level: 2 },
-  { key: "profile", path: "/mobile/profile", file: "\u5C0F\u7A0B\u5E8F/_9/code.html", name: "\u670D\u52A1\u4E0E\u6211\u7684", group: "mobile", level: 1 },
-  { key: "billing", path: "/mobile/billing", file: "\u5C0F\u7A0B\u5E8F/_10/code.html", name: "\u5206\u9879\u6536\u8D39\u8D26\u5355", group: "mobile", level: 2 },
-  { key: "points", path: "/mobile/points", file: "\u5C0F\u7A0B\u5E8F/_11/code.html", name: "\u58F0\u8FB9\u79EF\u5206\u4E0E\u5151\u6362", group: "mobile", level: 2 }
-];
-var navRoutes = {
-  overview: "/web/overview",
-  "work-orders": "/web/work-orders",
-  "finance-center": "/web/finance",
-  "expense-management": "/web/expenses",
-  "property-expenses": "/web/expenses",
-  "property-expenditure": "/web/expenses",
-  "reserve-fund-expense": "/web/expenses?fund=maintenance",
-  "maintenance-fund-expenses": "/web/expenses?fund=maintenance",
-  "maintenance-fund": "/web/expenses?fund=maintenance",
-  "media-editor": "/web/media",
-  "weekly-media": "/web/media",
-  "broadcast-dispatcher": "/web/broadcast",
-  "property-residents": "/web/overview?panel=residents",
-  "system-settings": "/web/overview?panel=settings",
-  login: "/web/login",
-  home: "/mobile/home",
-  "media-audio": "/mobile/media",
-  "neighborhood-community": "/mobile/services",
-  "services-profile": "/mobile/profile",
-  "task-orders": "/worker/tasks",
-  "ongoing-tasks": "/worker/tasks?status=accepted",
-  "completed-records": "/worker/tasks?status=completed",
-  "profile-center": "/worker/tasks?panel=account",
-  "financial-overview": "/web/group",
-  "collection-comparison": "/web/group?section=matrix-table",
-  "expenditure-reconciliation": "/web/group?section=matrix-table&view=expenditure",
-  "capital-pool": "/web/group?section=capital",
-  "project-matrix": "/web/group?section=matrix-table",
-  "work-order-kanban": "/web/work-orders",
-  "converged-media": "/web/media",
-  "organization-permissions": "/web/group?panel=settings",
-  "group-center": "/web/group"
-};
-function matchRoute(pathname) {
-  const direct = pages.find((p) => p.path === pathname);
-  if (direct) return direct;
-  if (pathname === "/web/login" || pathname === "/worker/login") return { ...pages.find((p) => p.key === "login"), path: pathname, group: pathname.split("/")[1] };
-  if (/^\/(mobile|web|worker)\/orders\/[^/]+$/.test(pathname)) {
-    const group2 = pathname.split("/")[1];
-    return { ...pages.find((p) => p.key === (group2 === "web" ? "work-orders" : group2 === "worker" ? "tasks" : "profile")), detail: "order" };
-  }
-  if (/^\/mobile\/articles\/[^/]+$/.test(pathname)) return { ...pages.find((p) => p.key === "media"), detail: "article" };
-  if (/^\/mobile\/services\/[^/]+$/.test(pathname)) return { ...pages.find((p) => p.key === "services"), detail: "service" };
-  return null;
-}
-
 // src/data/seed.js
-var statuses = { pending: "\u5F85\u6D3E\u53D1", assigned: "\u5F85\u63A5\u5355", accepted: "\u5DF2\u63A5\u5355", arrived: "\u5DF2\u5230\u8FBE", processing: "\u5904\u7406\u4E2D", completed: "\u5F85\u7F34\u8D39 / \u5F85\u8BC4\u4EF7", closed: "\u5DF2\u5F52\u6863", cancelled: "\u5DF2\u53D6\u6D88" };
-var technicians = ["\u5F20\u5EFA\u56FD", "\u738B\u5FB7\u5229", "\u5218\u5EFA\u519B", "\u9648\u5927\u534E"];
-var organization = {
-  platform: { id: "shengbian", name: "\u58F0\u8FB9\u5E73\u53F0" },
-  companies: [
-    { id: "property-a", name: "\u7269\u4E1A\u516C\u53F8 A" },
-    { id: "property-b", name: "\u7269\u4E1A\u516C\u53F8 B" },
-    { id: "partner", name: "\u5176\u4ED6\u5408\u4F5C\u5C0F\u533A" }
-  ],
-  communities: [
-    { id: "pengyi", name: "\u5F6D\u4E00\u5C0F\u533A", companyId: "property-a" },
-    { id: "penger", name: "\u5F6D\u4E8C\u65B0\u6751", companyId: "property-a" },
-    { id: "jinxiu", name: "\u9526\u7EE3\u534E\u5EAD", companyId: "property-a" },
-    { id: "lvzhou", name: "\u7EFF\u6D32\u5BB6\u56ED", companyId: "property-b" }
-  ]
-};
-var arrivalPolicies = {
-  urgent: { minutes: 30, label: "\u52A0\u6025\u5DE5\u5355\u63A5\u5355\u540E 30 \u5206\u949F\u5185\u5230\u5C97" },
-  standard: { minutes: 120, label: "\u5E38\u89C4\u5DE5\u5355\u63A5\u5355\u540E 120 \u5206\u949F\u5185\u5230\u5C97" }
-};
-var communityById = (id2, data = organization) => data.communities.find((c) => c.id === id2);
 function isContentVisible(item, communityId) {
   const audience = item.audience || "community";
   return audience === "platform" || audience === "community" && (item.communityIds || ["pengyi"]).includes(communityId);
@@ -189,39 +26,6 @@ function arrivalStatus(order, at = Date.now()) {
   if (order.checkinAt) return actualAt <= dueAt ? { state: "on_time", text: `\u5DF2\u51C6\u65F6\u5230\u5C97\uFF08\u63D0\u524D ${deltaMinutes} \u5206\u949F\uFF09`, deltaMinutes } : { state: "overdue", text: `\u5DF2\u8D85\u65F6\u5230\u5C97 ${deltaMinutes} \u5206\u949F`, deltaMinutes };
   return at <= dueAt ? { state: "counting", text: `\u8DDD\u5230\u5C97\u65F6\u9650\u5269\u4F59 ${Math.ceil((dueAt - at) / 6e4)} \u5206\u949F`, dueAt: order.arrivalDueAt } : { state: "overdue", text: `\u5DF2\u8D85\u8FC7\u5230\u5C97\u65F6\u9650 ${deltaMinutes} \u5206\u949F`, deltaMinutes, dueAt: order.arrivalDueAt };
 }
-var products = [
-  { id: "ac-group", name: "\u5168\u5C4B\u7A7A\u8C03\u6DF1\u5EA6\u62C6\u6D17\u6740\u83CC", price: 88, category: "\u5BB6\u7535\u62C6\u6D17\u517B\u62A4" },
-  { id: "waterproof", name: "\u9633\u53F0\u7A97\u53F0\u9632\u6C34\u5FAE\u6392\u67E5", price: 0, category: "\u7A7A\u95F4\u5FAE\u6539\u7115\u65B0" },
-  { id: "vegetables", name: "\u90BB\u91CC\u7279\u4F9B\u6709\u673A\u679C\u852C\u7BB1", price: 59, category: "\u4EA7\u5730\u7504\u9009\u751F\u9C9C" },
-  { id: "dumplings", name: "\u674E\u963F\u59E8\u79C1\u623F\u6C34\u997A/\u70D8\u7119", price: 25, category: "\u90BB\u5C45\u95EA\u94FA" },
-  { id: "computer", name: "\u738B\u5DE5\u7535\u8111\u88C5\u673A\u4E0E\u6E05\u7070", price: 30, category: "\u90BB\u5C45\u95EA\u94FA" },
-  { id: "stroller", name: "\u8F7B\u4FBF\u905B\u5A03\u795E\u5668\u514D\u62BC\u79DF", price: 15, category: "\u90BB\u5C45\u95EA\u94FA" },
-  { id: "pet", name: "\u8BFE\u4F59\u4EE3\u905B\u72D7/\u4E0A\u95E8\u5582\u5BA0", price: 18, category: "\u5EB7\u517B\u4E0E\u5BA0\u7269\u6258\u517B" },
-  { id: "ac", name: "\u4E2D\u592E\u7A7A\u8C03\u9AD8\u6E29\u718F\u84B8\u6D88\u6740", price: 99, category: "\u5BB6\u7535\u62C6\u6D17\u517B\u62A4" },
-  { id: "screen", name: "304\u91D1\u521A\u7F51\u7EB1\u7A97\u5B9A\u5236\u6362\u65B0", price: 120, category: "\u7A7A\u95F4\u5FAE\u6539\u7115\u65B0" },
-  { id: "peach", name: "\u9AD8\u5C71\u871C\u6843\u793C\u76D2(8\u679A\u7279\u7EA7)", price: 68, category: "\u4EA7\u5730\u7504\u9009\u751F\u9C9C" }
-];
-var rewards = [
-  { id: "coupon50", name: "50\u5143\u7269\u4E1A\u8D39\u62B5\u7528\u5238", points: 500, cash: 0, category: "deduction", coupon: 50 },
-  { id: "cleaning", name: "\u6DF1\u5EA6\u6CB9\u70DF\u673A\u9AD8\u6E29\u6E05\u6D17", points: 1200, cash: 49, category: "convenience" },
-  { id: "tools", name: "\u4FBF\u6C11\u4E94\u91D1\u5168\u5957\u5DE5\u5177\u7BB1", points: 100, cash: 0, category: "convenience" },
-  { id: "parking30", name: "30\u5143\u4E34\u505C\u901A\u7528\u62B5\u6263\u5238", points: 300, cash: 0, category: "deduction", coupon: 30 },
-  { id: "rice", name: "\u9ED1\u571F\u9999 \u4E94\u5E38\u5927\u7C73 5kg", points: 1500, cash: 0, category: "life" },
-  { id: "oil", name: "\u9AD8\u5C71\u51B7\u538B\u91CE\u751F\u5C71\u8336\u6CB9 500ml", points: 1800, cash: 0, category: "life" },
-  { id: "toy", name: "\u58F0\u8FB9FM\u9650\u91CF\u5B9A\u5236\u76F2\u76D2", points: 800, cash: 0, category: "culture" },
-  { id: "movie", name: "\u793E\u533A\u9732\u5929\u7535\u5F71VIP\u5EA7\u7968", points: 200, cash: 0, category: "culture" }
-];
-var articles = [
-  { id: "garden", title: "\u5C0F\u533A\u7EFF\u5316\u5347\u7EA7\u6539\u9020\u73B0\u573A\u76F4\u51FB\uFF1A\u5320\u5FC3\u4FEE\u526A\u5B9E\u5F55", body: "\u73AF\u5883\u7EFF\u5316\u90E8\u5B8C\u6210\u56ED\u533A\u7EFF\u7BF1\u4FEE\u526A\u4E0E\u82B1\u5349\u8865\u683D\u3002\u65BD\u5DE5\u533A\u57DF\u5DF2\u6E05\u7406\uFF0C\u6B65\u884C\u901A\u9053\u6062\u590D\u901A\u884C\u3002\u6B22\u8FCE\u5C45\u6C11\u901A\u8FC7\u90BB\u91CC\u5708\u63D0\u51FA\u5EFA\u8BAE\u3002", kind: "article", audience: "community", communityIds: ["pengyi"] },
-  { id: "elevator", title: "\u7535\u68AF\u7EF4\u4FDD\u6DF1\u5EA6\u5B9E\u5F55\uFF1A\u5B88\u62A4\u5782\u76F4\u51FA\u884C\u7684\u6BCF\u4E00\u7A0B", body: "\u5DE5\u7A0B\u7EF4\u4FDD\u7EC4\u5B8C\u6210\u7535\u68AF\u5236\u52A8\u7CFB\u7EDF\u3001\u94A2\u4E1D\u7EF3\u548C\u5E94\u6025\u547C\u53EB\u8BBE\u5907\u4E13\u9879\u68C0\u67E5\uFF0C\u7EF4\u4FDD\u7ED3\u679C\u5DF2\u5907\u6848\u3002\u4E58\u68AF\u5F02\u5E38\u8BF7\u53CA\u65F6\u8054\u7CFB\u7269\u4E1A\u3002", kind: "video", audience: "platform", publisher: "\u58F0\u8FB9\u5E73\u53F0" },
-  { id: "festival", title: "\u672C\u5468\u516D\u9732\u5929\u7535\u5F71\u8282\u4E0E\u8DF3\u86A4\u591C\u5E02\u644A\u4F4D\u62A5\u540D\u5F00\u542F", body: "\u65F6\u95F4\uFF1A\u672C\u5468\u516D 18:30\u3002\u5730\u70B9\uFF1A\u4E2D\u592E\u8349\u576A\u3002\u6BCF\u6237\u53EF\u9884\u8BA2\u4E00\u4E2A\u644A\u4F4D\uFF0C\u53C2\u4E0E\u5BB6\u5EAD\u8BF7\u81EA\u5907\u73AF\u4FDD\u6536\u7EB3\u888B\u3002\u96E8\u5929\u5C06\u63D0\u524D\u901A\u77E5\u987A\u5EF6\u3002", kind: "activity" },
-  { id: "safety", title: "\u751F\u6D3B\u8D34\u58EB\uFF1A\u590F\u5B63\u7A7A\u8C03\u81EA\u6D01\u4E0E\u7528\u7535\u5B89\u5168\u6307\u5357", body: "\u6E05\u6D01\u7A7A\u8C03\u524D\u8BF7\u65AD\u5F00\u7535\u6E90\u3002\u8FC7\u6EE4\u7F51\u6D17\u51C0\u667E\u5E72\u540E\u518D\u5B89\u88C5\u3002\u9047\u5230\u5F02\u5473\u6216\u8DF3\u95F8\u5E94\u7ACB\u5373\u505C\u673A\uFF0C\u5E76\u8054\u7CFB\u6301\u8BC1\u5DE5\u7A0B\u5E08\u68C0\u67E5\u3002", kind: "audio", audience: "platform", publisher: "\u58F0\u8FB9\u5E73\u53F0" },
-  { id: "storm", title: "\u53F0\u98CE\u5929\u91CC\u768424\u5C0F\u65F6\uFF1A\u7269\u4E1A\u9632\u6C5B\u9006\u884C\u65E5\u8BB0\uFF0C\u6BCF\u4E00\u4EFD\u5B89\u5FC3\u90FD\u6709\u4EBA\u5F7B\u591C\u672A\u7720", body: "\u66B4\u96E8\u503E\u76C6\u7684\u51CC\u6668\u4E24\u70B9\uFF0C\u5730\u4E0B\u8F66\u5E93\u6392\u6C34\u6CF5\u623F\u8B66\u62A5\u54CD\u8D77\u3002\u5DE5\u7A0B\u4E3B\u7BA1\u5E26\u9886\u73ED\u7EC4\u8FDE\u7EED\u594B\u6218\uFF0C\u6E05\u7406\u6392\u6C34\u53E3\u3001\u68C0\u67E5\u5E94\u6025\u7535\u6E90\u3001\u94FA\u8BBE\u6321\u6C34\u677F\u3002\u7BA1\u5BB6\u968F\u540E\u8D70\u8BBF\u4F4E\u5C42\u4F4F\u6237\uFF0C\u786E\u8BA4\u65E0\u6F0F\u6C34\u9690\u60A3\u3002", kind: "article" },
-  { id: "plants", title: "\u6625\u5B63\u7EFF\u5316\u7FFB\u65B0\u8BA1\u5212\u516C\u5E03\uFF1A\u6211\u4EEC\u4E3A\u5C0F\u533A\u6DFB\u7F6E\u4E86800\u682A\u5F00\u82B1\u704C\u6728", body: "\u6625\u5B63\u66F4\u65B0\u4EE5\u672C\u5730\u8010\u9634\u690D\u7269\u4E3A\u4E3B\uFF0C\u5206\u533A\u9519\u5CF0\u65BD\u5DE5\uFF0C\u4FDD\u7559\u5C45\u6C11\u6D3B\u52A8\u7A7A\u95F4\u3002\u704C\u6728\u517B\u62A4\u671F\u8BF7\u52FF\u8E29\u8E0F\u7EFF\u5730\u3002", kind: "article" },
-  { id: "tank", title: "3\u5206\u949F\u770B\u61C2\u4E8C\u6B21\u4F9B\u6C34\u6C34\u7BB1\u6DF1\u5EA6\u6E05\u6D17\u6D88\u6BD2\u5168\u8FC7\u7A0B", body: "\u4F5C\u4E1A\u5305\u542B\u6392\u7A7A\u3001\u6E05\u6D01\u3001\u6D88\u6BD2\u3001\u590D\u68C0\u56DB\u4E2A\u73AF\u8282\u3002\u6C34\u8D28\u68C0\u6D4B\u5408\u683C\u540E\u6062\u590D\u4F9B\u6C34\u3002\u539F\u8BBE\u8BA1\u672A\u9644\u89C6\u9891\u539F\u7247\uFF0C\u6B64\u5904\u4FDD\u7559\u56FE\u6587\u7EAA\u5B9E\u4E0E\u4E0A\u4F20\u89C6\u9891\u64AD\u653E\u5165\u53E3\u3002", kind: "video" },
-  { id: "security", title: "\u4FDD\u5B89\u5C0F\u54E5\u7684\u6668\u95F4\u786C\u6838\u9632\u66B4\u6F14\u7EC3\uFF0C\u5B89\u5168\u611F\u76F4\u63A5\u62C9\u6EE1\uFF01", body: "\u79E9\u5E8F\u7EF4\u62A4\u961F\u5B8C\u6210\u6668\u95F4\u5E94\u6025\u6F14\u7EC3\uFF0C\u68C0\u67E5\u9632\u62A4\u88C5\u5907\u3001\u8054\u7EDC\u6D41\u7A0B\u4E0E\u758F\u6563\u8DEF\u7EBF\u3002\u539F\u8BBE\u8BA1\u672A\u9644\u89C6\u9891\u539F\u7247\u3002", kind: "video" },
-  { id: "radio", title: "\u697C\u680B\u7BA1\u5BB6\u8001\u5F20\u7684\u5341\u5E74\u8BB0\u5FC6", body: "\u8FD9\u91CC\u662F\u58F0\u8FB9\u793E\u533A\u7535\u53F0\u3002\u5927\u5BB6\u597D\uFF0C\u6211\u662F\u60A8\u7684\u793E\u533A\u7BA1\u5BB6\u3002\u5341\u5E74\u6765\uFF0C\u4ECE\u4E00\u6B21\u6C34\u7BA1\u7EF4\u4FEE\u5230\u4E00\u573A\u90BB\u91CC\u6D3B\u52A8\uFF0C\u6211\u4EEC\u59CB\u7EC8\u8BA4\u771F\u5BF9\u5F85\u6BCF\u4E00\u4EF6\u5C0F\u4E8B\u3002\u4ECA\u65E5\u63D0\u9192\uFF1A\u5916\u51FA\u8BF7\u68C0\u67E5\u95E8\u7A97\u548C\u7535\u6E90\uFF0C\u9047\u5230\u7269\u4E1A\u95EE\u9898\u53EF\u4EE5\u5728\u7EBF\u63D0\u4EA4\u62A5\u4FEE\u3002\u611F\u8C22\u6BCF\u4E00\u4F4D\u90BB\u5C45\u7684\u7406\u89E3\u4E0E\u652F\u6301\u3002", kind: "audio" }
-];
 function initialState() {
   const now2 = (/* @__PURE__ */ new Date()).toISOString();
   const orders2 = [
@@ -295,14 +99,67 @@ function initialState() {
     balances: { group: 189203405e-1, jinxiu: 1840200, pengyi: 92e4, penger: 1e4, lvzhou: 2e4 }
   };
 }
+var statuses, technicians, organization, arrivalPolicies, communityById, products, rewards, articles;
+var init_seed = __esm({
+  "src/data/seed.js"() {
+    statuses = { pending: "\u5F85\u6D3E\u53D1", assigned: "\u5F85\u63A5\u5355", accepted: "\u5DF2\u63A5\u5355", arrived: "\u5DF2\u5230\u8FBE", processing: "\u5904\u7406\u4E2D", completed: "\u5F85\u7F34\u8D39 / \u5F85\u8BC4\u4EF7", closed: "\u5DF2\u5F52\u6863", cancelled: "\u5DF2\u53D6\u6D88" };
+    technicians = ["\u5F20\u5EFA\u56FD", "\u738B\u5FB7\u5229", "\u5218\u5EFA\u519B", "\u9648\u5927\u534E"];
+    organization = {
+      platform: { id: "shengbian", name: "\u58F0\u8FB9\u5E73\u53F0" },
+      companies: [
+        { id: "property-a", name: "\u7269\u4E1A\u516C\u53F8 A" },
+        { id: "property-b", name: "\u7269\u4E1A\u516C\u53F8 B" },
+        { id: "partner", name: "\u5176\u4ED6\u5408\u4F5C\u5C0F\u533A" }
+      ],
+      communities: [
+        { id: "pengyi", name: "\u5F6D\u4E00\u5C0F\u533A", companyId: "property-a" },
+        { id: "penger", name: "\u5F6D\u4E8C\u65B0\u6751", companyId: "property-a" },
+        { id: "jinxiu", name: "\u9526\u7EE3\u534E\u5EAD", companyId: "property-a" },
+        { id: "lvzhou", name: "\u7EFF\u6D32\u5BB6\u56ED", companyId: "property-b" }
+      ]
+    };
+    arrivalPolicies = {
+      urgent: { minutes: 30, label: "\u52A0\u6025\u5DE5\u5355\u63A5\u5355\u540E 30 \u5206\u949F\u5185\u5230\u5C97" },
+      standard: { minutes: 120, label: "\u5E38\u89C4\u5DE5\u5355\u63A5\u5355\u540E 120 \u5206\u949F\u5185\u5230\u5C97" }
+    };
+    communityById = (id2, data = organization) => data.communities.find((c) => c.id === id2);
+    products = [
+      { id: "ac-group", name: "\u5168\u5C4B\u7A7A\u8C03\u6DF1\u5EA6\u62C6\u6D17\u6740\u83CC", price: 88, category: "\u5BB6\u7535\u62C6\u6D17\u517B\u62A4" },
+      { id: "waterproof", name: "\u9633\u53F0\u7A97\u53F0\u9632\u6C34\u5FAE\u6392\u67E5", price: 0, category: "\u7A7A\u95F4\u5FAE\u6539\u7115\u65B0" },
+      { id: "vegetables", name: "\u90BB\u91CC\u7279\u4F9B\u6709\u673A\u679C\u852C\u7BB1", price: 59, category: "\u4EA7\u5730\u7504\u9009\u751F\u9C9C" },
+      { id: "dumplings", name: "\u674E\u963F\u59E8\u79C1\u623F\u6C34\u997A/\u70D8\u7119", price: 25, category: "\u90BB\u5C45\u95EA\u94FA" },
+      { id: "computer", name: "\u738B\u5DE5\u7535\u8111\u88C5\u673A\u4E0E\u6E05\u7070", price: 30, category: "\u90BB\u5C45\u95EA\u94FA" },
+      { id: "stroller", name: "\u8F7B\u4FBF\u905B\u5A03\u795E\u5668\u514D\u62BC\u79DF", price: 15, category: "\u90BB\u5C45\u95EA\u94FA" },
+      { id: "pet", name: "\u8BFE\u4F59\u4EE3\u905B\u72D7/\u4E0A\u95E8\u5582\u5BA0", price: 18, category: "\u5EB7\u517B\u4E0E\u5BA0\u7269\u6258\u517B" },
+      { id: "ac", name: "\u4E2D\u592E\u7A7A\u8C03\u9AD8\u6E29\u718F\u84B8\u6D88\u6740", price: 99, category: "\u5BB6\u7535\u62C6\u6D17\u517B\u62A4" },
+      { id: "screen", name: "304\u91D1\u521A\u7F51\u7EB1\u7A97\u5B9A\u5236\u6362\u65B0", price: 120, category: "\u7A7A\u95F4\u5FAE\u6539\u7115\u65B0" },
+      { id: "peach", name: "\u9AD8\u5C71\u871C\u6843\u793C\u76D2(8\u679A\u7279\u7EA7)", price: 68, category: "\u4EA7\u5730\u7504\u9009\u751F\u9C9C" }
+    ];
+    rewards = [
+      { id: "coupon50", name: "50\u5143\u7269\u4E1A\u8D39\u62B5\u7528\u5238", points: 500, cash: 0, category: "deduction", coupon: 50 },
+      { id: "cleaning", name: "\u6DF1\u5EA6\u6CB9\u70DF\u673A\u9AD8\u6E29\u6E05\u6D17", points: 1200, cash: 49, category: "convenience" },
+      { id: "tools", name: "\u4FBF\u6C11\u4E94\u91D1\u5168\u5957\u5DE5\u5177\u7BB1", points: 100, cash: 0, category: "convenience" },
+      { id: "parking30", name: "30\u5143\u4E34\u505C\u901A\u7528\u62B5\u6263\u5238", points: 300, cash: 0, category: "deduction", coupon: 30 },
+      { id: "rice", name: "\u9ED1\u571F\u9999 \u4E94\u5E38\u5927\u7C73 5kg", points: 1500, cash: 0, category: "life" },
+      { id: "oil", name: "\u9AD8\u5C71\u51B7\u538B\u91CE\u751F\u5C71\u8336\u6CB9 500ml", points: 1800, cash: 0, category: "life" },
+      { id: "toy", name: "\u58F0\u8FB9FM\u9650\u91CF\u5B9A\u5236\u76F2\u76D2", points: 800, cash: 0, category: "culture" },
+      { id: "movie", name: "\u793E\u533A\u9732\u5929\u7535\u5F71VIP\u5EA7\u7968", points: 200, cash: 0, category: "culture" }
+    ];
+    articles = [
+      { id: "garden", title: "\u5C0F\u533A\u7EFF\u5316\u5347\u7EA7\u6539\u9020\u73B0\u573A\u76F4\u51FB\uFF1A\u5320\u5FC3\u4FEE\u526A\u5B9E\u5F55", body: "\u73AF\u5883\u7EFF\u5316\u90E8\u5B8C\u6210\u56ED\u533A\u7EFF\u7BF1\u4FEE\u526A\u4E0E\u82B1\u5349\u8865\u683D\u3002\u65BD\u5DE5\u533A\u57DF\u5DF2\u6E05\u7406\uFF0C\u6B65\u884C\u901A\u9053\u6062\u590D\u901A\u884C\u3002\u6B22\u8FCE\u5C45\u6C11\u901A\u8FC7\u90BB\u91CC\u5708\u63D0\u51FA\u5EFA\u8BAE\u3002", kind: "article", audience: "community", communityIds: ["pengyi"] },
+      { id: "elevator", title: "\u7535\u68AF\u7EF4\u4FDD\u6DF1\u5EA6\u5B9E\u5F55\uFF1A\u5B88\u62A4\u5782\u76F4\u51FA\u884C\u7684\u6BCF\u4E00\u7A0B", body: "\u5DE5\u7A0B\u7EF4\u4FDD\u7EC4\u5B8C\u6210\u7535\u68AF\u5236\u52A8\u7CFB\u7EDF\u3001\u94A2\u4E1D\u7EF3\u548C\u5E94\u6025\u547C\u53EB\u8BBE\u5907\u4E13\u9879\u68C0\u67E5\uFF0C\u7EF4\u4FDD\u7ED3\u679C\u5DF2\u5907\u6848\u3002\u4E58\u68AF\u5F02\u5E38\u8BF7\u53CA\u65F6\u8054\u7CFB\u7269\u4E1A\u3002", kind: "video", audience: "platform", publisher: "\u58F0\u8FB9\u5E73\u53F0" },
+      { id: "festival", title: "\u672C\u5468\u516D\u9732\u5929\u7535\u5F71\u8282\u4E0E\u8DF3\u86A4\u591C\u5E02\u644A\u4F4D\u62A5\u540D\u5F00\u542F", body: "\u65F6\u95F4\uFF1A\u672C\u5468\u516D 18:30\u3002\u5730\u70B9\uFF1A\u4E2D\u592E\u8349\u576A\u3002\u6BCF\u6237\u53EF\u9884\u8BA2\u4E00\u4E2A\u644A\u4F4D\uFF0C\u53C2\u4E0E\u5BB6\u5EAD\u8BF7\u81EA\u5907\u73AF\u4FDD\u6536\u7EB3\u888B\u3002\u96E8\u5929\u5C06\u63D0\u524D\u901A\u77E5\u987A\u5EF6\u3002", kind: "activity" },
+      { id: "safety", title: "\u751F\u6D3B\u8D34\u58EB\uFF1A\u590F\u5B63\u7A7A\u8C03\u81EA\u6D01\u4E0E\u7528\u7535\u5B89\u5168\u6307\u5357", body: "\u6E05\u6D01\u7A7A\u8C03\u524D\u8BF7\u65AD\u5F00\u7535\u6E90\u3002\u8FC7\u6EE4\u7F51\u6D17\u51C0\u667E\u5E72\u540E\u518D\u5B89\u88C5\u3002\u9047\u5230\u5F02\u5473\u6216\u8DF3\u95F8\u5E94\u7ACB\u5373\u505C\u673A\uFF0C\u5E76\u8054\u7CFB\u6301\u8BC1\u5DE5\u7A0B\u5E08\u68C0\u67E5\u3002", kind: "audio", audience: "platform", publisher: "\u58F0\u8FB9\u5E73\u53F0" },
+      { id: "storm", title: "\u53F0\u98CE\u5929\u91CC\u768424\u5C0F\u65F6\uFF1A\u7269\u4E1A\u9632\u6C5B\u9006\u884C\u65E5\u8BB0\uFF0C\u6BCF\u4E00\u4EFD\u5B89\u5FC3\u90FD\u6709\u4EBA\u5F7B\u591C\u672A\u7720", body: "\u66B4\u96E8\u503E\u76C6\u7684\u51CC\u6668\u4E24\u70B9\uFF0C\u5730\u4E0B\u8F66\u5E93\u6392\u6C34\u6CF5\u623F\u8B66\u62A5\u54CD\u8D77\u3002\u5DE5\u7A0B\u4E3B\u7BA1\u5E26\u9886\u73ED\u7EC4\u8FDE\u7EED\u594B\u6218\uFF0C\u6E05\u7406\u6392\u6C34\u53E3\u3001\u68C0\u67E5\u5E94\u6025\u7535\u6E90\u3001\u94FA\u8BBE\u6321\u6C34\u677F\u3002\u7BA1\u5BB6\u968F\u540E\u8D70\u8BBF\u4F4E\u5C42\u4F4F\u6237\uFF0C\u786E\u8BA4\u65E0\u6F0F\u6C34\u9690\u60A3\u3002", kind: "article" },
+      { id: "plants", title: "\u6625\u5B63\u7EFF\u5316\u7FFB\u65B0\u8BA1\u5212\u516C\u5E03\uFF1A\u6211\u4EEC\u4E3A\u5C0F\u533A\u6DFB\u7F6E\u4E86800\u682A\u5F00\u82B1\u704C\u6728", body: "\u6625\u5B63\u66F4\u65B0\u4EE5\u672C\u5730\u8010\u9634\u690D\u7269\u4E3A\u4E3B\uFF0C\u5206\u533A\u9519\u5CF0\u65BD\u5DE5\uFF0C\u4FDD\u7559\u5C45\u6C11\u6D3B\u52A8\u7A7A\u95F4\u3002\u704C\u6728\u517B\u62A4\u671F\u8BF7\u52FF\u8E29\u8E0F\u7EFF\u5730\u3002", kind: "article" },
+      { id: "tank", title: "3\u5206\u949F\u770B\u61C2\u4E8C\u6B21\u4F9B\u6C34\u6C34\u7BB1\u6DF1\u5EA6\u6E05\u6D17\u6D88\u6BD2\u5168\u8FC7\u7A0B", body: "\u4F5C\u4E1A\u5305\u542B\u6392\u7A7A\u3001\u6E05\u6D01\u3001\u6D88\u6BD2\u3001\u590D\u68C0\u56DB\u4E2A\u73AF\u8282\u3002\u6C34\u8D28\u68C0\u6D4B\u5408\u683C\u540E\u6062\u590D\u4F9B\u6C34\u3002\u539F\u8BBE\u8BA1\u672A\u9644\u89C6\u9891\u539F\u7247\uFF0C\u6B64\u5904\u4FDD\u7559\u56FE\u6587\u7EAA\u5B9E\u4E0E\u4E0A\u4F20\u89C6\u9891\u64AD\u653E\u5165\u53E3\u3002", kind: "video" },
+      { id: "security", title: "\u4FDD\u5B89\u5C0F\u54E5\u7684\u6668\u95F4\u786C\u6838\u9632\u66B4\u6F14\u7EC3\uFF0C\u5B89\u5168\u611F\u76F4\u63A5\u62C9\u6EE1\uFF01", body: "\u79E9\u5E8F\u7EF4\u62A4\u961F\u5B8C\u6210\u6668\u95F4\u5E94\u6025\u6F14\u7EC3\uFF0C\u68C0\u67E5\u9632\u62A4\u88C5\u5907\u3001\u8054\u7EDC\u6D41\u7A0B\u4E0E\u758F\u6563\u8DEF\u7EBF\u3002\u539F\u8BBE\u8BA1\u672A\u9644\u89C6\u9891\u539F\u7247\u3002", kind: "video" },
+      { id: "radio", title: "\u697C\u680B\u7BA1\u5BB6\u8001\u5F20\u7684\u5341\u5E74\u8BB0\u5FC6", body: "\u8FD9\u91CC\u662F\u58F0\u8FB9\u793E\u533A\u7535\u53F0\u3002\u5927\u5BB6\u597D\uFF0C\u6211\u662F\u60A8\u7684\u793E\u533A\u7BA1\u5BB6\u3002\u5341\u5E74\u6765\uFF0C\u4ECE\u4E00\u6B21\u6C34\u7BA1\u7EF4\u4FEE\u5230\u4E00\u573A\u90BB\u91CC\u6D3B\u52A8\uFF0C\u6211\u4EEC\u59CB\u7EC8\u8BA4\u771F\u5BF9\u5F85\u6BCF\u4E00\u4EF6\u5C0F\u4E8B\u3002\u4ECA\u65E5\u63D0\u9192\uFF1A\u5916\u51FA\u8BF7\u68C0\u67E5\u95E8\u7A97\u548C\u7535\u6E90\uFF0C\u9047\u5230\u7269\u4E1A\u95EE\u9898\u53EF\u4EE5\u5728\u7EBF\u63D0\u4EA4\u62A5\u4FEE\u3002\u611F\u8C22\u6BCF\u4E00\u4F4D\u90BB\u5C45\u7684\u7406\u89E3\u4E0E\u652F\u6301\u3002", kind: "audio" }
+    ];
+  }
+});
 
 // src/services/store.js
-var STORAGE_KEY = "shengbian-demo-v1";
-var id = (prefix) => `${prefix}-${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 7)}`;
-var now = () => (/* @__PURE__ */ new Date()).toISOString();
-var money = (value) => Number(value || 0).toLocaleString("zh-CN", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
-var isPhone = (value) => /^1[3-9]\d{9}$/.test(value);
-var isAmount = (value) => /^\d+(\.\d{1,2})?$/.test(String(value)) && Number(value) > 0 && Number(value) <= 1e8;
 function createStore(storage, notify2 = () => {
 }) {
   function migrate(state2) {
@@ -580,6 +437,1208 @@ function createStore(storage, notify2 = () => {
     }
   };
 }
+var STORAGE_KEY, id, now, money, isPhone, isAmount;
+var init_store = __esm({
+  "src/services/store.js"() {
+    init_seed();
+    STORAGE_KEY = "shengbian-demo-v1";
+    id = (prefix) => `${prefix}-${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 7)}`;
+    now = () => (/* @__PURE__ */ new Date()).toISOString();
+    money = (value) => Number(value || 0).toLocaleString("zh-CN", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+    isPhone = (value) => /^1[3-9]\d{9}$/.test(value);
+    isAmount = (value) => /^\d+(\.\d{1,2})?$/.test(String(value)) && Number(value) > 0 && Number(value) <= 1e8;
+  }
+});
+
+// src/ui.js
+function bind(element, action, fn) {
+  if (!element) return;
+  element.dataset.action = action;
+  if (!["A", "BUTTON", "INPUT", "SELECT", "TEXTAREA", "LABEL"].includes(element.tagName)) {
+    element.tabIndex = 0;
+    element.setAttribute("role", "button");
+    element.addEventListener("keydown", (e) => {
+      if (e.key === "Enter" || e.key === " ") {
+        e.preventDefault();
+        element.click();
+      }
+    });
+  }
+  if (element.tagName === "BUTTON" && element.type !== "submit") element.type = "button";
+  if (!label(element) && !element.getAttribute("aria-label")) {
+    element.setAttribute("aria-label", element.title || action);
+    element.title ||= action;
+  }
+  element.addEventListener("click", async (e) => {
+    if (e.target.closest("[data-action]") !== element || element.disabled) return;
+    if (element.tagName === "A") e.preventDefault();
+    try {
+      await fn(e);
+    } catch (error) {
+      toast(error.message || "\u64CD\u4F5C\u5931\u8D25\uFF0C\u8BF7\u91CD\u8BD5", true);
+    }
+  });
+}
+function toast(text, error = false) {
+  let box = $("#demo-toast");
+  if (!box) {
+    box = document.createElement("div");
+    box.id = "demo-toast";
+    box.className = "demo-toast";
+    box.setAttribute("role", "status");
+    document.body.append(box);
+  }
+  const dialog = $("#demo-dialog");
+  if (dialog?.open && box.parentElement !== dialog) dialog.append(box);
+  else if (!dialog && box.parentElement !== document.body) document.body.append(box);
+  box.textContent = text;
+  box.dataset.error = String(error);
+  box.hidden = false;
+  clearTimeout(toast.timer);
+  toast.timer = setTimeout(() => {
+    box.hidden = true;
+  }, 4e3);
+}
+async function busy(button, fn) {
+  if (button?.disabled) return;
+  const html = button?.innerHTML;
+  if (button) {
+    button.disabled = true;
+    button.setAttribute("aria-busy", "true");
+    button.innerHTML = icon("progress_activity") + "\u5904\u7406\u4E2D...";
+  }
+  try {
+    await new Promise((r) => setTimeout(r, 240));
+    if (!navigator.onLine) throw new Error("\u7F51\u7EDC\u5DF2\u65AD\u5F00\uFF0C\u8BF7\u68C0\u67E5\u8FDE\u63A5\u540E\u91CD\u8BD5\uFF0C\u6570\u636E\u5C1A\u672A\u63D0\u4EA4");
+    return await fn();
+  } finally {
+    if (button?.isConnected) {
+      button.disabled = false;
+      button.removeAttribute("aria-busy");
+      button.innerHTML = html;
+    }
+  }
+}
+function closeModal() {
+  const dlg = $("#demo-dialog");
+  if (dlg) {
+    const message = $("#demo-toast", dlg);
+    if (message) document.body.append(message);
+    dlg.close();
+    dlg.remove();
+    lastFocus?.focus?.();
+  }
+}
+function modal(title, content, actions = []) {
+  closeModal();
+  lastFocus = document.activeElement;
+  const dlg = document.createElement("dialog");
+  dlg.id = "demo-dialog";
+  dlg.className = "demo-dialog";
+  dlg.setAttribute("aria-labelledby", "dialog-title");
+  dlg.innerHTML = `<header><h2 id="dialog-title">${escape(title)}</h2><button type="button" class="demo-icon" aria-label="\u5173\u95ED">${icon("close")}</button></header><div class="demo-dialog-body">${content}</div><footer></footer>`;
+  document.body.append(dlg);
+  bind($("header button", dlg), "\u5173\u95ED\u5F39\u7A97", closeModal);
+  for (const action of actions) {
+    const btn = document.createElement("button");
+    btn.type = "button";
+    btn.className = "demo-button" + (action.secondary ? " secondary" : "");
+    btn.textContent = action.label;
+    btn.disabled = !!action.disabled;
+    $("footer", dlg).append(btn);
+    bind(btn, action.label, () => action.run(btn));
+  }
+  dlg.addEventListener("click", (e) => {
+    if (e.target === dlg && (e.offsetX < 0 || e.offsetX > dlg.offsetWidth || e.offsetY < 0 || e.offsetY > dlg.offsetHeight)) closeModal();
+  });
+  dlg.addEventListener("cancel", (e) => {
+    e.preventDefault();
+    closeModal();
+  });
+  dlg.showModal();
+  return dlg;
+}
+function confirm(title, body, onConfirm, options = {}) {
+  return modal(title, `<p>${escape(body)}</p>`, [
+    { label: "\u53D6\u6D88", secondary: true, run: closeModal },
+    { label: options.label || "\u786E\u8BA4", run: (btn) => busy(btn, async () => {
+      const result = await onConfirm();
+      closeModal();
+      options.after?.(result);
+    }) }
+  ]);
+}
+function field(name, title, value = "", options = {}) {
+  const attrs = `name="${escape(name)}" aria-label="${escape(title)}" ${options.required === false ? "" : "required"} ${options.min != null ? `min="${escape(options.min)}"` : ""} ${options.max != null ? `max="${escape(options.max)}"` : ""}`;
+  let input;
+  if (options.choices) input = `<select ${attrs}>${options.choices.map((c) => {
+    const [val, text] = Array.isArray(c) ? c : [c, c];
+    return `<option value="${escape(val)}" ${String(value) === String(val) ? "selected" : ""}>${escape(text)}</option>`;
+  }).join("")}</select>`;
+  else if (options.type === "textarea") input = `<textarea ${attrs} maxlength="${options.maxLength || 1e3}" rows="4">${escape(value)}</textarea>`;
+  else input = `<input ${attrs} type="${options.type || "text"}" value="${escape(value)}" ${options.step ? `step="${options.step}"` : ""} ${options.pattern ? `pattern="${escape(options.pattern)}"` : ""} autocomplete="off">`;
+  return `<label class="demo-field"><span>${escape(title)}</span>${input}</label>`;
+}
+function formModal(title, fields, onSubmit, buttonText = "\u786E\u8BA4\u63D0\u4EA4") {
+  let dlg;
+  const submit = (btn) => {
+    const form = $("form", dlg);
+    if (!form.reportValidity()) return;
+    return busy(btn, async () => {
+      const values = Object.fromEntries(new FormData(form));
+      const result = await onSubmit(values);
+      if (dlg.isConnected && result !== false) closeModal();
+    }).catch((error) => {
+      if (dlg.isConnected) $(".demo-form-error", dlg).textContent = error.message;
+      toast(error.message, true);
+    });
+  };
+  dlg = modal(title, `<form class="demo-form">${fields}<p class="demo-form-error" role="alert"></p><button type="submit" hidden></button></form>`, [
+    { label: "\u53D6\u6D88", secondary: true, run: closeModal },
+    { label: buttonText, run: submit }
+  ]);
+  $("form", dlg).addEventListener("submit", (e) => {
+    e.preventDefault();
+    submit($("footer button:last-child", dlg)).catch((error) => {
+      $(".demo-form-error", dlg).textContent = error.message;
+    });
+  });
+  return dlg;
+}
+function active(elements, selected) {
+  for (const el of elements) {
+    el.setAttribute("aria-pressed", String(el === selected));
+    el.classList.toggle("demo-selected", el === selected);
+    if (el !== selected) el.classList.remove("bg-primary", "text-on-primary", "bg-primary-container", "text-on-primary-container", "bg-surface-container-lowest", "shadow-sm");
+  }
+}
+function download(filename, data, type = "text/plain;charset=utf-8") {
+  const url = URL.createObjectURL(new Blob([data], { type }));
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = filename;
+  a.click();
+  setTimeout(() => URL.revokeObjectURL(url), 1e3);
+}
+function csv(filename, rows) {
+  download(filename, "\uFEFF" + rows.map((row) => row.map((v) => `"${String(v ?? "").replace(/^[=+@-]/, "'$&").replaceAll('"', '""')}"`).join(",")).join("\r\n"), "text/csv;charset=utf-8");
+}
+function empty(text = "\u6682\u65E0\u8BB0\u5F55") {
+  return `<p class="demo-empty">${icon("inbox")}${escape(text)}</p>`;
+}
+function list(items, render) {
+  return items.length ? `<div class="demo-list">${items.map(render).join("")}</div>` : empty();
+}
+var $, $$, escape, label, icon, lastFocus;
+var init_ui = __esm({
+  "src/ui.js"() {
+    $ = (selector, root = document) => root.querySelector(selector);
+    $$ = (selector, root = document) => [...root.querySelectorAll(selector)];
+    escape = (value) => String(value ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c]);
+    label = (element) => {
+      const clone = element.cloneNode(true);
+      clone.querySelectorAll(".material-symbols-outlined,.nav-badge").forEach((e) => e.remove());
+      return clone.textContent.replace(/\s+/g, " ").trim();
+    };
+    icon = (name) => `<span class="material-symbols-outlined" aria-hidden="true">${name}</span>`;
+  }
+});
+
+// src/services/audio.js
+function createRadio(onUpdate = () => {
+}) {
+  const audio = new Audio("/assets/community-radio.wav");
+  audio.preload = "metadata";
+  for (const event of ["timeupdate", "loadedmetadata", "play", "pause", "ended", "ratechange"]) audio.addEventListener(event, () => onUpdate(audio));
+  audio.addEventListener("error", () => onUpdate(audio, new Error("\u97F3\u9891\u52A0\u8F7D\u5931\u8D25\uFF0C\u8BF7\u5237\u65B0\u540E\u91CD\u8BD5")));
+  const toggle = async () => {
+    if (audio.paused) {
+      if (audio.ended) audio.currentTime = 0;
+      await audio.play();
+    } else audio.pause();
+  };
+  const seek = (value) => {
+    if (Number.isFinite(audio.duration)) audio.currentTime = Math.max(0, Math.min(audio.duration, value));
+  };
+  window.addEventListener("pagehide", () => audio.pause());
+  return { audio, toggle, seek };
+}
+var init_audio = __esm({
+  "src/services/audio.js"() {
+  }
+});
+
+// src/api/client.js
+function apiBaseUrl() {
+  return (globalThis.__SHENGBIAN_API_BASE__ || defaultBaseUrl).replace(/\/$/, "");
+}
+function cookie(name) {
+  return document.cookie.split("; ").find((item) => item.startsWith(`${name}=`))?.slice(name.length + 1) || "";
+}
+function requestId() {
+  return globalThis.crypto?.randomUUID?.() || `web-${Date.now()}-${Math.random().toString(36).slice(2)}`;
+}
+async function apiRequest(path, options = {}) {
+  const method = options.method || "GET";
+  const headers = new Headers(options.headers || {});
+  headers.set("Accept", "application/json");
+  headers.set("X-Request-Id", requestId());
+  if (options.body !== void 0) {
+    headers.set("Content-Type", "application/json");
+    options = { ...options, body: JSON.stringify(options.body) };
+  }
+  const csrf = cookie("sb_csrf");
+  if (csrf && !["GET", "HEAD", "OPTIONS"].includes(method)) headers.set("X-CSRF-Token", decodeURIComponent(csrf));
+  const response = await fetch(`${apiBaseUrl()}${path}`, { ...options, method, headers, credentials: "include" });
+  let payload = null;
+  try {
+    payload = await response.json();
+  } catch {
+  }
+  if (!response.ok) {
+    const error = payload?.error || {};
+    if (response.status === 401) globalThis.dispatchEvent?.(new CustomEvent("shengbian:api-unauthorized"));
+    throw new ApiError(error.message || `\u8BF7\u6C42\u5931\u8D25\uFF08${response.status}\uFF09`, { status: response.status, code: error.code, details: error.details, requestId: payload?.meta?.requestId });
+  }
+  return payload?.data;
+}
+var defaultBaseUrl, ApiError;
+var init_client = __esm({
+  "src/api/client.js"() {
+    defaultBaseUrl = "http://localhost:3001/api/v1";
+    ApiError = class extends Error {
+      constructor(message, { status, code, details, requestId: requestId2 } = {}) {
+        super(message);
+        this.name = "ApiError";
+        this.status = status;
+        this.code = code;
+        this.details = details;
+        this.requestId = requestId2;
+      }
+    };
+  }
+});
+
+// src/api/auth.js
+var auth_exports = {};
+__export(auth_exports, {
+  currentUser: () => currentUser,
+  login: () => login,
+  logout: () => logout,
+  revokeSession: () => revokeSession,
+  sessions: () => sessions
+});
+var login, logout, currentUser, sessions, revokeSession;
+var init_auth = __esm({
+  "src/api/auth.js"() {
+    init_client();
+    login = (phone, password) => apiRequest("/auth/login", { method: "POST", body: { phone, password } });
+    logout = () => apiRequest("/auth/logout", { method: "POST" });
+    currentUser = () => apiRequest("/auth/me");
+    sessions = () => apiRequest("/auth/sessions");
+    revokeSession = (id2) => apiRequest(`/auth/sessions/${encodeURIComponent(id2)}`, { method: "DELETE" });
+  }
+});
+
+// src/api/work-orders.js
+function apiErrorMessage(error) {
+  if (!(error instanceof ApiError)) return error?.message || "\u7F51\u7EDC\u5F02\u5E38\uFF0C\u8BF7\u7A0D\u540E\u91CD\u8BD5";
+  if (error.status === 401) return "\u767B\u5F55\u5DF2\u5931\u6548\uFF0C\u8BF7\u91CD\u65B0\u767B\u5F55";
+  if (error.status === 403) return "\u60A8\u5F53\u524D\u65E0\u6743\u64CD\u4F5C\u8BE5\u5DE5\u5355";
+  if (error.status === 404) return "\u8BE5\u5DE5\u5355\u4E0D\u5B58\u5728\u6216\u60A8\u65E0\u6743\u67E5\u770B";
+  if (error.status === 409) return "\u5DE5\u5355\u72B6\u6001\u5DF2\u53D1\u751F\u53D8\u5316\uFF0C\u8BF7\u5237\u65B0\u540E\u91CD\u8BD5";
+  if (error.status === 422) return error.message || "\u8BF7\u68C0\u67E5\u586B\u5199\u5185\u5BB9";
+  if (error.status >= 500) return "\u670D\u52A1\u6682\u65F6\u4E0D\u53EF\u7528\uFF0C\u8BF7\u7A0D\u540E\u91CD\u8BD5";
+  return error.message || "\u64CD\u4F5C\u5931\u8D25\uFF0C\u8BF7\u91CD\u8BD5";
+}
+var residentStatusLabels, listWorkOrders, getWorkOrder, listWorkOrderEvents, createWorkOrder, confirmCompletion, requestRework, submitReview, listResidentPeople, listPersonRelationships;
+var init_work_orders = __esm({
+  "src/api/work-orders.js"() {
+    init_client();
+    residentStatusLabels = Object.freeze({
+      PENDING_DISPATCH: "\u5F85\u6D3E\u5355",
+      ASSIGNED: "\u5DF2\u6D3E\u5355",
+      ACCEPTED: "\u7EF4\u4FEE\u4EBA\u5458\u5DF2\u63A5\u5355",
+      ARRIVED: "\u7EF4\u4FEE\u4EBA\u5458\u5DF2\u5230\u573A",
+      COMPLETED: "\u5F85\u60A8\u786E\u8BA4",
+      REWORK_REQUIRED: "\u8FD4\u5DE5\u5904\u7406\u4E2D",
+      ARCHIVED: "\u5DF2\u5B8C\u6210",
+      CANCELLED: "\u5DF2\u53D6\u6D88"
+    });
+    listWorkOrders = ({ page = 1, pageSize = 20, communityId, houseId, status, keyword } = {}) => {
+      const query = new URLSearchParams({ page: String(page), pageSize: String(pageSize) });
+      for (const [key, value] of Object.entries({ communityId, houseId, status, keyword })) if (value) query.set(key, value);
+      return apiRequest(`/work-orders?${query}`);
+    };
+    getWorkOrder = (id2) => apiRequest(`/work-orders/${encodeURIComponent(id2)}`);
+    listWorkOrderEvents = (id2) => apiRequest(`/work-orders/${encodeURIComponent(id2)}/events`);
+    createWorkOrder = (input) => apiRequest("/work-orders", { method: "POST", body: input });
+    confirmCompletion = (id2) => apiRequest(`/work-orders/${encodeURIComponent(id2)}/confirm-completion`, { method: "POST", body: {} });
+    requestRework = (id2, reason) => apiRequest(`/work-orders/${encodeURIComponent(id2)}/request-rework`, { method: "POST", body: { reason } });
+    submitReview = (id2, input) => apiRequest(`/work-orders/${encodeURIComponent(id2)}/review`, { method: "POST", body: input });
+    listResidentPeople = (keyword) => apiRequest(`/people?page=1&pageSize=100&keyword=${encodeURIComponent(keyword)}`);
+    listPersonRelationships = (personId) => apiRequest(`/people/${encodeURIComponent(personId)}/relationships`);
+  }
+});
+
+// src/pages/resident.js
+var resident_exports = {};
+__export(resident_exports, {
+  initResident: () => initResident,
+  renderResidentOrderDetail: () => renderResidentOrderDetail,
+  renderResidentOrders: () => renderResidentOrders
+});
+async function residentIdentity() {
+  const context = globalThis.__SHENGBIAN_API_CONTEXT__ || await currentUser();
+  const user = context?.user;
+  if (!user?.id) throw new Error("\u5C45\u6C11\u8EAB\u4EFD\u5C1A\u672A\u52A0\u8F7D\uFF0C\u8BF7\u91CD\u65B0\u767B\u5F55");
+  const people = await listResidentPeople(user.phone || "");
+  const person = (people?.items || []).find((item) => item.userId === user.id) || (people?.items || []).find((item) => item.maskedPhone && user.phone?.startsWith(item.maskedPhone.slice(0, 3)));
+  if (!person) throw new Error("\u5F53\u524D\u8D26\u53F7\u5C1A\u672A\u7ED1\u5B9A\u5C45\u6C11\u6863\u6848\uFF0C\u6682\u65F6\u65E0\u6CD5\u63D0\u4EA4\u62A5\u4FEE");
+  const relationships = await listPersonRelationships(person.id);
+  return { user, person, relationships: relationships || [] };
+}
+function eligibleRelationships(identity) {
+  const todayValue = today();
+  return identity.relationships.filter((item) => item.verificationStatus === "VERIFIED" && item.startDate <= todayValue && (!item.endDate || item.endDate >= todayValue));
+}
+function apiFailure(target, error, retry) {
+  target.innerHTML = `<div class="resident-api-error" role="alert"><strong>${escape(apiErrorMessage(error))}</strong><button type="button" class="demo-button secondary" data-api-retry>\u91CD\u65B0\u52A0\u8F7D</button></div>`;
+  bind($("[data-api-retry]", target), "\u91CD\u65B0\u52A0\u8F7D", retry);
+}
+function initResident(ctx) {
+  const { route: route2, store: store2, state: state2, go: go3, qs: qs2, panel: panel2, requireAuth: requireAuth2 } = ctx;
+  if (route2.key === "login") loginPage(ctx);
+  if (route2.key === "verify") verifyPage(ctx);
+  if (route2.key === "repair") realApiEnabled() ? apiRepairPage(ctx) : repairPage(ctx);
+  if (route2.key === "review") realApiEnabled() ? apiReviewPage(ctx) : reviewPage(ctx);
+  if (["bills", "billing"].includes(route2.key)) billingPage(ctx);
+  if (route2.key === "points") pointsPage(ctx);
+  if (route2.key === "services") servicesPage(ctx);
+  if (route2.key === "profile") {
+    const amount = $$("span,div").find((e) => e.children.length === 0 && e.textContent.trim() === "1,280 \u79EF\u5206");
+    if (amount) {
+      amount.dataset.points = "";
+      amount.textContent = state2().user.points.toLocaleString("zh-CN");
+    }
+    const activeOrder = state2().orders.find((o) => !["closed", "cancelled"].includes(o.status) && o.room === state2().user.room);
+    const card = $$("main div").find((e) => e.classList.contains("bg-surface-container-lowest") && e.textContent.includes("\u6B63\u5728\u4E3A\u60A8\u670D\u52A1"));
+    if (card && activeOrder) {
+      const title = $("h2,h3,h4", card);
+      if (title) title.textContent = activeOrder.title;
+      bind(card, "\u67E5\u770B\u8FDB\u884C\u4E2D\u5DE5\u5355", () => go3("/mobile/orders/" + activeOrder.id));
+    }
+    if (!realApiEnabled()) renderPendingReviews(ctx, card);
+    const buttons3 = document.createElement("div");
+    buttons3.className = "demo-inline";
+    buttons3.innerHTML = `<button class="demo-button secondary" data-profile="bookings">${icon("event_note")}\u9884\u7EA6\u8BB0\u5F55</button><button class="demo-button secondary" data-profile="account">${icon("manage_accounts")}\u8D26\u53F7\u8BBE\u7F6E</button><button class="demo-button secondary" data-profile="bills">${icon("receipt_long")}\u5386\u53F2\u8D26\u671F</button>`;
+    $("main > div").append(buttons3);
+    $$("[data-profile]").forEach((b) => bind(b, label(b), () => b.dataset.profile === "bills" ? go3("/mobile/bills") : panel2(b.dataset.profile)));
+  }
+  if (route2.group === "mobile") {
+    on(/我要开闪铺|我要开铺|我也要开铺|入驻开店/, () => requireAuth2(() => shopForm(ctx)));
+    on(/发布|说点什么|文字投稿/, () => requireAuth2(() => postForm(ctx)));
+    on(/^我的报修/, () => panel2("orders"));
+    on(/积分明细/, () => pointsHistory(ctx));
+    on(/兑换记录/, () => redemptionHistory(ctx));
+    on(/去逛邻里圈/, () => go3("/mobile/services?panel=community-feed"));
+    if (qs2.get("panel") === "community-feed") communityFeed(ctx);
+  }
+}
+function renderPendingReviews(ctx, activeCard) {
+  const { state: state2, go: go3 } = ctx;
+  const snapshot = state2();
+  const pending = snapshot.orders.filter(
+    (order) => (order.room === snapshot.user.room || order.contact === snapshot.user.name || order.phone === snapshot.user.phone) && order.communityId === snapshot.user.communityId && order.status === "completed" && !snapshot.reviews.some((review) => review.orderId === order.id)
+  );
+  if (!pending.length) return;
+  const section = document.createElement("section");
+  section.className = "demo-pending-reviews";
+  section.setAttribute("aria-label", "\u5F85\u8BC4\u4EF7\u670D\u52A1");
+  section.innerHTML = `<div class="demo-pending-reviews-heading"><div><span class="material-symbols-outlined" aria-hidden="true">rate_review</span><div><h2>\u5F85\u8BC4\u4EF7\u670D\u52A1</h2><p>\u7EF4\u4FEE\u5DF2\u5B8C\u6210\uFF0C\u60A8\u7684\u53CD\u9988\u5C06\u5E2E\u52A9\u7269\u4E1A\u6539\u8FDB\u670D\u52A1</p></div></div><span>${pending.length} \u9879\u5F85\u529E</span></div><div class="demo-pending-review-list">${pending.map((order) => `<article><div><strong>${escape(order.title)}</strong><small>${escape(order.room)} \xB7 ${escape(order.technician || "\u7EF4\u4FEE\u5E08\u5085")} \xB7 ${new Date(order.timeline?.at(-1)?.at || order.createdAt).toLocaleDateString("zh-CN")} \u5B8C\u5DE5</small></div><button class="demo-button" data-pending-review="${escape(order.id)}">\u7ACB\u5373\u8BC4\u4EF7 ${icon("arrow_forward")}</button></article>`).join("")}</div>`;
+  const mainContent = $("main > div");
+  if (activeCard?.parentElement === mainContent) activeCard.after(section);
+  else mainContent?.prepend(section);
+  $$("[data-pending-review]", section).forEach((button) => bind(button, "\u7ACB\u5373\u8BC4\u4EF7\u670D\u52A1", () => go3("/mobile/review?id=" + button.dataset.pendingReview)));
+}
+function loginPage(ctx) {
+  const { route: route2, qs: qs2, safeNext: safeNext2, go: go3, state: state2, role: role2 } = ctx;
+  const account = $("#accountInput"), password = $("#passwordInput"), agreement = $("#agreementCheckbox");
+  account.value = role2 === "group" ? "group-admin" : role2 === "admin" ? "admin" : role2 === "worker" ? "worker" : "13800006688";
+  password.value = "demo123";
+  password.autocomplete = "current-password";
+  agreement.checked = false;
+  if (role2 !== "resident") {
+    const heading = $("header h1,header .font-headline-sm");
+    if (heading) heading.textContent = role2 === "group" ? "\u96C6\u56E2\u7BA1\u7406\u5458\u767B\u5F55" : role2 === "admin" ? "\u7269\u4E1A\u7BA1\u7406\u5458\u767B\u5F55" : "\u7EF4\u4FEE\u5E08\u5085\u767B\u5F55";
+  }
+  bind($("#clearAccountBtn"), "\u6E05\u7A7A\u8D26\u53F7", () => {
+    account.value = "";
+    account.focus();
+  });
+  bind($("#togglePasswordBtn"), "\u663E\u793A\u6216\u9690\u85CF\u5BC6\u7801", () => {
+    password.type = password.type === "password" ? "text" : "password";
+    $("#eyeIcon").textContent = password.type === "password" ? "visibility_off" : "visibility";
+  });
+  $("#clearAccountBtn").classList.remove("opacity-0", "pointer-events-none");
+  let mode = "password";
+  on(/短信验证码登录/, (el) => {
+    mode = mode === "password" ? "sms" : "password";
+    password.type = mode === "sms" ? "text" : "password";
+    password.value = mode === "sms" ? "123456" : "demo123";
+    password.setAttribute("aria-label", mode === "sms" ? "\u6F14\u793A\u9A8C\u8BC1\u7801" : "\u767B\u5F55\u5BC6\u7801");
+    el.innerHTML = icon("sms") + (mode === "sms" ? "\u8D26\u53F7\u5BC6\u7801\u767B\u5F55" : "\u77ED\u4FE1\u9A8C\u8BC1\u7801\u767B\u5F55");
+    toast(mode === "sms" ? "\u6F14\u793A\u9A8C\u8BC1\u7801\u4E3A123456\uFF0C\u4E0D\u4F1A\u53D1\u9001\u771F\u5B9E\u77ED\u4FE1" : "\u5DF2\u5207\u6362\u5BC6\u7801\u767B\u5F55");
+  });
+  on(/忘记密码/, () => formModal("\u91CD\u7F6E\u6F14\u793A\u5BC6\u7801", field("phone", "\u624B\u673A\u53F7", "", { type: "tel", pattern: "1[3-9][0-9]{9}" }) + field("code", "\u6F14\u793A\u9A8C\u8BC1\u7801", "123456") + field("password", "\u65B0\u5BC6\u7801", "", { type: "password" }) + field("confirm", "\u786E\u8BA4\u5BC6\u7801", "", { type: "password" }), (v) => {
+    if (v.code !== "123456") throw new Error("\u9A8C\u8BC1\u7801\u4E0D\u6B63\u786E");
+    if (v.password.length < 6) throw new Error("\u5BC6\u7801\u81F3\u5C116\u4F4D");
+    if (v.password !== v.confirm) throw new Error("\u4E24\u6B21\u5BC6\u7801\u8F93\u5165\u4E0D\u4E00\u81F4");
+    sessionStorage.setItem("shengbian-password", v.password);
+    toast("\u6F14\u793A\u5BC6\u7801\u5DF2\u66F4\u65B0");
+  }));
+  const submit = (btn) => busy(btn, async () => {
+    if (!agreement.checked) throw new Error("\u8BF7\u5148\u9605\u8BFB\u5E76\u540C\u610F\u670D\u52A1\u534F\u8BAE\u4E0E\u9690\u79C1\u653F\u7B56");
+    const validAccount = ["admin", "worker", "group-admin"].includes(account.value.trim()) || isPhone(account.value.trim());
+    if (!validAccount) throw new Error("\u8BF7\u8F93\u5165\u6709\u6548\u624B\u673A\u53F7\u6216\u6F14\u793A\u8D26\u53F7");
+    const usingApi = Boolean(globalThis.__SHENGBIAN_API_BASE__) && isPhone(account.value.trim());
+    if (!usingApi && mode === "password" && password.value !== (sessionStorage.getItem("shengbian-password") || "demo123")) throw new Error("\u8D26\u53F7\u6216\u5BC6\u7801\u4E0D\u6B63\u786E");
+    if (mode === "sms" && password.value !== "123456") throw new Error("\u9A8C\u8BC1\u7801\u4E0D\u6B63\u786E");
+    if (usingApi) {
+      if (mode !== "password") throw new Error("\u6B63\u5F0F\u8D26\u53F7\u8BF7\u4F7F\u7528\u5BC6\u7801\u767B\u5F55");
+      await login(account.value.trim(), password.value);
+      sessionStorage.setItem("shengbian-api-auth-" + role2, "yes");
+    }
+    if (role2 === "admin" && !usingApi && account.value !== "admin") throw new Error("\u8BF7\u4F7F\u7528\u7BA1\u7406\u5458\u6F14\u793A\u8D26\u53F7 admin");
+    if (role2 === "worker" && !usingApi && account.value !== "worker") throw new Error("\u8BF7\u4F7F\u7528\u7EF4\u4FEE\u5E08\u5085\u6F14\u793A\u8D26\u53F7 worker");
+    if (role2 === "group" && !usingApi && account.value !== "group-admin") throw new Error("\u8BF7\u4F7F\u7528\u96C6\u56E2\u7BA1\u7406\u5458\u6F14\u793A\u8D26\u53F7 group-admin");
+    sessionStorage.setItem("shengbian-auth-" + role2, "yes");
+    go3(safeNext2(qs2.get("next") || (role2 === "group" ? "/web/group" : role2 === "admin" ? "/web/overview" : role2 === "worker" ? "/worker/tasks" : "/mobile/home")));
+  });
+  const submitButton = $('#loginForm button[type="submit"]');
+  submitButton.dataset.action = "\u7ACB\u5373\u767B\u5F55";
+  $("#loginForm").addEventListener("submit", (e) => {
+    e.preventDefault();
+    submit(submitButton).catch((error) => toast(error.message, true));
+  });
+  on("\u5FAE\u4FE1\u4E00\u952E\u5FEB\u6377\u767B\u5F55", (btn) => {
+    if (!agreement.checked) return toast("\u8BF7\u5148\u540C\u610F\u670D\u52A1\u534F\u8BAE\u4E0E\u9690\u79C1\u653F\u7B56", true);
+    confirm("\u5FAE\u4FE1\u6F14\u793A\u6388\u6743", "\u5C06\u4EE5\u6D4B\u8BD5\u5C45\u6C11\u8EAB\u4EFD\u767B\u5F55\uFF0C\u4E0D\u4F1A\u8BFB\u53D6\u771F\u5B9E\u5FAE\u4FE1\u4FE1\u606F\u3002", () => sessionStorage.setItem("shengbian-auth-resident", "yes"), { label: "\u786E\u8BA4\u6388\u6743", after: () => go3(safeNext2(qs2.get("next") || "/mobile/home")) });
+  });
+  on(/去办理/, () => go3("/mobile/verify"));
+  const note = document.createElement("p");
+  note.className = "demo-auth-note";
+  note.textContent = "\u6F14\u793A\u73AF\u5883 \xB7 \u4F7F\u7528\u865A\u6784\u8D44\u6599 \xB7 \u65E0\u771F\u5B9E\u8EAB\u4EFD\u6838\u9A8C\u6216\u652F\u4ED8";
+  $("#loginForm").after(note);
+  const audio = $$("main div").find((e) => e.classList.contains("rounded-xl") && e.textContent.includes("\u793E\u533A\u90BB\u91CC\u6668\u64AD\u53F0"));
+  if (audio) bind(audio, "\u6536\u542C\u6668\u95F4\u5E7F\u64AD", () => ctx.speech(void 0));
+}
+function verifyPage(ctx) {
+  const { store: store2, state: state2, go: go3, upload: upload2 } = ctx;
+  let role2 = "owner", method = 1;
+  const nameInput = $('input[placeholder*="\u771F\u5B9E\u59D3\u540D"]'), idInput = $("#idCardInput");
+  idInput.value = "110101199001010010";
+  idInput.type = "password";
+  bind($("#toggleIdMask"), "\u663E\u793A\u6216\u9690\u85CF\u8BC1\u4EF6\u53F7\u7801", () => {
+    idInput.type = idInput.type === "password" ? "text" : "password";
+    $("#eyeIcon").textContent = idInput.type === "password" ? "visibility_off" : "visibility";
+  });
+  const roleButtons = [$("#roleOwnerBtn"), $("#roleTenantBtn")];
+  roleButtons.forEach((btn, i) => bind(btn, i ? "\u79DF\u5BA2\u5165\u4F4F" : "\u4E1A\u4E3B\u5165\u4F4F", () => {
+    role2 = i ? "tenant" : "owner";
+    active(roleButtons, btn);
+    $("#ownerVerificationCard").classList.toggle("hidden", !!i);
+    $("#tenantHintCard").classList.toggle("hidden", !i);
+    $("#submitBtn").innerHTML = icon("verified_user") + (i ? "\u63D0\u4EA4\u79DF\u7EA6\u5E76\u7533\u8BF7\u8BA4\u8BC1" : "\u63D0\u4EA4\u786E\u6743\u5E76\u7ED1\u5B9A\u623F\u5C4B");
+    if (i && !$("#tenant-upload")) {
+      const button = document.createElement("button");
+      button.id = "tenant-upload";
+      button.className = "demo-button secondary";
+      button.textContent = "\u4E0A\u4F20\u79DF\u7EA6";
+      $("#tenantHintCard").append(button);
+      bind(button, "\u4E0A\u4F20\u79DF\u7EA6", () => upload2(button, { accept: "image/*,.pdf" }));
+    }
+  }));
+  for (let i = 1; i <= 3; i++) bind($("#tabMethod" + i), "\u8BA4\u8BC1\u65B9\u5F0F" + i, () => {
+    method = i;
+    for (let j = 1; j <= 3; j++) $("#methodContent" + j).classList.toggle("hidden", j !== i);
+    active([1, 2, 3].map((j) => $("#tabMethod" + j)), $("#tabMethod" + i));
+  });
+  $$("main .material-symbols-outlined").filter((e) => ["keyboard_arrow_down", "expand_more"].includes(e.textContent.trim())).forEach((el) => {
+    const row = el.parentElement;
+    bind(row, "\u9009\u62E9\u623F\u5C4B\u4FE1\u606F", () => formModal("\u623F\u5C4B\u5750\u843D", field("room", "\u697C\u680B-\u5355\u5143-\u623F\u53F7", state2().user.room), (v) => {
+      if (!/^\d{1,3}-\d{1,2}-\d{1,4}$/.test(v.room)) throw new Error("\u623F\u53F7\u683C\u5F0F\u4E3A16-2-502");
+      store2.change((s) => s.user.room = v.room);
+      toast("\u623F\u5C4B\u4FE1\u606F\u5DF2\u66F4\u65B0");
+      row.querySelector("span").textContent = v.room;
+    }));
+  });
+  $$("main .material-symbols-outlined").filter((e) => ["receipt_long", "task_alt"].includes(e.textContent.trim()) && e.closest('[id^="methodContent"]')).forEach((el) => {
+    const card = el.parentElement;
+    if (!card.closest("[data-action]")) bind(card, "\u4E0A\u4F20\u8BA4\u8BC1\u51ED\u8BC1", () => upload2(card, { accept: "image/*,.pdf" }));
+  });
+  bind($("#submitBtn"), "\u63D0\u4EA4\u623F\u5C4B\u8BA4\u8BC1", (btnEvent) => {
+    const name = nameInput.value.trim();
+    if (name.length < 2) throw new Error("\u8BF7\u8F93\u5165\u771F\u5B9E\u59D3\u540D\uFF08\u6F14\u793A\u8BF7\u4F7F\u7528\u865A\u6784\u59D3\u540D\uFF09");
+    if (!/^\d{17}[\dXx]$/.test(idInput.value)) throw new Error("\u8EAB\u4EFD\u8BC1\u53F7\u7801\u987B\u4E3A18\u4F4D");
+    if (!$("#agreementCheck").checked) throw new Error("\u8BF7\u786E\u8BA4\u5E76\u540C\u610F\u623F\u5C4B\u4FE1\u606F\u6388\u6743");
+    const value = $(`#methodContent${method} input`)?.value.trim();
+    if (role2 === "owner" && !value) throw new Error("\u8BF7\u586B\u5199\u6240\u9009\u8BA4\u8BC1\u65B9\u5F0F\u7684\u51ED\u8BC1\u7F16\u53F7");
+    if (role2 === "owner" && method === 2 && !/^\d{20}$/.test(value)) throw new Error("\u7F51\u7B7E\u5408\u540C\u53F7\u987B\u4E3A20\u4F4D\u6570\u5B57");
+    if (role2 === "tenant" && !(state2().drafts["uploads-verify"] || []).length) throw new Error("\u8BF7\u4E0A\u4F20\u79DF\u7EA6\u51ED\u8BC1");
+    return confirm("\u63D0\u4EA4\u623F\u4EA7\u8BA4\u8BC1", "\u6B64\u64CD\u4F5C\u4EC5\u521B\u5EFA\u6F14\u793A\u8BA4\u8BC1\u8BB0\u5F55\uFF0C\u4E0D\u4F1A\u8C03\u7528\u771F\u5B9E\u516C\u5B89\u6216\u623F\u4EA7\u63A5\u53E3\u3002", () => {
+      store2.change((s) => {
+        s.user.name = name;
+        s.user.verified = role2 === "owner";
+        s.user.role = role2;
+        s.logs.unshift({ id: id("VERIFY"), action: "\u63D0\u4EA4\u623F\u4EA7\u8BA4\u8BC1", target: `${name} \xB7 ${s.user.room} \xB7 ${role2 === "tenant" ? "\u79DF\u5BA2\u5F85\u5BA1\u6838" : "\u6F14\u793A\u786E\u6743"}`, at: now() });
+      });
+      sessionStorage.setItem("shengbian-auth-resident", "yes");
+    }, { after: () => go3("/mobile/profile") });
+  });
+}
+function apiRepairPage(ctx) {
+  const { go: go3 } = ctx;
+  const host = $("main > div");
+  const first = $("#tab-private")?.closest("section");
+  const picker = document.createElement("div");
+  picker.className = "resident-api-house-picker";
+  picker.innerHTML = '<p class="demo-muted">\u6B63\u5728\u52A0\u8F7D\u60A8\u6709\u6743\u62A5\u4FEE\u7684\u623F\u5C4B\u2026</p>';
+  first?.append(picker);
+  $("#tab-public")?.remove();
+  $("#issue-text")?.setAttribute("maxlength", "1000");
+  const submitButton = find(/立即提交报修/)[0];
+  const categories = $$("#category-group button");
+  let category = label(categories.find((button) => button.classList.contains("active")) || categories[0]) || "\u5176\u4ED6\u6545\u969C";
+  categories.forEach((button) => bind(button, label(button), () => {
+    category = label(button);
+    active(categories, button);
+  }));
+  let identity;
+  residentIdentity().then((result) => {
+    identity = result;
+    const eligible = eligibleRelationships(result);
+    if (!eligible.length) throw new Error("\u5F53\u524D\u8D26\u53F7\u6CA1\u6709\u53EF\u7528\u4E8E\u62A5\u4FEE\u7684\u6709\u6548\u623F\u5C4B\u5173\u7CFB");
+    picker.innerHTML = `<label class="resident-api-field"><span>\u62A5\u4FEE\u623F\u5C4B</span><select id="api-house-select" required>${eligible.map((relation) => `<option value="${escape(relation.id)}" data-house="${escape(relation.house.id)}">${escape(relation.house.displayAddress || relation.house.displayCode || relation.house.code)}</option>`).join("")}</select></label>`;
+  }).catch((error) => {
+    picker.innerHTML = `<div class="resident-api-error" role="alert">${escape(apiErrorMessage(error))}</div>`;
+    if (submitButton) submitButton.disabled = true;
+  });
+  on(/立即提交报修/, (button) => busy(button, async () => {
+    if (!identity) throw new Error("\u623F\u5C4B\u8D44\u6599\u4ECD\u5728\u52A0\u8F7D\uFF0C\u8BF7\u7A0D\u5019");
+    const description = $("#issue-text")?.value.trim() || "";
+    if (description.length < 5) throw new Error("\u8BF7\u586B\u5199\u81F3\u5C115\u4E2A\u5B57\u7684\u6545\u969C\u63CF\u8FF0");
+    const relationSelect = $("#api-house-select");
+    const relation = identity.relationships.find((item) => item.id === relationSelect?.value);
+    if (!relation) throw new Error("\u8BF7\u9009\u62E9\u6709\u6548\u62A5\u4FEE\u623F\u5C4B");
+    const order = await createWorkOrder({
+      scope: "PRIVATE",
+      houseId: relation.house.id,
+      requesterPersonId: identity.person.id,
+      requesterRelationshipId: relation.id,
+      category,
+      priority: "NORMAL",
+      title: `${category}\u62A5\u4FEE`,
+      description
+    });
+    go3("/mobile/orders/" + order.id + "?submitted=1");
+  }));
+  if (!host) return;
+  const note = document.createElement("p");
+  note.className = "demo-api-note";
+  note.textContent = "\u5F53\u524D\u9875\u9762\u8FDE\u63A5\u771F\u5B9E\u7269\u4E1A\u5DE5\u5355\u670D\u52A1\uFF0C\u63D0\u4EA4\u540E\u53EF\u5728\u201C\u6211\u7684\u62A5\u4FEE\u201D\u67E5\u770B\u5B9E\u65F6\u8FDB\u5EA6\u3002";
+  host.prepend(note);
+}
+async function renderResidentOrders(ctx, page = 1) {
+  const { go: go3 } = ctx;
+  const host = document.createElement("section");
+  host.id = "resident-api-orders";
+  host.className = "resident-api-orders demo-repair-center";
+  const anchor = $("main > div");
+  anchor?.prepend(host);
+  host.innerHTML = '<p class="demo-muted">\u6B63\u5728\u52A0\u8F7D\u6211\u7684\u62A5\u4FEE\u2026</p>';
+  try {
+    const result = await listWorkOrders({ page, pageSize: 20 });
+    const items = result?.items || [];
+    host.innerHTML = `<div class="demo-repair-center-heading"><div><h2>\u6211\u7684\u62A5\u4FEE</h2><p>\u771F\u5B9E\u5DE5\u5355\u8FDB\u5EA6\u4E0E\u5904\u7406\u8BB0\u5F55</p></div><button type="button" class="demo-button secondary" data-api-new>\u6211\u8981\u62A5\u4FEE</button></div>${items.length ? `<div class="resident-api-order-list">${items.map((order) => `<button type="button" class="demo-repair-order" data-api-order="${escape(order.id)}"><div><strong>${escape(order.title)}</strong><small>${escape(order.orderNo || order.id)} \xB7 ${escape(order.locationSnapshot?.address || "\u623F\u5C4B")}</small></div><span class="demo-repair-status">${escape(residentStatusLabels[order.status] || "\u5904\u7406\u4E2D")}</span></button>`).join("")}</div>` : '<div class="demo-repair-empty">\u6682\u65F6\u8FD8\u6CA1\u6709\u62A5\u4FEE\u8BB0\u5F55</div>'}<div class="resident-api-pagination"><button type="button" class="demo-button secondary" data-api-prev ${page <= 1 ? "disabled" : ""}>\u4E0A\u4E00\u9875</button><span>\u7B2C ${page} \u9875 \xB7 \u5171 ${result?.total || 0} \u6761</span><button type="button" class="demo-button secondary" data-api-next ${page * (result?.pageSize || 20) >= (result?.total || 0) ? "disabled" : ""}>\u4E0B\u4E00\u9875</button></div>`;
+    bind($("[data-api-new]", host), "\u6211\u8981\u62A5\u4FEE", () => go3("/mobile/repair"));
+    $$("[data-api-order]", host).forEach((button) => bind(button, "\u67E5\u770B\u771F\u5B9E\u62A5\u4FEE\u8BE6\u60C5", () => go3("/mobile/orders/" + button.dataset.apiOrder)));
+    bind($("[data-api-prev]", host), "\u4E0A\u4E00\u9875", () => renderResidentOrders(ctx, page - 1));
+    bind($("[data-api-next]", host), "\u4E0B\u4E00\u9875", () => renderResidentOrders(ctx, page + 1));
+  } catch (error) {
+    apiFailure(host, error, () => renderResidentOrders(ctx, page));
+  }
+}
+async function renderResidentOrderDetail(ctx, orderId) {
+  const { go: go3, back: back2 } = ctx;
+  let dlg = modal("\u5DE5\u5355\u8BE6\u60C5", '<p class="demo-muted">\u6B63\u5728\u52A0\u8F7D\u5DE5\u5355\u8BE6\u60C5\u2026</p>', [{ label: "\u8FD4\u56DE", secondary: true, run: back2 }]);
+  const reload = async () => {
+    try {
+      const [order, events] = await Promise.all([getWorkOrder(orderId), listWorkOrderEvents(orderId)]);
+      const actions = [];
+      const allowed = new Set(order.allowedActions || []);
+      if (allowed.has("CONFIRM_COMPLETION")) actions.push({ label: "\u786E\u8BA4\u5DF2\u4FEE\u597D", run: () => confirm("\u786E\u8BA4\u7EF4\u4FEE\u5B8C\u6210", "\u786E\u8BA4\u95EE\u9898\u5DF2\u7ECF\u89E3\u51B3\u5E76\u7ED3\u675F\u8BE5\u5DE5\u5355\uFF1F", async () => {
+        try {
+          await confirmCompletion(orderId);
+          await reload();
+        } catch (error) {
+          toast(apiErrorMessage(error), true);
+          await reload();
+        }
+      }, { label: "\u786E\u8BA4\u5B8C\u6210" }) });
+      if (allowed.has("REQUEST_REWORK")) actions.push({ label: "\u8FD8\u6CA1\u4FEE\u597D", run: () => formModal("\u53CD\u9988\u672A\u4FEE\u597D", field("reason", "\u8BF7\u8BF4\u660E\u54EA\u91CC\u8FD8\u6CA1\u6709\u4FEE\u597D", "", { type: "textarea", maxLength: 1e3 }), async (values) => {
+        const reason = values.reason.trim();
+        if (!reason) throw new Error("\u8BF7\u586B\u5199\u672A\u4FEE\u597D\u539F\u56E0");
+        try {
+          await requestRework(orderId, reason);
+          await reload();
+        } catch (error) {
+          toast(apiErrorMessage(error), true);
+          await reload();
+        }
+      }) });
+      if (allowed.has("SUBMIT_REVIEW")) actions.push({ label: "\u8BC4\u4EF7\u670D\u52A1", run: () => apiReviewPage({ ...ctx, qs: new URLSearchParams("id=" + encodeURIComponent(orderId)) }) });
+      actions.push({ label: "\u8FD4\u56DE", secondary: true, run: back2 });
+      const timeline = (events || []).map((event) => `<li><strong>${escape(eventLabel(event))}</strong><time>${escape(formatDate(event.createdAt))}</time>${event.note ? `<small>${escape(event.note)}</small>` : ""}</li>`).join("");
+      const review = order.review;
+      dlg = modal("\u5DE5\u5355\u8BE6\u60C5", `<div class="resident-api-detail"><div class="resident-api-detail-heading"><h3>${escape(order.title)}</h3><span class="demo-repair-status">${escape(residentStatusLabels[order.status] || order.status)}</span></div><dl class="demo-meta"><dt>\u5DE5\u5355\u53F7</dt><dd>${escape(order.orderNo || order.id)}</dd><dt>\u623F\u5C4B/\u4F4D\u7F6E</dt><dd>${escape(order.locationSnapshot?.address || "\u2014")}</dd><dt>\u8054\u7CFB\u4EBA</dt><dd>${escape(order.contactSnapshot?.name || "\u2014")} \xB7 ${escape(order.contactSnapshot?.maskedPhone || "\u2014")}</dd><dt>\u63D0\u4EA4\u65F6\u95F4</dt><dd>${escape(formatDate(order.createdAt))}</dd></dl><p class="resident-api-description">${escape(order.description)}</p><h4>\u5904\u7406\u65F6\u95F4\u7EBF</h4><ol class="demo-timeline">${timeline || "<li>\u6682\u65E0\u53EF\u5C55\u793A\u7684\u5904\u7406\u8BB0\u5F55</li>"}</ol>${review ? `<section class="resident-api-review"><h4>\u5DF2\u63D0\u4EA4\u8BC4\u4EF7 \xB7 ${escape(review.rating)} \u661F</h4><p>${escape(review.comment || "\u672A\u586B\u5199\u6587\u5B57\u8BC4\u4EF7")}</p></section>` : ""}</div>`, actions);
+    } catch (error) {
+      dlg = modal("\u5DE5\u5355\u8BE6\u60C5", `<div class="resident-api-error" role="alert">${escape(apiErrorMessage(error))}</div>`, [{ label: "\u91CD\u65B0\u52A0\u8F7D", run: reload }, { label: "\u8FD4\u56DE", secondary: true, run: back2 }]);
+    }
+  };
+  await reload();
+}
+async function apiReviewPage(ctx) {
+  const orderId = ctx.qs.get("id");
+  const host = $("main > div");
+  if (!host || !orderId) return;
+  host.innerHTML = '<p class="demo-muted">\u6B63\u5728\u52A0\u8F7D\u8BC4\u4EF7\u4FE1\u606F\u2026</p>';
+  try {
+    const order = await getWorkOrder(orderId);
+    if (order.status !== "ARCHIVED" || !order.allowedActions?.includes("SUBMIT_REVIEW")) throw new Error("\u8BE5\u5DE5\u5355\u5F53\u524D\u4E0D\u53EF\u8BC4\u4EF7");
+    host.innerHTML = `<section class="resident-api-review-page"><h2>${escape(order.title)}</h2><p class="demo-muted">${escape(order.orderNo || order.id)} \xB7 ${escape(residentStatusLabels[order.status])}</p><div class="resident-api-rating" role="group" aria-label="\u670D\u52A1\u8BC4\u5206">${[1, 2, 3, 4, 5].map((value) => `<button type="button" data-rating="${value}" aria-label="${value}\u661F">\u2605</button>`).join("")}</div><label class="resident-api-field"><span>\u670D\u52A1\u8BC4\u4EF7\uFF08\u53EF\u9009\uFF09</span><textarea id="resident-review-comment" maxlength="2000" rows="4" placeholder="\u8BF4\u8BF4\u8FD9\u6B21\u670D\u52A1\u7684\u611F\u53D7"></textarea></label><button type="button" class="demo-button" id="resident-review-submit">\u63D0\u4EA4\u8BC4\u4EF7</button></section>`;
+    let rating = 0;
+    const stars = $$("[data-rating]", host);
+    const paint = () => stars.forEach((star) => {
+      star.classList.toggle("selected", Number(star.dataset.rating) <= rating);
+    });
+    stars.forEach((star) => bind(star, `${star.dataset.rating}\u661F`, () => {
+      rating = Number(star.dataset.rating);
+      paint();
+    }));
+    bind($("#resident-review-submit", host), "\u63D0\u4EA4\u8BC4\u4EF7", (button) => busy(button, async () => {
+      if (!rating) throw new Error("\u8BF7\u9009\u62E91-5\u661F\u8BC4\u5206");
+      try {
+        await submitReview(orderId, { rating, comment: $("#resident-review-comment", host).value.trim() || void 0 });
+        toast("\u8BC4\u4EF7\u5DF2\u63D0\u4EA4");
+        go("/mobile/orders/" + orderId);
+      } catch (error) {
+        if (error?.status === 409) toast("\u8BE5\u5DE5\u5355\u5DF2\u7ECF\u8BC4\u4EF7\u8FC7\u4E86", true);
+        throw new Error(apiErrorMessage(error));
+      }
+    }));
+  } catch (error) {
+    apiFailure(host, error, () => apiReviewPage(ctx));
+  }
+}
+function repairPage(ctx) {
+  const { store: store2, state: state2, go: go3, upload: upload2 } = ctx;
+  let scope = "private", category = "\u7BA1\u9053\u758F\u901A", date = today(), slot = "\u4E0A\u5348\u65F6\u6BB5 09:00 - 11:30", callConfirm = true;
+  renderRepairCenter(ctx);
+  const draft = state2().drafts.repair || {};
+  if (draft.description) $("#issue-text").value = draft.description;
+  const save = () => store2.saveDraft("repair", { description: $("#issue-text").value, scope, category, date, slot, callConfirm });
+  $("#issue-text").maxLength = 1e3;
+  $("#issue-text").addEventListener("input", save);
+  [$("#tab-private"), $("#tab-public")].forEach((btn, i) => bind(btn, i ? "\u516C\u5171\u533A\u57DF\u62A5\u4FEE" : "\u5BA4\u5185\u4E13\u6709\u62A5\u4FEE", () => {
+    scope = i ? "public" : "private";
+    active([$("#tab-private"), $("#tab-public")], btn);
+    save();
+  }));
+  $$("#category-group button").forEach((btn) => bind(btn, label(btn), () => {
+    category = label(btn);
+    active($$("#category-group button"), btn);
+    save();
+  }));
+  $$("#date-selector button").forEach((btn, i) => {
+    if (i < 3) {
+      const d = /* @__PURE__ */ new Date();
+      d.setDate(d.getDate() + i);
+      const value = d.toLocaleDateString("en-CA");
+      $("span:last-child", btn).textContent = `${d.getMonth() + 1}-${d.getDate()}`;
+      bind(btn, ["\u4ECA\u5929", "\u660E\u5929", "\u540E\u5929"][i], () => {
+        date = value;
+        active($$("#date-selector button"), btn);
+        save();
+      });
+    } else bind(btn, "\u81EA\u9009\u65E5\u671F", () => formModal("\u9009\u62E9\u9884\u7EA6\u65E5\u671F", field("date", "\u9884\u7EA6\u65E5\u671F", date, { type: "date", min: today() }), (v) => {
+      date = v.date;
+      active($$("#date-selector button"), btn);
+      $("span:last-child", btn).textContent = date;
+      save();
+    }));
+  });
+  $$("#slot-selector button").forEach((btn) => bind(btn, label(btn), () => {
+    slot = label(btn);
+    active($$("#slot-selector button"), btn);
+    save();
+  }));
+  bind($("#toggle-call"), "\u4E0A\u95E8\u524D\u7535\u8BDD\u786E\u8BA4", () => {
+    callConfirm = !callConfirm;
+    $("#toggle-call").setAttribute("aria-pressed", String(callConfirm));
+    $("#toggle-call").style.background = callConfirm ? "#006544" : "#bdc9c0";
+    $("#toggle-call span").style.transform = `translateX(${callConfirm ? 16 : 0}px)`;
+    save();
+  });
+  bind($("#voice-record-btn"), "\u8BED\u97F3\u586B\u5199\u6545\u969C\u63CF\u8FF0", () => voiceInput(ctx, $("#issue-text")));
+  on(/立即提交报修/, (btn) => {
+    if ($("#issue-text").value.trim().length < 5) throw new Error("\u8BF7\u586B\u5199\u81F3\u5C115\u4E2A\u5B57\u7684\u6545\u969C\u63CF\u8FF0");
+    formModal("\u786E\u8BA4\u62A5\u4FEE\u4FE1\u606F", `<p>${escape(category)} \xB7 ${escape(date)} \xB7 ${escape(slot)}</p>` + field("contact", "\u8054\u7CFB\u4EBA", state2().user.name) + field("phone", "\u8054\u7CFB\u7535\u8BDD", state2().user.phone, { type: "tel", pattern: "1[3-9][0-9]{9}" }) + field("room", scope === "public" ? "\u516C\u5171\u533A\u57DF\u5177\u4F53\u4F4D\u7F6E" : "\u62A5\u4FEE\u623F\u5C4B", scope === "public" ? "" : state2().user.room), (values) => {
+      const photos = [
+        ...$$("main img").map((img) => ({ src: img.src, name: "\u73B0\u573A\u793A\u4F8B\u7167\u7247" })),
+        ...state2().drafts["uploads-repair"] || []
+      ];
+      const order = store2.createOrder({ ...values, scope, category, description: $("#issue-text").value.trim(), appointment: date + " " + slot, urgent: slot.includes("\u52A0\u6025"), callConfirm, photos });
+      store2.saveDraft("repair", {});
+      store2.saveDraft("uploads-repair", []);
+      go3("/mobile/orders/" + order.id + "?submitted=1");
+    }, "\u786E\u8BA4\u63D0\u4EA4\u62A5\u4FEE");
+  });
+}
+function renderRepairCenter(ctx) {
+  const { state: state2, go: go3 } = ctx;
+  const snapshot = state2();
+  const ownerOrders = snapshot.orders.filter(
+    (order) => (!order.communityId || order.communityId === snapshot.user.communityId) && (order.room === snapshot.user.room || order.contact === snapshot.user.name || order.phone === snapshot.user.phone)
+  ).sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+  const active2 = ownerOrders.filter((order) => !["completed", "closed", "cancelled"].includes(order.status));
+  const history2 = ownerOrders.filter((order) => ["completed", "closed", "cancelled"].includes(order.status));
+  const pendingReviews = history2.filter((order) => order.status === "completed" && !snapshot.reviews.some((review) => review.orderId === order.id));
+  const statusText = (order) => {
+    const review = snapshot.reviews.find((item) => item.orderId === order.id);
+    if (order.status === "completed" && !review) return "\u5DF2\u5B8C\u5DE5\uFF0C\u5F85\u8BC4\u4EF7";
+    return review ? `\u5DF2\u8BC4\u4EF7 ${review.rating} \u661F` : statuses[order.status];
+  };
+  const section = document.createElement("section");
+  section.id = "resident-repair-center";
+  section.className = "demo-repair-center";
+  section.innerHTML = `<div class="demo-repair-center-heading"><div><span class="material-symbols-outlined" aria-hidden="true">assignment_turned_in</span><div><h2>\u6211\u7684\u62A5\u4FEE</h2><p>\u63D0\u4EA4\u540E\u53EF\u5728\u8FD9\u91CC\u67E5\u770B\u8FDB\u5EA6\u3001\u5386\u53F2\u548C\u670D\u52A1\u8BC4\u4EF7</p></div></div><button class="demo-button secondary" data-repair-all>\u5168\u90E8\u8BB0\u5F55</button></div><div class="demo-repair-metrics"><span>\u8FDB\u884C\u4E2D ${active2.length}</span><span>\u5386\u53F2 ${history2.length}</span><span>\u5F85\u8BC4\u4EF7 ${pendingReviews.length}</span></div><div class="demo-repair-section"><h3>\u8FDB\u884C\u4E2D</h3>${active2.length ? active2.slice(0, 1).map((order) => `<button class="demo-repair-order" data-repair-detail="${escape(order.id)}"><div><strong>${escape(order.title)}</strong><small>${escape(order.id)} \xB7 ${escape(order.appointment)}</small></div><span class="demo-repair-status active">${escape(statusText(order))}</span></button>`).join("") : '<div class="demo-repair-empty">\u6682\u65E0\u8FDB\u884C\u4E2D\u7684\u62A5\u4FEE</div>'}</div><div class="demo-repair-section"><h3>\u5F85\u8BC4\u4EF7</h3>${pendingReviews.length ? pendingReviews.slice(0, 1).map((order) => `<article class="demo-repair-order"><div><strong>${escape(order.title)}</strong><small>${escape(order.technician || "\u7EF4\u4FEE\u5E08\u5085")}\u5DF2\u5B8C\u6210\u670D\u52A1</small></div><button class="demo-button" data-repair-review="${escape(order.id)}">\u7ACB\u5373\u8BC4\u4EF7 ${icon("arrow_forward")}</button></article>`).join("") : '<div class="demo-repair-empty">\u6682\u65E0\u5F85\u8BC4\u4EF7\u7684\u5B8C\u5DE5\u5DE5\u5355</div>'}</div><div class="demo-repair-section"><h3>\u5386\u53F2\u62A5\u4FEE</h3>${history2.length ? history2.slice(0, 1).map((order) => `<button class="demo-repair-order" data-repair-detail="${escape(order.id)}"><div><strong>${escape(order.title)}</strong><small>${escape(order.id)} \xB7 ${new Date(order.createdAt).toLocaleDateString("zh-CN")}</small></div><span class="demo-repair-status">${escape(statusText(order))}</span></button>`).join("") : '<div class="demo-repair-empty">\u6682\u65E0\u5386\u53F2\u62A5\u4FEE\u8BB0\u5F55</div>'}</div>`;
+  const anchor = $("#tab-private")?.closest("section");
+  anchor?.after(section);
+  $$("[data-repair-detail]", section).forEach((button) => bind(button, "\u67E5\u770B\u62A5\u4FEE\u8BE6\u60C5", () => go3("/mobile/orders/" + button.dataset.repairDetail)));
+  $$("[data-repair-review]", section).forEach((button) => bind(button, "\u8BC4\u4EF7\u5DF2\u5B8C\u5DE5\u62A5\u4FEE", () => go3("/mobile/review?id=" + button.dataset.repairReview)));
+  bind($("[data-repair-all]", section), "\u67E5\u770B\u5168\u90E8\u62A5\u4FEE\u8BB0\u5F55", () => go3("/mobile/profile?panel=orders"));
+}
+function reviewPage(ctx) {
+  const { state: state2, store: store2, qs: qs2, go: go3 } = ctx;
+  const orderId = qs2.get("id") || "BX202407220038";
+  const order = state2().orders.find((o) => o.id === orderId);
+  let rating = 5;
+  const subratings = { \u4E0A\u95E8\u51C6\u65F6\u6027: 5, \u6280\u672F\u4E13\u4E1A\u5EA6: 5, \u670D\u52A1\u6001\u5EA6: 5, \u73B0\u573A\u536B\u751F: 5 };
+  const stars = $$("#main-star-group button");
+  stars.forEach((btn, index) => bind(btn, `${index + 1}\u661F`, () => {
+    rating = index + 1;
+    stars.forEach((b, i) => {
+      $("span", b).style.fontVariationSettings = `'FILL' ${i <= index ? 1 : 0}`;
+      b.style.color = i <= index ? "#9d6300" : "#bdc9c0";
+      b.setAttribute("aria-pressed", String(i <= index));
+    });
+    $("#rating-text span:last-child").textContent = ["\u975E\u5E38\u4E0D\u6EE1\u610F\uFF0C\u6709\u5F85\u6539\u8FDB", "\u8F83\u4E0D\u6EE1\u610F\uFF0C\u4F53\u9A8C\u6B20\u4F73", "\u4E00\u822C\uFF0C\u57FA\u672C\u7B26\u5408\u9884\u671F", "\u6EE1\u610F\uFF0C\u5E08\u5085\u6280\u672F\u53EF\u9760", "\u975E\u5E38\u6EE1\u610F\uFF0C\u8D85\u51FA\u9884\u671F\uFF01"][index];
+  }));
+  $$(".tag-chip").forEach((btn) => bind(btn, label(btn), () => {
+    const selected = btn.dataset.selected !== "true";
+    btn.dataset.selected = String(selected);
+    btn.classList.toggle("demo-selected", selected);
+    btn.setAttribute("aria-pressed", String(selected));
+  }));
+  $$(".material-symbols-outlined").filter((e) => e.textContent.trim() === "star" && !e.closest("button") && e.closest("main")).forEach((star) => {
+    const row = star.parentElement.parentElement;
+    const all = $$(".material-symbols-outlined", star.parentElement).filter((e) => e.textContent === "star");
+    const key = Object.keys(subratings).find((k) => row.textContent.includes(k));
+    if (key) bind(star, key + "\u8BC4\u5206", () => {
+      subratings[key] = all.indexOf(star) + 1;
+      all.forEach((s, i) => s.style.fontVariationSettings = `'FILL' ${i < subratings[key] ? 1 : 0}`);
+    });
+  });
+  $("#comment-input").maxLength = 300;
+  $("#comment-input").addEventListener("input", (e) => $("#char-counter").textContent = `${e.target.value.length}/300`);
+  bind($("#voice-btn"), "\u8BED\u97F3\u586B\u5199\u8BC4\u4EF7", () => voiceInput(ctx, $("#comment-input")));
+  bind($("#submit-review-btn"), "\u63D0\u4EA4\u8BC4\u4EF7\u5E76\u9886\u53D6\u79EF\u5206", () => confirm("\u63D0\u4EA4\u670D\u52A1\u8BC4\u4EF7", `\u7EFC\u5408\u8BC4\u5206\uFF1A${rating}\u661F\u3002\u8BC4\u4EF7\u540E\u53D1\u653E20\u79EF\u5206\uFF0C\u6BCF\u4E2A\u5DE5\u5355\u4EC5\u4E00\u6B21\u3002`, () => store2.review(orderId, {
+    rating,
+    subratings,
+    comment: $("#comment-input").value,
+    tags: $$('.tag-chip[data-selected="true"]').map(label),
+    recommend: $$("main input[type=checkbox]")[0]?.checked || false,
+    anonymous: $$("main input[type=checkbox]")[1]?.checked || false,
+    photos: state2().drafts["uploads-review"] || []
+  }), { after: () => {
+    modal("\u8BC4\u4EF7\u5DF2\u63D0\u4EA4", "<p>\u611F\u8C22\u60A8\u7684\u771F\u5B9E\u53CD\u9988\uFF0C20\u79EF\u5206\u5DF2\u5165\u8D26\u3002</p>", [{ label: "\u67E5\u770B\u5DE5\u5355", run: () => go3("/mobile/orders/" + orderId) }, { label: "\u67E5\u770B\u79EF\u5206", secondary: true, run: () => go3("/mobile/points") }]);
+  } }));
+  if (!order || !["completed", "closed"].includes(order.status)) {
+    $("#submit-review-btn").disabled = true;
+    toast("\u8BE5\u5DE5\u5355\u4E0D\u5B58\u5728\u6216\u5C1A\u672A\u5B8C\u5DE5\uFF0C\u4E0D\u80FD\u8BC4\u4EF7", true);
+  } else {
+    const heading = $("main h2");
+    if (heading) heading.textContent = order.title;
+    if (state2().reviews.some((r) => r.orderId === orderId)) {
+      $("#submit-review-btn").disabled = true;
+      $("#submit-review-btn").textContent = "\u5DF2\u8BC4\u4EF7\uFF0C\u79EF\u5206\u5DF2\u5165\u8D26";
+    }
+  }
+}
+function billingPage(ctx) {
+  const { route: route2, state: state2, qs: qs2, store: store2, go: go3 } = ctx;
+  const book = route2.key === "bills" ? "legacy" : "current";
+  let tab = ["property", "parking", "others"].includes(qs2.get("tab")) ? qs2.get("tab") : "property";
+  const tabs = ["property", "parking", "others"];
+  const topAmount = $("#topTotalAmount") || $$("main span").find((e) => e.textContent.trim() === "983.20");
+  const topTitle = $("#totalTitleLabel");
+  const summary = $("#payAllBtn");
+  const update = () => {
+    const bills = state2().bills.filter((b) => b.book === book);
+    tabs.forEach((type) => {
+      const content = $("#content-" + type);
+      if (!content) return;
+      content.classList.toggle("hidden", type !== tab);
+      const bill = bills.find((b) => b.type === type);
+      if (bill && book === "current") {
+        const title = $("h2,h3,h4", content);
+        if (title) title.textContent = bill.title;
+      }
+      if (bill) {
+        const pendingLabel = $$("span", content).find((e) => /^待缴/.test(e.textContent.trim()) && e.children.length === 0);
+        if (pendingLabel) {
+          pendingLabel.textContent = bill.paid ? "\u5DF2\u7F34\u6E05" : "\u5F85\u7F34\u8D26\u5355";
+          pendingLabel.dataset.billState = "";
+        }
+        $$("[data-bill-pay]", content).forEach((btn) => {
+          btn.disabled = bill.paid;
+          if (bill.paid) btn.textContent = "\u5DF2\u7F34\u6E05";
+        });
+      }
+    });
+    active(tabs.map((t) => $("#tab-" + t)), $("#tab-" + tab));
+    const pending = bills.filter((b) => !b.paid && (book === "legacy" || b.type === tab));
+    if (topAmount) topAmount.textContent = money(pending.reduce((sum, b) => sum + b.amount, 0));
+    if (topTitle) topTitle.textContent = `\u5F53\u524D\u5F85\u7F34\u603B\u989D (${tab === "property" ? "\u7269\u4E1A\u670D\u52A1\u8D39" : tab === "parking" ? "\u8F66\u4F4D\u7BA1\u7406\u8D39" : "\u516C\u5171\u80FD\u8017\u4E0E\u7EF4\u4FEE\u8D39"})`;
+    summary.disabled = !pending.length;
+    const text = $("#payAllBtnText");
+    if (text) text.textContent = !pending.length ? "\u672C\u9879\u5DF2\u7F34\u6E05" : `\u7F34\u7EB3${tab === "property" ? "\u7269\u4E1A\u8D39" : tab === "parking" ? "\u505C\u8F66\u8D39" : "\u5176\u4ED6\u8D39\u7528"}`;
+    if (!pending.length && book === "legacy") summary.textContent = "\u8D26\u5355\u5DF2\u7F34\u6E05";
+    const repairBills = bills.filter((b) => b.orderId);
+    if (book === "current") {
+      let box = $("#repair-bills");
+      if (!box) {
+        box = document.createElement("div");
+        box.id = "repair-bills";
+        $("#content-others").prepend(box);
+      }
+      box.innerHTML = list(repairBills, (b) => `<article><strong>${escape(b.title)}</strong><p>\xA5${money(b.amount)} \xB7 ${b.paid ? "\u5DF2\u7F34\u6E05" : "\u5F85\u7F34\u8D39"}</p><button class="demo-button" data-repair-pay="${b.id}" ${b.paid ? "disabled" : ""}>\u7F34\u7EB3\u7EF4\u4FEE\u8D39</button></article>`);
+      $$("[data-repair-pay]", box).forEach((btn) => bind(btn, "\u7F34\u7EB3\u7EF4\u4FEE\u8D39", () => payDialog(ctx, [btn.dataset.repairPay], update)));
+    }
+  };
+  tabs.forEach((type) => bind($("#tab-" + type), "\u5207\u6362" + type + "\u8D26\u5355", () => {
+    tab = type;
+    const url = new URL(location.href);
+    url.searchParams.set("tab", tab);
+    history.replaceState(null, "", url);
+    update();
+  }));
+  bind(summary, "\u7F34\u7EB3\u5F53\u524D\u8D26\u5355", () => payDialog(ctx, state2().bills.filter((b) => b.book === book && !b.paid && (book === "legacy" || b.type === tab)).map((b) => b.id), update));
+  tabs.forEach((type) => {
+    const content = $("#content-" + type);
+    if (!content) return;
+    find(/立即缴费|缴车位费|缴纳停车费/, content).forEach((btn) => {
+      btn.dataset.billPay = type;
+      bind(btn, "\u7F34\u7EB3" + type + "\u8D26\u5355", () => payDialog(ctx, state2().bills.filter((b) => b.book === book && b.type === type && !b.paid && !b.orderId).map((b) => b.id), update));
+    });
+  });
+  bind($("#houseDropdownBtn"), "\u9009\u62E9\u7F34\u8D39\u623F\u4EA7", () => {
+    $("#houseDropdownMenu").classList.toggle("hidden");
+    $("#houseDropdownBtn").setAttribute("aria-expanded", String(!$("#houseDropdownMenu").classList.contains("hidden")));
+  });
+  $$("#houseDropdownMenu > div").forEach((row, i) => bind(row, i ? "\u9009\u62E9\u8F66\u4F4D\u8D26\u5355" : "\u9009\u62E9\u4F4F\u5B85\u8D26\u5355", () => {
+    tab = i ? "parking" : "property";
+    $("#houseDropdownMenu").classList.add("hidden");
+    update();
+  }));
+  on(/查看公示/, () => go3("/mobile/articles/garden"));
+  update();
+  window.addEventListener("demo:external", update);
+  if (qs2.get("bill") && state2().bills.some((b) => b.id === qs2.get("bill") && !b.paid)) payDialog(ctx, [qs2.get("bill")], update);
+}
+function payDialog(ctx, billIds, after) {
+  if (!billIds.length) return toast("\u5F53\u524D\u8D26\u5355\u5DF2\u7F34\u6E05");
+  const bills = ctx.state().bills.filter((b) => billIds.includes(b.id));
+  const amount = bills.reduce((sum, b) => sum + b.amount, 0);
+  const coupons = ctx.state().coupons.filter((c) => !c.used && bills.every((b) => b.type === c.type));
+  const couponField = field("coupon", "\u62B5\u6263\u5238", "", { required: false, choices: [["", "\u4E0D\u4F7F\u7528"], ...coupons.map((c) => [c.id, `\u62B5\u6263 \xA5${c.amount}`])] });
+  formModal("\u786E\u8BA4\u7F34\u8D39\uFF08\u6A21\u62DF\u652F\u4ED8\uFF09", list(bills, (b) => `<div>${escape(b.title)}<strong>\xA5${money(b.amount)}</strong></div>`) + `<p>\u8D26\u5355\u5408\u8BA1\uFF1A<strong>\xA5${money(amount)}</strong></p>` + couponField + field("result", "\u652F\u4ED8\u7ED3\u679C", "success", { choices: [["success", "\u6A21\u62DF\u652F\u4ED8\u6210\u529F"], ["failure", "\u6A21\u62DF\u652F\u4ED8\u5931\u8D25"]] }), (values) => {
+    if (values.result === "failure") throw new Error("\u6A21\u62DF\u652F\u4ED8\u5931\u8D25\uFF0C\u8D26\u5355\u672A\u6263\u6B3E\uFF0C\u53EF\u91CD\u65B0\u652F\u4ED8");
+    const payment = ctx.store.pay(billIds, values.coupon || void 0);
+    after();
+    modal("\u7F34\u8D39\u6210\u529F", `<p>\u5B9E\u4ED8 \xA5${money(payment.amount)}\uFF0C\u62B5\u6263 \xA5${money(payment.discount)}</p><p>\u4EA4\u6613\u53F7\uFF1A${escape(payment.id)}</p><p>\u5DF2\u83B7${Math.floor(payment.amount)}\u79EF\u5206\u3002</p>`, [
+      { label: "\u67E5\u770B\u7535\u5B50\u56DE\u5355", run: () => modal("\u7F34\u8D39\u7535\u5B50\u56DE\u5355\uFF08\u6F14\u793A\uFF09", `<p>\u4EA4\u6613\u53F7\uFF1A${payment.id}</p><p>\u5B9E\u4ED8\uFF1A\xA5${money(payment.amount)}</p><p>${new Date(payment.at).toLocaleString("zh-CN")}</p><p>\u672C\u51ED\u8BC1\u975E\u7A0E\u52A1\u53D1\u7968\u3002</p>`, [{ label: "\u4E0B\u8F7D\u56DE\u5355", run: () => download(payment.id + ".txt", JSON.stringify(payment, null, 2)) }]) },
+      { label: "\u8FD4\u56DE\u8D26\u5355", secondary: true, run: closeModal }
+    ]);
+    return false;
+  }, "\u786E\u8BA4\u6A21\u62DF\u652F\u4ED8");
+}
+function pointsPage(ctx) {
+  const { store: store2, state: state2, go: go3, requireAuth: requireAuth2 } = ctx;
+  const balance = $$("main span").find((e) => e.textContent.trim() === "2,480");
+  if (balance) {
+    balance.dataset.points = "";
+    balance.textContent = state2().user.points.toLocaleString("zh-CN");
+  }
+  const taskButtons = find(/做任务快速赚分/);
+  taskButtons.forEach((btn) => bind(btn, "\u67E5\u770B\u79EF\u5206\u4EFB\u52A1", () => $("#taskSection").scrollIntoView({ behavior: "smooth" })));
+  on(/去评价/, () => {
+    const order = state2().orders.find((o) => o.status === "completed" && !state2().reviews.some((r) => r.orderId === o.id));
+    if (!order) return modal("\u670D\u52A1\u8BC4\u4EF7", empty("\u6682\u65E0\u5F85\u8BC4\u4EF7\u5DE5\u5355"));
+    go3("/mobile/review?id=" + order.id);
+  });
+  on(/报名参与/, () => formModal("\u5468\u672B\u7EFF\u690D\u5171\u5EFA\u62A5\u540D", field("name", "\u53C2\u4E0E\u4EBA\u59D3\u540D", state2().user.name) + field("phone", "\u624B\u673A\u53F7\u7801", state2().user.phone, { type: "tel", pattern: "1[3-9][0-9]{9}" }) + field("count", "\u53C2\u52A0\u4EBA\u6570", "1", { type: "number", min: 1, max: 10 }), (values) => {
+    store2.change((s) => {
+      if (s.bookings.some((b) => b.productId === "garden-activity" && b.status !== "\u5DF2\u53D6\u6D88")) throw new Error("\u5DF2\u62A5\u540D\u672C\u671F\u6D3B\u52A8\uFF0C\u8BF7\u52FF\u91CD\u590D\u63D0\u4EA4");
+      s.bookings.unshift({ ...values, id: id("ACT"), productId: "garden-activity", title: "\u5468\u672B\u7EFF\u690D\u5171\u5EFA", date: "\u672C\u5468\u516D 09:00", status: "\u62A5\u540D\u6210\u529F\uFF0C\u5F85\u73B0\u573A\u7B7E\u5230", amount: 0, at: now() });
+    });
+    toast("\u62A5\u540D\u6210\u529F\uFF0C\u53C2\u4E0E\u6D3B\u52A8\u540E\u53D1\u653E50\u79EF\u5206");
+  }));
+  $$(".category-tab").forEach((btn) => bind(btn, "\u7B5B\u9009" + label(btn), () => {
+    const category = btn.dataset.originalOnclick.match(/filterTab\('([^']+)'/)?.[1] || "all";
+    active($$(".category-tab"), btn);
+    $$(".product-item").forEach((item) => item.hidden = category !== "all" && !item.classList.contains(category));
+  }));
+  $$(".product-item").forEach((item, index) => {
+    const reward = rewards[index];
+    if (!reward) return;
+    const btn = $("button", item);
+    bind(btn, "\u5151\u6362" + reward.name, () => {
+      const requestId2 = id("REQ");
+      const paymentField = reward.cash ? field("cashPayment", "\u652F\u4ED8\u7ED3\u679C", "success", { choices: [["success", "\u6A21\u62DF\u652F\u4ED8\u6210\u529F"], ["failure", "\u6A21\u62DF\u652F\u4ED8\u5931\u8D25"]] }) : "";
+      formModal("\u786E\u8BA4\u79EF\u5206\u5151\u6362", `<h3>${escape(reward.name)}</h3><p>\u6263\u9664 ${reward.points}\u79EF\u5206${reward.cash ? ` + \xA5${reward.cash}\uFF08\u6A21\u62DF\u652F\u4ED8\uFF09` : ""}\uFF0C\u5F53\u524D\u53EF\u7528 ${state2().user.points}\u79EF\u5206</p>` + field("delivery", "\u9886\u53D6\u65B9\u5F0F", "\u7269\u4E1A\u670D\u52A1\u4E2D\u5FC3\u81EA\u63D0", { choices: ["\u7269\u4E1A\u670D\u52A1\u4E2D\u5FC3\u81EA\u63D0", "\u914D\u9001\u81F3\u5DF2\u7ED1\u5B9A\u623F\u5C4B"] }) + paymentField, (values) => {
+        const result = store2.redeem(reward.id, values.delivery, requestId2, { cashPayment: values.cashPayment || "success" });
+        if (balance) balance.textContent = state2().user.points.toLocaleString("zh-CN");
+        const payment = result.paymentId && state2().payments.find((p) => p.id === result.paymentId);
+        modal("\u5151\u6362\u6210\u529F", `<p>${escape(result.name)}</p><h3>\u6838\u9500\u7801\uFF1A${result.code}</h3><p>${escape(result.delivery)}</p>${payment ? `<p>\u6A21\u62DF\u652F\u4ED8\uFF1A\xA5${money(payment.amount)} \xB7 \u4EA4\u6613\u53F7 ${escape(payment.id)}</p>` : ""}`, [
+          { label: "\u67E5\u770B\u5151\u6362\u8BB0\u5F55", run: () => redemptionHistory(ctx) },
+          { label: "\u8FD4\u56DE\u79EF\u5206\u4E2D\u5FC3", secondary: true, run: closeModal }
+        ]);
+        return false;
+      }, "\u786E\u8BA4\u5151\u6362");
+    });
+  });
+  let accumulated = Number(state2().drafts["listened-" + today()] || 0), previous = Date.now();
+  const radio = createRadio((audio, error) => {
+    if (error) return toast(error.message, true);
+    $("#radioIcon").textContent = audio.paused ? "play_arrow" : "pause";
+    $("#radioText").textContent = audio.paused ? "\u542C\u64AD\u8D5A\u5206" : "\u6536\u542C\u4E2D...";
+  });
+  radio.audio.loop = true;
+  const timer = setInterval(() => {
+    const elapsed = Math.min(1e3, Date.now() - previous);
+    previous = Date.now();
+    if (!radio.audio.paused && !radio.audio.seeking && radio.audio.readyState >= 3 && !document.hidden) {
+      accumulated += elapsed;
+      if (accumulated >= 12e4) {
+        store2.award(15, "\u6BCF\u65E5\u6536\u542C\u5E7F\u64AD", "radio-" + today());
+        $("#radioText").textContent = "\u4ECA\u65E5\u79EF\u5206\u5DF2\u5165\u8D26";
+        clearInterval(timer);
+      }
+      store2.saveDraft("listened-" + today(), accumulated);
+    }
+  }, 1e3);
+  window.addEventListener("pagehide", () => clearInterval(timer));
+  bind($("#radioPlayBtn"), "\u6536\u542C\u793E\u533A\u5E7F\u64AD\u8D5A\u79EF\u5206", radio.toggle);
+}
+function pointsHistory(ctx) {
+  modal("\u79EF\u5206\u660E\u7EC6", list(ctx.state().pointsLog, (p) => `<article><strong>${p.delta > 0 ? "+" : ""}${p.delta} \u5206 \xB7 ${escape(p.reason)}</strong><small>${new Date(p.at).toLocaleString("zh-CN")}</small></article>`));
+}
+function redemptionHistory(ctx) {
+  modal("\u5151\u6362\u8BB0\u5F55", list(ctx.state().redemptions, (r) => `<article><strong>${escape(r.name)}</strong><p>${r.points}\u79EF\u5206 \xB7 \u6838\u9500\u7801 ${r.code} \xB7 ${escape(r.status)}</p><small>${escape(r.delivery)} \xB7 ${new Date(r.at).toLocaleString("zh-CN")}</small></article>`));
+}
+function servicesPage(ctx) {
+  const { go: go3, qs: qs2 } = ctx;
+  const buttons3 = find(/立即拼团|预约排班|立即预订|^预约$|免押借|一键快捷预约|免费量尺预约|立即抢鲜|^联系$/);
+  const ids = ["ac-group", "waterproof", "vegetables", "dumplings", "computer", "stroller", "pet", "ac", "screen", "peach"];
+  buttons3.forEach((btn, i) => bind(btn, "\u67E5\u770B\u670D\u52A1\u8BE6\u60C5", () => go3("/mobile/services/" + ids[i])));
+  $$(".cursor-pointer").filter((e) => /全屋开荒|油烟机|墙面补漆|闲置代管|冷链到家|老人助餐/.test(e.textContent)).forEach((el, i) => bind(el, "\u67E5\u770B\u670D\u52A1\u5206\u7C7B", () => {
+    const choices = i === 0 ? [products[7]] : i === 1 ? [products[0], products[7]] : i === 2 ? [products[1], products[8]] : i === 3 ? [] : i === 4 ? [products[2], products[9]] : [products[6]];
+    const dlg = modal(label(el).split(" ")[0], list(choices, (p) => `<button data-product="${p.id}"><strong>${p.name}</strong><small>\xA5${money(p.price)}</small></button>`), choices.length ? [] : [{ label: "\u767B\u8BB0\u79DF\u552E\u9700\u6C42", run: () => formModal("\u8F66\u4F4D\u4E0E\u4ED3\u50A8\u9700\u6C42", field("description", "\u9700\u6C42\u8BF4\u660E", "", { type: "textarea" }), (v) => {
+      ctx.notify("\u79DF\u552E\u9700\u6C42\u5DF2\u767B\u8BB0", v.description);
+    }) }]);
+    $$("[data-product]", dlg).forEach((btn) => bind(btn, "\u670D\u52A1\u8BE6\u60C5", () => go3("/mobile/services/" + btn.dataset.product)));
+  }));
+  if (ctx.route.detail === "service") serviceDetail(ctx, decodeURIComponent(location.pathname.split("/").pop()));
+}
+function serviceDetail(ctx, productId) {
+  const product = products.find((p) => p.id === productId);
+  if (!product) return modal("\u670D\u52A1\u4E0D\u5B58\u5728", empty("\u8BE5\u670D\u52A1\u4E0D\u5B58\u5728\u6216\u5DF2\u4E0B\u67B6"), [{ label: "\u8FD4\u56DE\u670D\u52A1\u5217\u8868", run: () => ctx.go("/mobile/services") }]);
+  modal("\u670D\u52A1\u8BE6\u60C5", `<h3>${escape(product.name)}</h3><p>${escape(product.category)}</p><h3>\xA5${money(product.price)} / \u6B21\uFF08\u4EFD\uFF09</h3><p>\u7531\u7269\u4E1A\u670D\u52A1\u4E2D\u5FC3\u534F\u8C03\uFF0C\u63D0\u4EA4\u540E\u7BA1\u5BB6\u5C06\u786E\u8BA4\u65F6\u95F4\u53CA\u670D\u52A1\u8303\u56F4\u3002\u6750\u6599\u589E\u9879\u987B\u53E6\u884C\u786E\u8BA4\u3002</p>`, [
+    { label: "\u7ACB\u5373\u9884\u7EA6", run: () => ctx.requireAuth(() => {
+      const requestId2 = id("REQ");
+      formModal("\u786E\u8BA4\u9884\u7EA6", field("date", "\u9884\u7EA6\u65E5\u671F", today(), { type: "date", min: today() }) + field("time", "\u9884\u7EA6\u65F6\u6BB5", "14:00-16:30", { choices: ["09:00-11:30", "14:00-16:30", "17:30-19:30"] }) + field("quantity", "\u6570\u91CF", "1", { type: "number", min: 1, max: 99 }) + field("phone", "\u8054\u7CFB\u7535\u8BDD", ctx.state().user.phone, { type: "tel", pattern: "1[3-9][0-9]{9}" }) + field("address", "\u670D\u52A1/\u914D\u9001\u5730\u5740", ctx.state().user.room), (values) => {
+        const booking = ctx.store.book(productId, values, requestId2);
+        modal("\u9884\u7EA6\u6210\u529F", `<p>${escape(booking.title)}</p><p>${escape(booking.date)} \xB7 ${escape(booking.time)}</p><p>\u9884\u7EA6\u91D1\u989D \xA5${money(booking.amount)}\uFF0C\u5F85\u7BA1\u5BB6\u786E\u8BA4\u3002</p><small>${booking.id}</small>`, [
+          { label: "\u67E5\u770B\u9884\u7EA6\u8BB0\u5F55", run: () => ctx.panel("bookings") },
+          { label: "\u8FD4\u56DE\u670D\u52A1\u5217\u8868", secondary: true, run: () => ctx.go("/mobile/services") }
+        ]);
+        return false;
+      }, "\u63D0\u4EA4\u9884\u7EA6");
+    }) },
+    { label: ctx.state().favorites.includes(productId) ? "\u53D6\u6D88\u6536\u85CF" : "\u6536\u85CF\u670D\u52A1", secondary: true, run: () => {
+      ctx.store.toggle("favorites", productId);
+      serviceDetail(ctx, productId);
+    } }
+  ]);
+}
+function shopForm(ctx) {
+  formModal("\u90BB\u5C45\u95EA\u94FA\u5165\u9A7B\u7533\u8BF7", field("name", "\u5E97\u94FA\u540D\u79F0") + field("category", "\u7ECF\u8425\u7C7B\u76EE", "\u4FBF\u6C11\u670D\u52A1", { choices: ["\u4FBF\u6C11\u670D\u52A1", "\u624B\u4F5C\u98DF\u54C1", "\u7269\u54C1\u79DF\u8D41", "\u751F\u6D3B\u96F6\u552E"] }) + field("phone", "\u8054\u7CFB\u7535\u8BDD", ctx.state().user.phone, { type: "tel", pattern: "1[3-9][0-9]{9}" }) + field("description", "\u670D\u52A1\u7B80\u4ECB", "", { type: "textarea" }), (v) => {
+    ctx.store.change((s) => {
+      if (!s.user.verified) throw new Error("\u8BF7\u5148\u5B8C\u6210\u623F\u5C4B\u8BA4\u8BC1");
+      s.shops.unshift({ ...v, id: id("SHOP"), status: "\u5F85\u7269\u4E1A\u5BA1\u6838", at: now() });
+    });
+    toast("\u5165\u9A7B\u7533\u8BF7\u5DF2\u63D0\u4EA4\uFF0C\u5F85\u7269\u4E1A\u5BA1\u6838");
+  });
+}
+function postForm(ctx) {
+  formModal("\u53D1\u5E03\u90BB\u91CC\u52A8\u6001", field("body", "\u52A8\u6001\u5185\u5BB9", "", { type: "textarea", maxLength: 500 }), (v) => {
+    ctx.store.change((s) => s.posts.unshift({ id: id("POST"), body: v.body, author: s.user.name, likes: 0, at: now() }));
+    toast("\u52A8\u6001\u5DF2\u53D1\u5E03");
+    setTimeout(() => communityFeed(ctx), 0);
+  }, "\u53D1\u5E03");
+}
+function communityFeed(ctx) {
+  const dlg = modal("\u6211\u7684\u751F\u6D3B\u5708", list(ctx.state().posts, (p) => `<article><strong>${escape(p.author)}</strong><p>${escape(p.body)}</p><button class="demo-button secondary" data-like-post="${p.id}">${ctx.state().likes.includes(p.id) ? "\u53D6\u6D88\u70B9\u8D5E" : "\u70B9\u8D5E"} ${p.likes + (ctx.state().likes.includes(p.id) ? 1 : 0)}</button></article>`), [{ label: "\u53D1\u5E03\u52A8\u6001", run: () => ctx.requireAuth(() => postForm(ctx)) }]);
+  $$("[data-like-post]", dlg).forEach((btn) => bind(btn, "\u70B9\u8D5E\u52A8\u6001", () => {
+    ctx.store.toggle("likes", btn.dataset.likePost);
+    communityFeed(ctx);
+  }));
+}
+function voiceInput(ctx, target) {
+  const Recognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+  if (!Recognition) {
+    return formModal("\u8BED\u97F3\u8F93\u5165\u6682\u4E0D\u53EF\u7528", `<p>\u5F53\u524D\u6D4F\u89C8\u5668\u672A\u63D0\u4F9B\u8BED\u97F3\u8BC6\u522B\uFF0C\u53EF\u76F4\u63A5\u586B\u5199\u5185\u5BB9\u3002</p>` + field("text", "\u586B\u5199\u5185\u5BB9", target.value, { type: "textarea" }), (v) => {
+      target.value = v.text;
+      target.dispatchEvent(new Event("input"));
+    });
+  }
+  const recognition = new Recognition();
+  recognition.lang = "zh-CN";
+  recognition.interimResults = false;
+  recognition.onresult = (e) => {
+    target.value = (target.value + e.results[0][0].transcript).slice(0, target.maxLength > 0 ? target.maxLength : 1e3);
+    target.dispatchEvent(new Event("input"));
+    toast("\u8BED\u97F3\u8BC6\u522B\u5B8C\u6210");
+  };
+  recognition.onerror = (e) => toast(e.error === "not-allowed" ? "\u9EA6\u514B\u98CE\u6743\u9650\u672A\u83B7\u6388\u6743\uFF0C\u53EF\u76F4\u63A5\u8F93\u5165\u6587\u5B57" : "\u8BED\u97F3\u8BC6\u522B\u5931\u8D25\uFF0C\u8BF7\u91CD\u8BD5\u6216\u8F93\u5165\u6587\u5B57", true);
+  recognition.start();
+  toast("\u6B63\u5728\u6536\u542C\uFF0C\u8BF7\u8BF4\u51FA\u5185\u5BB9");
+}
+var find, on, today, realApiEnabled, formatDate, eventLabel;
+var init_resident = __esm({
+  "src/pages/resident.js"() {
+    init_ui();
+    init_store();
+    init_seed();
+    init_audio();
+    init_auth();
+    init_work_orders();
+    find = (text, root = document) => $$('button,a,[role="button"],.cursor-pointer', root).filter((e) => typeof text === "string" ? label(e) === text : text.test(label(e)));
+    on = (text, fn) => find(text).forEach((el) => {
+      if (!el.dataset.action) bind(el, label(el), () => fn(el));
+    });
+    today = () => (/* @__PURE__ */ new Date()).toLocaleDateString("en-CA");
+    realApiEnabled = () => Boolean(globalThis.__SHENGBIAN_API_BASE__) && sessionStorage.getItem("shengbian-api-auth-resident") === "yes";
+    formatDate = (value) => value ? new Date(value).toLocaleString("zh-CN") : "\u2014";
+    eventLabel = (event) => ({
+      CREATE: "\u5DF2\u63D0\u4EA4\u62A5\u4FEE",
+      WORK_ORDER_CREATED: "\u5DF2\u63D0\u4EA4\u62A5\u4FEE",
+      ASSIGN: "\u7269\u4E1A\u5DF2\u6D3E\u5355",
+      WORK_ORDER_ASSIGNED: "\u7269\u4E1A\u5DF2\u6D3E\u5355",
+      ACCEPTED: "\u7EF4\u4FEE\u4EBA\u5458\u5DF2\u63A5\u5355",
+      ARRIVED: "\u7EF4\u4FEE\u4EBA\u5458\u5DF2\u5230\u573A",
+      COMPLETED: "\u7EF4\u4FEE\u4EBA\u5458\u5DF2\u5B8C\u6210\u5904\u7406",
+      RESIDENT_CONFIRMED_COMPLETION: "\u60A8\u5DF2\u786E\u8BA4\u7EF4\u4FEE\u5B8C\u6210",
+      REWORK_REQUESTED: "\u60A8\u53CD\u9988\u95EE\u9898\u672A\u89E3\u51B3",
+      REVIEW_SUBMITTED: "\u60A8\u5DF2\u63D0\u4EA4\u670D\u52A1\u8BC4\u4EF7"
+    })[event.action] || ({ PENDING_DISPATCH: "\u5DF2\u63D0\u4EA4\u62A5\u4FEE", ASSIGNED: "\u7269\u4E1A\u5DF2\u6D3E\u5355", ACCEPTED: "\u7EF4\u4FEE\u4EBA\u5458\u5DF2\u63A5\u5355", ARRIVED: "\u7EF4\u4FEE\u4EBA\u5458\u5DF2\u5230\u573A", COMPLETED: "\u7EF4\u4FEE\u4EBA\u5458\u5DF2\u5B8C\u6210\u5904\u7406", ARCHIVED: "\u5DF2\u5B8C\u6210", REWORK_REQUIRED: "\u5DF2\u8FDB\u5165\u8FD4\u5DE5\u6D41\u7A0B", CANCELLED: "\u5DE5\u5355\u5DF2\u53D6\u6D88" }[event.toStatus] || "\u5DE5\u5355\u72B6\u6001\u5DF2\u66F4\u65B0");
+  }
+});
+
+// src/routes.js
+var pages = [
+  { key: "overview", path: "/web/overview", file: "web/_1/code.html", name: "\u8C03\u5EA6\u6982\u89C8\u5DE5\u4F5C\u53F0", group: "web", level: 1 },
+  { key: "work-orders", path: "/web/work-orders", file: "web/_2/code.html", name: "\u5DE5\u5355\u6D3E\u53D1\u4E0E\u8C03\u5EA6", group: "web", level: 1 },
+  { key: "expenses", path: "/web/expenses", file: "web/_3/code.html", name: "\u7269\u4E1A\u652F\u51FA\u7BA1\u7406", group: "web", level: 1 },
+  { key: "finance", path: "/web/finance", file: "web/_4/code.html", name: "\u7269\u4E1A\u8D22\u52A1\u6536\u7F34\u4E2D\u5FC3", group: "web", level: 1 },
+  { key: "weekly", path: "/web/media", file: "web/_6/code.html", name: "\u5468\u62A5\u9644\u4EF6\u4E0A\u4F20", group: "web", level: 1 },
+  { key: "broadcast", path: "/web/broadcast", file: "web/_7/code.html", name: "\u7D27\u6025\u901A\u77E5\u4E0E\u5E7F\u64AD", group: "web", level: 1 },
+  { key: "checkin", path: "/worker/checkin", file: "web/_8/code.html", name: "\u73B0\u573A\u6253\u5361\u4E0E\u5B8C\u5DE5\u7ED3\u7B97", group: "worker", level: 2 },
+  { key: "tasks", path: "/worker/tasks", file: "web/_9/code.html", name: "\u5E08\u5085\u4EFB\u52A1\u63A5\u5355", group: "worker", level: 1 },
+  { key: "group", path: "/web/group", file: "web/_10/code.html", name: "\u96C6\u56E2\u8FD0\u8425\u4E2D\u67A2", group: "web", level: 1 },
+  { key: "home", path: "/mobile/home", file: "\u5C0F\u7A0B\u5E8F/_1/code.html", name: "\u5C45\u6C11\u9996\u9875", group: "mobile", level: 1, public: true },
+  { key: "login", path: "/mobile/login", file: "\u5C0F\u7A0B\u5E8F/_2/code.html", name: "\u5C45\u6C11\u767B\u5F55", group: "mobile", level: 2, public: true },
+  { key: "verify", path: "/mobile/verify", file: "\u5C0F\u7A0B\u5E8F/_3/code.html", name: "\u5B9E\u540D\u4E0E\u623F\u5C4B\u786E\u6743", group: "mobile", level: 2, public: true },
+  { key: "review", path: "/mobile/review", file: "\u5C0F\u7A0B\u5E8F/_4/code.html", name: "\u7EF4\u4FEE\u670D\u52A1\u8BC4\u4EF7", group: "mobile", level: 3 },
+  { key: "media", path: "/mobile/media", file: "\u5C0F\u7A0B\u5E8F/_5/code.html", name: "\u58F0\u8FB9\u89C6\u542C", group: "mobile", level: 1, public: true },
+  { key: "services", path: "/mobile/services", file: "\u5C0F\u7A0B\u5E8F/_6/code.html", name: "\u7269\u4E1A\u4FBF\u5229\u4E0E\u90BB\u5C45\u95EA\u94FA", group: "mobile", level: 1, public: true },
+  { key: "bills", path: "/mobile/bills", file: "\u5C0F\u7A0B\u5E8F/_7/code.html", name: "\u5408\u5E76\u7F34\u8D39\u8D26\u5355", group: "mobile", level: 2 },
+  { key: "repair", path: "/mobile/repair", file: "\u5C0F\u7A0B\u5E8F/_8/code.html", name: "\u5728\u7EBF\u62A5\u4FEE", group: "mobile", level: 2 },
+  { key: "profile", path: "/mobile/profile", file: "\u5C0F\u7A0B\u5E8F/_9/code.html", name: "\u670D\u52A1\u4E0E\u6211\u7684", group: "mobile", level: 1 },
+  { key: "billing", path: "/mobile/billing", file: "\u5C0F\u7A0B\u5E8F/_10/code.html", name: "\u5206\u9879\u6536\u8D39\u8D26\u5355", group: "mobile", level: 2 },
+  { key: "points", path: "/mobile/points", file: "\u5C0F\u7A0B\u5E8F/_11/code.html", name: "\u58F0\u8FB9\u79EF\u5206\u4E0E\u5151\u6362", group: "mobile", level: 2 }
+];
+var navRoutes = {
+  overview: "/web/overview",
+  "work-orders": "/web/work-orders",
+  "finance-center": "/web/finance",
+  "expense-management": "/web/expenses",
+  "property-expenses": "/web/expenses",
+  "property-expenditure": "/web/expenses",
+  "reserve-fund-expense": "/web/expenses?fund=maintenance",
+  "maintenance-fund-expenses": "/web/expenses?fund=maintenance",
+  "maintenance-fund": "/web/expenses?fund=maintenance",
+  "media-editor": "/web/media",
+  "weekly-media": "/web/media",
+  "broadcast-dispatcher": "/web/broadcast",
+  "property-residents": "/web/overview?panel=residents",
+  "system-settings": "/web/overview?panel=settings",
+  login: "/web/login",
+  home: "/mobile/home",
+  "media-audio": "/mobile/media",
+  "neighborhood-community": "/mobile/services",
+  "services-profile": "/mobile/profile",
+  "task-orders": "/worker/tasks",
+  "ongoing-tasks": "/worker/tasks?status=accepted",
+  "completed-records": "/worker/tasks?status=completed",
+  "profile-center": "/worker/tasks?panel=account",
+  "financial-overview": "/web/group",
+  "collection-comparison": "/web/group?section=matrix-table",
+  "expenditure-reconciliation": "/web/group?section=matrix-table&view=expenditure",
+  "capital-pool": "/web/group?section=capital",
+  "project-matrix": "/web/group?section=matrix-table",
+  "work-order-kanban": "/web/work-orders",
+  "converged-media": "/web/media",
+  "organization-permissions": "/web/group?panel=settings",
+  "group-center": "/web/group"
+};
+function matchRoute(pathname) {
+  const direct = pages.find((p) => p.path === pathname);
+  if (direct) return direct;
+  if (pathname === "/web/login" || pathname === "/worker/login") return { ...pages.find((p) => p.key === "login"), path: pathname, group: pathname.split("/")[1] };
+  if (/^\/(mobile|web|worker)\/orders\/[^/]+$/.test(pathname)) {
+    const group2 = pathname.split("/")[1];
+    return { ...pages.find((p) => p.key === (group2 === "web" ? "work-orders" : group2 === "worker" ? "tasks" : "profile")), detail: "order" };
+  }
+  if (/^\/mobile\/articles\/[^/]+$/.test(pathname)) return { ...pages.find((p) => p.key === "media"), detail: "article" };
+  if (/^\/mobile\/services\/[^/]+$/.test(pathname)) return { ...pages.find((p) => p.key === "services"), detail: "service" };
+  return null;
+}
+
+// src/app.js
+init_store();
 
 // src/services/files.js
 var open = () => new Promise((resolve, reject) => {
@@ -620,6 +1679,9 @@ async function deleteFile(id2) {
   });
   db.close();
 }
+
+// src/app.js
+init_seed();
 
 // src/data/source.json
 var source_default = {
@@ -1261,811 +2323,14 @@ var source_default = {
   }
 };
 
-// src/ui.js
-var $ = (selector, root = document) => root.querySelector(selector);
-var $$ = (selector, root = document) => [...root.querySelectorAll(selector)];
-var escape = (value) => String(value ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c]);
-var label = (element) => {
-  const clone = element.cloneNode(true);
-  clone.querySelectorAll(".material-symbols-outlined,.nav-badge").forEach((e) => e.remove());
-  return clone.textContent.replace(/\s+/g, " ").trim();
-};
-var icon = (name) => `<span class="material-symbols-outlined" aria-hidden="true">${name}</span>`;
-function bind(element, action, fn) {
-  if (!element) return;
-  element.dataset.action = action;
-  if (!["A", "BUTTON", "INPUT", "SELECT", "TEXTAREA", "LABEL"].includes(element.tagName)) {
-    element.tabIndex = 0;
-    element.setAttribute("role", "button");
-    element.addEventListener("keydown", (e) => {
-      if (e.key === "Enter" || e.key === " ") {
-        e.preventDefault();
-        element.click();
-      }
-    });
-  }
-  if (element.tagName === "BUTTON" && element.type !== "submit") element.type = "button";
-  if (!label(element) && !element.getAttribute("aria-label")) {
-    element.setAttribute("aria-label", element.title || action);
-    element.title ||= action;
-  }
-  element.addEventListener("click", async (e) => {
-    if (e.target.closest("[data-action]") !== element || element.disabled) return;
-    if (element.tagName === "A") e.preventDefault();
-    try {
-      await fn(e);
-    } catch (error) {
-      toast(error.message || "\u64CD\u4F5C\u5931\u8D25\uFF0C\u8BF7\u91CD\u8BD5", true);
-    }
-  });
-}
-function toast(text, error = false) {
-  let box = $("#demo-toast");
-  if (!box) {
-    box = document.createElement("div");
-    box.id = "demo-toast";
-    box.className = "demo-toast";
-    box.setAttribute("role", "status");
-    document.body.append(box);
-  }
-  const dialog = $("#demo-dialog");
-  if (dialog?.open && box.parentElement !== dialog) dialog.append(box);
-  else if (!dialog && box.parentElement !== document.body) document.body.append(box);
-  box.textContent = text;
-  box.dataset.error = String(error);
-  box.hidden = false;
-  clearTimeout(toast.timer);
-  toast.timer = setTimeout(() => {
-    box.hidden = true;
-  }, 4e3);
-}
-async function busy(button, fn) {
-  if (button?.disabled) return;
-  const html = button?.innerHTML;
-  if (button) {
-    button.disabled = true;
-    button.setAttribute("aria-busy", "true");
-    button.innerHTML = icon("progress_activity") + "\u5904\u7406\u4E2D...";
-  }
-  try {
-    await new Promise((r) => setTimeout(r, 240));
-    if (!navigator.onLine) throw new Error("\u7F51\u7EDC\u5DF2\u65AD\u5F00\uFF0C\u8BF7\u68C0\u67E5\u8FDE\u63A5\u540E\u91CD\u8BD5\uFF0C\u6570\u636E\u5C1A\u672A\u63D0\u4EA4");
-    return await fn();
-  } finally {
-    if (button?.isConnected) {
-      button.disabled = false;
-      button.removeAttribute("aria-busy");
-      button.innerHTML = html;
-    }
-  }
-}
-var lastFocus;
-function closeModal() {
-  const dlg = $("#demo-dialog");
-  if (dlg) {
-    const message = $("#demo-toast", dlg);
-    if (message) document.body.append(message);
-    dlg.close();
-    dlg.remove();
-    lastFocus?.focus?.();
-  }
-}
-function modal(title, content, actions = []) {
-  closeModal();
-  lastFocus = document.activeElement;
-  const dlg = document.createElement("dialog");
-  dlg.id = "demo-dialog";
-  dlg.className = "demo-dialog";
-  dlg.setAttribute("aria-labelledby", "dialog-title");
-  dlg.innerHTML = `<header><h2 id="dialog-title">${escape(title)}</h2><button type="button" class="demo-icon" aria-label="\u5173\u95ED">${icon("close")}</button></header><div class="demo-dialog-body">${content}</div><footer></footer>`;
-  document.body.append(dlg);
-  bind($("header button", dlg), "\u5173\u95ED\u5F39\u7A97", closeModal);
-  for (const action of actions) {
-    const btn = document.createElement("button");
-    btn.type = "button";
-    btn.className = "demo-button" + (action.secondary ? " secondary" : "");
-    btn.textContent = action.label;
-    btn.disabled = !!action.disabled;
-    $("footer", dlg).append(btn);
-    bind(btn, action.label, () => action.run(btn));
-  }
-  dlg.addEventListener("click", (e) => {
-    if (e.target === dlg && (e.offsetX < 0 || e.offsetX > dlg.offsetWidth || e.offsetY < 0 || e.offsetY > dlg.offsetHeight)) closeModal();
-  });
-  dlg.addEventListener("cancel", (e) => {
-    e.preventDefault();
-    closeModal();
-  });
-  dlg.showModal();
-  return dlg;
-}
-function confirm(title, body, onConfirm, options = {}) {
-  return modal(title, `<p>${escape(body)}</p>`, [
-    { label: "\u53D6\u6D88", secondary: true, run: closeModal },
-    { label: options.label || "\u786E\u8BA4", run: (btn) => busy(btn, async () => {
-      const result = await onConfirm();
-      closeModal();
-      options.after?.(result);
-    }) }
-  ]);
-}
-function field(name, title, value = "", options = {}) {
-  const attrs = `name="${escape(name)}" aria-label="${escape(title)}" ${options.required === false ? "" : "required"} ${options.min != null ? `min="${escape(options.min)}"` : ""} ${options.max != null ? `max="${escape(options.max)}"` : ""}`;
-  let input;
-  if (options.choices) input = `<select ${attrs}>${options.choices.map((c) => {
-    const [val, text] = Array.isArray(c) ? c : [c, c];
-    return `<option value="${escape(val)}" ${String(value) === String(val) ? "selected" : ""}>${escape(text)}</option>`;
-  }).join("")}</select>`;
-  else if (options.type === "textarea") input = `<textarea ${attrs} maxlength="${options.maxLength || 1e3}" rows="4">${escape(value)}</textarea>`;
-  else input = `<input ${attrs} type="${options.type || "text"}" value="${escape(value)}" ${options.step ? `step="${options.step}"` : ""} ${options.pattern ? `pattern="${escape(options.pattern)}"` : ""} autocomplete="off">`;
-  return `<label class="demo-field"><span>${escape(title)}</span>${input}</label>`;
-}
-function formModal(title, fields, onSubmit, buttonText = "\u786E\u8BA4\u63D0\u4EA4") {
-  let dlg;
-  const submit = (btn) => {
-    const form = $("form", dlg);
-    if (!form.reportValidity()) return;
-    return busy(btn, async () => {
-      const values = Object.fromEntries(new FormData(form));
-      const result = await onSubmit(values);
-      if (dlg.isConnected && result !== false) closeModal();
-    }).catch((error) => {
-      if (dlg.isConnected) $(".demo-form-error", dlg).textContent = error.message;
-      toast(error.message, true);
-    });
-  };
-  dlg = modal(title, `<form class="demo-form">${fields}<p class="demo-form-error" role="alert"></p><button type="submit" hidden></button></form>`, [
-    { label: "\u53D6\u6D88", secondary: true, run: closeModal },
-    { label: buttonText, run: submit }
-  ]);
-  $("form", dlg).addEventListener("submit", (e) => {
-    e.preventDefault();
-    submit($("footer button:last-child", dlg)).catch((error) => {
-      $(".demo-form-error", dlg).textContent = error.message;
-    });
-  });
-  return dlg;
-}
-function active(elements, selected) {
-  for (const el of elements) {
-    el.setAttribute("aria-pressed", String(el === selected));
-    el.classList.toggle("demo-selected", el === selected);
-    if (el !== selected) el.classList.remove("bg-primary", "text-on-primary", "bg-primary-container", "text-on-primary-container", "bg-surface-container-lowest", "shadow-sm");
-  }
-}
-function download(filename, data, type = "text/plain;charset=utf-8") {
-  const url = URL.createObjectURL(new Blob([data], { type }));
-  const a = document.createElement("a");
-  a.href = url;
-  a.download = filename;
-  a.click();
-  setTimeout(() => URL.revokeObjectURL(url), 1e3);
-}
-function csv(filename, rows) {
-  download(filename, "\uFEFF" + rows.map((row) => row.map((v) => `"${String(v ?? "").replace(/^[=+@-]/, "'$&").replaceAll('"', '""')}"`).join(",")).join("\r\n"), "text/csv;charset=utf-8");
-}
-function empty(text = "\u6682\u65E0\u8BB0\u5F55") {
-  return `<p class="demo-empty">${icon("inbox")}${escape(text)}</p>`;
-}
-function list(items, render) {
-  return items.length ? `<div class="demo-list">${items.map(render).join("")}</div>` : empty();
-}
-
-// src/services/audio.js
-function createRadio(onUpdate = () => {
-}) {
-  const audio = new Audio("/assets/community-radio.wav");
-  audio.preload = "metadata";
-  for (const event of ["timeupdate", "loadedmetadata", "play", "pause", "ended", "ratechange"]) audio.addEventListener(event, () => onUpdate(audio));
-  audio.addEventListener("error", () => onUpdate(audio, new Error("\u97F3\u9891\u52A0\u8F7D\u5931\u8D25\uFF0C\u8BF7\u5237\u65B0\u540E\u91CD\u8BD5")));
-  const toggle = async () => {
-    if (audio.paused) {
-      if (audio.ended) audio.currentTime = 0;
-      await audio.play();
-    } else audio.pause();
-  };
-  const seek = (value) => {
-    if (Number.isFinite(audio.duration)) audio.currentTime = Math.max(0, Math.min(audio.duration, value));
-  };
-  window.addEventListener("pagehide", () => audio.pause());
-  return { audio, toggle, seek };
-}
-
-// src/pages/resident.js
-init_auth();
-var find = (text, root = document) => $$('button,a,[role="button"],.cursor-pointer', root).filter((e) => typeof text === "string" ? label(e) === text : text.test(label(e)));
-var on = (text, fn) => find(text).forEach((el) => {
-  if (!el.dataset.action) bind(el, label(el), () => fn(el));
-});
-var today = () => (/* @__PURE__ */ new Date()).toLocaleDateString("en-CA");
-function initResident(ctx) {
-  const { route: route2, store: store2, state: state2, go: go2, qs: qs2, panel: panel2, requireAuth: requireAuth2 } = ctx;
-  if (route2.key === "login") loginPage(ctx);
-  if (route2.key === "verify") verifyPage(ctx);
-  if (route2.key === "repair") repairPage(ctx);
-  if (route2.key === "review") reviewPage(ctx);
-  if (["bills", "billing"].includes(route2.key)) billingPage(ctx);
-  if (route2.key === "points") pointsPage(ctx);
-  if (route2.key === "services") servicesPage(ctx);
-  if (route2.key === "profile") {
-    const amount = $$("span,div").find((e) => e.children.length === 0 && e.textContent.trim() === "1,280 \u79EF\u5206");
-    if (amount) {
-      amount.dataset.points = "";
-      amount.textContent = state2().user.points.toLocaleString("zh-CN");
-    }
-    const activeOrder = state2().orders.find((o) => !["closed", "cancelled"].includes(o.status) && o.room === state2().user.room);
-    const card = $$("main div").find((e) => e.classList.contains("bg-surface-container-lowest") && e.textContent.includes("\u6B63\u5728\u4E3A\u60A8\u670D\u52A1"));
-    if (card && activeOrder) {
-      const title = $("h2,h3,h4", card);
-      if (title) title.textContent = activeOrder.title;
-      bind(card, "\u67E5\u770B\u8FDB\u884C\u4E2D\u5DE5\u5355", () => go2("/mobile/orders/" + activeOrder.id));
-    }
-    renderPendingReviews(ctx, card);
-    const buttons3 = document.createElement("div");
-    buttons3.className = "demo-inline";
-    buttons3.innerHTML = `<button class="demo-button secondary" data-profile="bookings">${icon("event_note")}\u9884\u7EA6\u8BB0\u5F55</button><button class="demo-button secondary" data-profile="account">${icon("manage_accounts")}\u8D26\u53F7\u8BBE\u7F6E</button><button class="demo-button secondary" data-profile="bills">${icon("receipt_long")}\u5386\u53F2\u8D26\u671F</button>`;
-    $("main > div").append(buttons3);
-    $$("[data-profile]").forEach((b) => bind(b, label(b), () => b.dataset.profile === "bills" ? go2("/mobile/bills") : panel2(b.dataset.profile)));
-  }
-  if (route2.group === "mobile") {
-    on(/我要开闪铺|我要开铺|我也要开铺|入驻开店/, () => requireAuth2(() => shopForm(ctx)));
-    on(/发布|说点什么|文字投稿/, () => requireAuth2(() => postForm(ctx)));
-    on(/^我的报修/, () => panel2("orders"));
-    on(/积分明细/, () => pointsHistory(ctx));
-    on(/兑换记录/, () => redemptionHistory(ctx));
-    on(/去逛邻里圈/, () => go2("/mobile/services?panel=community-feed"));
-    if (qs2.get("panel") === "community-feed") communityFeed(ctx);
-  }
-}
-function renderPendingReviews(ctx, activeCard) {
-  const { state: state2, go: go2 } = ctx;
-  const snapshot = state2();
-  const pending = snapshot.orders.filter(
-    (order) => (order.room === snapshot.user.room || order.contact === snapshot.user.name || order.phone === snapshot.user.phone) && order.communityId === snapshot.user.communityId && order.status === "completed" && !snapshot.reviews.some((review) => review.orderId === order.id)
-  );
-  if (!pending.length) return;
-  const section = document.createElement("section");
-  section.className = "demo-pending-reviews";
-  section.setAttribute("aria-label", "\u5F85\u8BC4\u4EF7\u670D\u52A1");
-  section.innerHTML = `<div class="demo-pending-reviews-heading"><div><span class="material-symbols-outlined" aria-hidden="true">rate_review</span><div><h2>\u5F85\u8BC4\u4EF7\u670D\u52A1</h2><p>\u7EF4\u4FEE\u5DF2\u5B8C\u6210\uFF0C\u60A8\u7684\u53CD\u9988\u5C06\u5E2E\u52A9\u7269\u4E1A\u6539\u8FDB\u670D\u52A1</p></div></div><span>${pending.length} \u9879\u5F85\u529E</span></div><div class="demo-pending-review-list">${pending.map((order) => `<article><div><strong>${escape(order.title)}</strong><small>${escape(order.room)} \xB7 ${escape(order.technician || "\u7EF4\u4FEE\u5E08\u5085")} \xB7 ${new Date(order.timeline?.at(-1)?.at || order.createdAt).toLocaleDateString("zh-CN")} \u5B8C\u5DE5</small></div><button class="demo-button" data-pending-review="${escape(order.id)}">\u7ACB\u5373\u8BC4\u4EF7 ${icon("arrow_forward")}</button></article>`).join("")}</div>`;
-  const mainContent = $("main > div");
-  if (activeCard?.parentElement === mainContent) activeCard.after(section);
-  else mainContent?.prepend(section);
-  $$("[data-pending-review]", section).forEach((button) => bind(button, "\u7ACB\u5373\u8BC4\u4EF7\u670D\u52A1", () => go2("/mobile/review?id=" + button.dataset.pendingReview)));
-}
-function loginPage(ctx) {
-  const { route: route2, qs: qs2, safeNext: safeNext2, go: go2, state: state2, role: role2 } = ctx;
-  const account = $("#accountInput"), password = $("#passwordInput"), agreement = $("#agreementCheckbox");
-  account.value = role2 === "group" ? "group-admin" : role2 === "admin" ? "admin" : role2 === "worker" ? "worker" : "13800006688";
-  password.value = "demo123";
-  password.autocomplete = "current-password";
-  agreement.checked = false;
-  if (role2 !== "resident") {
-    const heading = $("header h1,header .font-headline-sm");
-    if (heading) heading.textContent = role2 === "group" ? "\u96C6\u56E2\u7BA1\u7406\u5458\u767B\u5F55" : role2 === "admin" ? "\u7269\u4E1A\u7BA1\u7406\u5458\u767B\u5F55" : "\u7EF4\u4FEE\u5E08\u5085\u767B\u5F55";
-  }
-  bind($("#clearAccountBtn"), "\u6E05\u7A7A\u8D26\u53F7", () => {
-    account.value = "";
-    account.focus();
-  });
-  bind($("#togglePasswordBtn"), "\u663E\u793A\u6216\u9690\u85CF\u5BC6\u7801", () => {
-    password.type = password.type === "password" ? "text" : "password";
-    $("#eyeIcon").textContent = password.type === "password" ? "visibility_off" : "visibility";
-  });
-  $("#clearAccountBtn").classList.remove("opacity-0", "pointer-events-none");
-  let mode = "password";
-  on(/短信验证码登录/, (el) => {
-    mode = mode === "password" ? "sms" : "password";
-    password.type = mode === "sms" ? "text" : "password";
-    password.value = mode === "sms" ? "123456" : "demo123";
-    password.setAttribute("aria-label", mode === "sms" ? "\u6F14\u793A\u9A8C\u8BC1\u7801" : "\u767B\u5F55\u5BC6\u7801");
-    el.innerHTML = icon("sms") + (mode === "sms" ? "\u8D26\u53F7\u5BC6\u7801\u767B\u5F55" : "\u77ED\u4FE1\u9A8C\u8BC1\u7801\u767B\u5F55");
-    toast(mode === "sms" ? "\u6F14\u793A\u9A8C\u8BC1\u7801\u4E3A123456\uFF0C\u4E0D\u4F1A\u53D1\u9001\u771F\u5B9E\u77ED\u4FE1" : "\u5DF2\u5207\u6362\u5BC6\u7801\u767B\u5F55");
-  });
-  on(/忘记密码/, () => formModal("\u91CD\u7F6E\u6F14\u793A\u5BC6\u7801", field("phone", "\u624B\u673A\u53F7", "", { type: "tel", pattern: "1[3-9][0-9]{9}" }) + field("code", "\u6F14\u793A\u9A8C\u8BC1\u7801", "123456") + field("password", "\u65B0\u5BC6\u7801", "", { type: "password" }) + field("confirm", "\u786E\u8BA4\u5BC6\u7801", "", { type: "password" }), (v) => {
-    if (v.code !== "123456") throw new Error("\u9A8C\u8BC1\u7801\u4E0D\u6B63\u786E");
-    if (v.password.length < 6) throw new Error("\u5BC6\u7801\u81F3\u5C116\u4F4D");
-    if (v.password !== v.confirm) throw new Error("\u4E24\u6B21\u5BC6\u7801\u8F93\u5165\u4E0D\u4E00\u81F4");
-    sessionStorage.setItem("shengbian-password", v.password);
-    toast("\u6F14\u793A\u5BC6\u7801\u5DF2\u66F4\u65B0");
-  }));
-  const submit = (btn) => busy(btn, async () => {
-    if (!agreement.checked) throw new Error("\u8BF7\u5148\u9605\u8BFB\u5E76\u540C\u610F\u670D\u52A1\u534F\u8BAE\u4E0E\u9690\u79C1\u653F\u7B56");
-    const validAccount = ["admin", "worker", "group-admin"].includes(account.value.trim()) || isPhone(account.value.trim());
-    if (!validAccount) throw new Error("\u8BF7\u8F93\u5165\u6709\u6548\u624B\u673A\u53F7\u6216\u6F14\u793A\u8D26\u53F7");
-    const usingApi = role2 !== "resident" && isPhone(account.value.trim());
-    if (!usingApi && mode === "password" && password.value !== (sessionStorage.getItem("shengbian-password") || "demo123")) throw new Error("\u8D26\u53F7\u6216\u5BC6\u7801\u4E0D\u6B63\u786E");
-    if (mode === "sms" && password.value !== "123456") throw new Error("\u9A8C\u8BC1\u7801\u4E0D\u6B63\u786E");
-    if (role2 !== "resident" && isPhone(account.value.trim())) {
-      if (mode !== "password") throw new Error("\u6B63\u5F0F\u8D26\u53F7\u8BF7\u4F7F\u7528\u5BC6\u7801\u767B\u5F55");
-      await login(account.value.trim(), password.value);
-      sessionStorage.setItem("shengbian-api-auth-" + role2, "yes");
-    }
-    if (role2 === "admin" && !usingApi && account.value !== "admin") throw new Error("\u8BF7\u4F7F\u7528\u7BA1\u7406\u5458\u6F14\u793A\u8D26\u53F7 admin");
-    if (role2 === "worker" && !usingApi && account.value !== "worker") throw new Error("\u8BF7\u4F7F\u7528\u7EF4\u4FEE\u5E08\u5085\u6F14\u793A\u8D26\u53F7 worker");
-    if (role2 === "group" && !usingApi && account.value !== "group-admin") throw new Error("\u8BF7\u4F7F\u7528\u96C6\u56E2\u7BA1\u7406\u5458\u6F14\u793A\u8D26\u53F7 group-admin");
-    sessionStorage.setItem("shengbian-auth-" + role2, "yes");
-    go2(safeNext2(qs2.get("next") || (role2 === "group" ? "/web/group" : role2 === "admin" ? "/web/overview" : role2 === "worker" ? "/worker/tasks" : "/mobile/home")));
-  });
-  const submitButton = $('#loginForm button[type="submit"]');
-  submitButton.dataset.action = "\u7ACB\u5373\u767B\u5F55";
-  $("#loginForm").addEventListener("submit", (e) => {
-    e.preventDefault();
-    submit(submitButton).catch((error) => toast(error.message, true));
-  });
-  on("\u5FAE\u4FE1\u4E00\u952E\u5FEB\u6377\u767B\u5F55", (btn) => {
-    if (!agreement.checked) return toast("\u8BF7\u5148\u540C\u610F\u670D\u52A1\u534F\u8BAE\u4E0E\u9690\u79C1\u653F\u7B56", true);
-    confirm("\u5FAE\u4FE1\u6F14\u793A\u6388\u6743", "\u5C06\u4EE5\u6D4B\u8BD5\u5C45\u6C11\u8EAB\u4EFD\u767B\u5F55\uFF0C\u4E0D\u4F1A\u8BFB\u53D6\u771F\u5B9E\u5FAE\u4FE1\u4FE1\u606F\u3002", () => sessionStorage.setItem("shengbian-auth-resident", "yes"), { label: "\u786E\u8BA4\u6388\u6743", after: () => go2(safeNext2(qs2.get("next") || "/mobile/home")) });
-  });
-  on(/去办理/, () => go2("/mobile/verify"));
-  const note = document.createElement("p");
-  note.className = "demo-auth-note";
-  note.textContent = "\u6F14\u793A\u73AF\u5883 \xB7 \u4F7F\u7528\u865A\u6784\u8D44\u6599 \xB7 \u65E0\u771F\u5B9E\u8EAB\u4EFD\u6838\u9A8C\u6216\u652F\u4ED8";
-  $("#loginForm").after(note);
-  const audio = $$("main div").find((e) => e.classList.contains("rounded-xl") && e.textContent.includes("\u793E\u533A\u90BB\u91CC\u6668\u64AD\u53F0"));
-  if (audio) bind(audio, "\u6536\u542C\u6668\u95F4\u5E7F\u64AD", () => ctx.speech(void 0));
-}
-function verifyPage(ctx) {
-  const { store: store2, state: state2, go: go2, upload: upload2 } = ctx;
-  let role2 = "owner", method = 1;
-  const nameInput = $('input[placeholder*="\u771F\u5B9E\u59D3\u540D"]'), idInput = $("#idCardInput");
-  idInput.value = "110101199001010010";
-  idInput.type = "password";
-  bind($("#toggleIdMask"), "\u663E\u793A\u6216\u9690\u85CF\u8BC1\u4EF6\u53F7\u7801", () => {
-    idInput.type = idInput.type === "password" ? "text" : "password";
-    $("#eyeIcon").textContent = idInput.type === "password" ? "visibility_off" : "visibility";
-  });
-  const roleButtons = [$("#roleOwnerBtn"), $("#roleTenantBtn")];
-  roleButtons.forEach((btn, i) => bind(btn, i ? "\u79DF\u5BA2\u5165\u4F4F" : "\u4E1A\u4E3B\u5165\u4F4F", () => {
-    role2 = i ? "tenant" : "owner";
-    active(roleButtons, btn);
-    $("#ownerVerificationCard").classList.toggle("hidden", !!i);
-    $("#tenantHintCard").classList.toggle("hidden", !i);
-    $("#submitBtn").innerHTML = icon("verified_user") + (i ? "\u63D0\u4EA4\u79DF\u7EA6\u5E76\u7533\u8BF7\u8BA4\u8BC1" : "\u63D0\u4EA4\u786E\u6743\u5E76\u7ED1\u5B9A\u623F\u5C4B");
-    if (i && !$("#tenant-upload")) {
-      const button = document.createElement("button");
-      button.id = "tenant-upload";
-      button.className = "demo-button secondary";
-      button.textContent = "\u4E0A\u4F20\u79DF\u7EA6";
-      $("#tenantHintCard").append(button);
-      bind(button, "\u4E0A\u4F20\u79DF\u7EA6", () => upload2(button, { accept: "image/*,.pdf" }));
-    }
-  }));
-  for (let i = 1; i <= 3; i++) bind($("#tabMethod" + i), "\u8BA4\u8BC1\u65B9\u5F0F" + i, () => {
-    method = i;
-    for (let j = 1; j <= 3; j++) $("#methodContent" + j).classList.toggle("hidden", j !== i);
-    active([1, 2, 3].map((j) => $("#tabMethod" + j)), $("#tabMethod" + i));
-  });
-  $$("main .material-symbols-outlined").filter((e) => ["keyboard_arrow_down", "expand_more"].includes(e.textContent.trim())).forEach((el) => {
-    const row = el.parentElement;
-    bind(row, "\u9009\u62E9\u623F\u5C4B\u4FE1\u606F", () => formModal("\u623F\u5C4B\u5750\u843D", field("room", "\u697C\u680B-\u5355\u5143-\u623F\u53F7", state2().user.room), (v) => {
-      if (!/^\d{1,3}-\d{1,2}-\d{1,4}$/.test(v.room)) throw new Error("\u623F\u53F7\u683C\u5F0F\u4E3A16-2-502");
-      store2.change((s) => s.user.room = v.room);
-      toast("\u623F\u5C4B\u4FE1\u606F\u5DF2\u66F4\u65B0");
-      row.querySelector("span").textContent = v.room;
-    }));
-  });
-  $$("main .material-symbols-outlined").filter((e) => ["receipt_long", "task_alt"].includes(e.textContent.trim()) && e.closest('[id^="methodContent"]')).forEach((el) => {
-    const card = el.parentElement;
-    if (!card.closest("[data-action]")) bind(card, "\u4E0A\u4F20\u8BA4\u8BC1\u51ED\u8BC1", () => upload2(card, { accept: "image/*,.pdf" }));
-  });
-  bind($("#submitBtn"), "\u63D0\u4EA4\u623F\u5C4B\u8BA4\u8BC1", (btnEvent) => {
-    const name = nameInput.value.trim();
-    if (name.length < 2) throw new Error("\u8BF7\u8F93\u5165\u771F\u5B9E\u59D3\u540D\uFF08\u6F14\u793A\u8BF7\u4F7F\u7528\u865A\u6784\u59D3\u540D\uFF09");
-    if (!/^\d{17}[\dXx]$/.test(idInput.value)) throw new Error("\u8EAB\u4EFD\u8BC1\u53F7\u7801\u987B\u4E3A18\u4F4D");
-    if (!$("#agreementCheck").checked) throw new Error("\u8BF7\u786E\u8BA4\u5E76\u540C\u610F\u623F\u5C4B\u4FE1\u606F\u6388\u6743");
-    const value = $(`#methodContent${method} input`)?.value.trim();
-    if (role2 === "owner" && !value) throw new Error("\u8BF7\u586B\u5199\u6240\u9009\u8BA4\u8BC1\u65B9\u5F0F\u7684\u51ED\u8BC1\u7F16\u53F7");
-    if (role2 === "owner" && method === 2 && !/^\d{20}$/.test(value)) throw new Error("\u7F51\u7B7E\u5408\u540C\u53F7\u987B\u4E3A20\u4F4D\u6570\u5B57");
-    if (role2 === "tenant" && !(state2().drafts["uploads-verify"] || []).length) throw new Error("\u8BF7\u4E0A\u4F20\u79DF\u7EA6\u51ED\u8BC1");
-    return confirm("\u63D0\u4EA4\u623F\u4EA7\u8BA4\u8BC1", "\u6B64\u64CD\u4F5C\u4EC5\u521B\u5EFA\u6F14\u793A\u8BA4\u8BC1\u8BB0\u5F55\uFF0C\u4E0D\u4F1A\u8C03\u7528\u771F\u5B9E\u516C\u5B89\u6216\u623F\u4EA7\u63A5\u53E3\u3002", () => {
-      store2.change((s) => {
-        s.user.name = name;
-        s.user.verified = role2 === "owner";
-        s.user.role = role2;
-        s.logs.unshift({ id: id("VERIFY"), action: "\u63D0\u4EA4\u623F\u4EA7\u8BA4\u8BC1", target: `${name} \xB7 ${s.user.room} \xB7 ${role2 === "tenant" ? "\u79DF\u5BA2\u5F85\u5BA1\u6838" : "\u6F14\u793A\u786E\u6743"}`, at: now() });
-      });
-      sessionStorage.setItem("shengbian-auth-resident", "yes");
-    }, { after: () => go2("/mobile/profile") });
-  });
-}
-function repairPage(ctx) {
-  const { store: store2, state: state2, go: go2, upload: upload2 } = ctx;
-  let scope = "private", category = "\u7BA1\u9053\u758F\u901A", date = today(), slot = "\u4E0A\u5348\u65F6\u6BB5 09:00 - 11:30", callConfirm = true;
-  renderRepairCenter(ctx);
-  const draft = state2().drafts.repair || {};
-  if (draft.description) $("#issue-text").value = draft.description;
-  const save = () => store2.saveDraft("repair", { description: $("#issue-text").value, scope, category, date, slot, callConfirm });
-  $("#issue-text").maxLength = 1e3;
-  $("#issue-text").addEventListener("input", save);
-  [$("#tab-private"), $("#tab-public")].forEach((btn, i) => bind(btn, i ? "\u516C\u5171\u533A\u57DF\u62A5\u4FEE" : "\u5BA4\u5185\u4E13\u6709\u62A5\u4FEE", () => {
-    scope = i ? "public" : "private";
-    active([$("#tab-private"), $("#tab-public")], btn);
-    save();
-  }));
-  $$("#category-group button").forEach((btn) => bind(btn, label(btn), () => {
-    category = label(btn);
-    active($$("#category-group button"), btn);
-    save();
-  }));
-  $$("#date-selector button").forEach((btn, i) => {
-    if (i < 3) {
-      const d = /* @__PURE__ */ new Date();
-      d.setDate(d.getDate() + i);
-      const value = d.toLocaleDateString("en-CA");
-      $("span:last-child", btn).textContent = `${d.getMonth() + 1}-${d.getDate()}`;
-      bind(btn, ["\u4ECA\u5929", "\u660E\u5929", "\u540E\u5929"][i], () => {
-        date = value;
-        active($$("#date-selector button"), btn);
-        save();
-      });
-    } else bind(btn, "\u81EA\u9009\u65E5\u671F", () => formModal("\u9009\u62E9\u9884\u7EA6\u65E5\u671F", field("date", "\u9884\u7EA6\u65E5\u671F", date, { type: "date", min: today() }), (v) => {
-      date = v.date;
-      active($$("#date-selector button"), btn);
-      $("span:last-child", btn).textContent = date;
-      save();
-    }));
-  });
-  $$("#slot-selector button").forEach((btn) => bind(btn, label(btn), () => {
-    slot = label(btn);
-    active($$("#slot-selector button"), btn);
-    save();
-  }));
-  bind($("#toggle-call"), "\u4E0A\u95E8\u524D\u7535\u8BDD\u786E\u8BA4", () => {
-    callConfirm = !callConfirm;
-    $("#toggle-call").setAttribute("aria-pressed", String(callConfirm));
-    $("#toggle-call").style.background = callConfirm ? "#006544" : "#bdc9c0";
-    $("#toggle-call span").style.transform = `translateX(${callConfirm ? 16 : 0}px)`;
-    save();
-  });
-  bind($("#voice-record-btn"), "\u8BED\u97F3\u586B\u5199\u6545\u969C\u63CF\u8FF0", () => voiceInput(ctx, $("#issue-text")));
-  on(/立即提交报修/, (btn) => {
-    if ($("#issue-text").value.trim().length < 5) throw new Error("\u8BF7\u586B\u5199\u81F3\u5C115\u4E2A\u5B57\u7684\u6545\u969C\u63CF\u8FF0");
-    formModal("\u786E\u8BA4\u62A5\u4FEE\u4FE1\u606F", `<p>${escape(category)} \xB7 ${escape(date)} \xB7 ${escape(slot)}</p>` + field("contact", "\u8054\u7CFB\u4EBA", state2().user.name) + field("phone", "\u8054\u7CFB\u7535\u8BDD", state2().user.phone, { type: "tel", pattern: "1[3-9][0-9]{9}" }) + field("room", scope === "public" ? "\u516C\u5171\u533A\u57DF\u5177\u4F53\u4F4D\u7F6E" : "\u62A5\u4FEE\u623F\u5C4B", scope === "public" ? "" : state2().user.room), (values) => {
-      const photos = [
-        ...$$("main img").map((img) => ({ src: img.src, name: "\u73B0\u573A\u793A\u4F8B\u7167\u7247" })),
-        ...state2().drafts["uploads-repair"] || []
-      ];
-      const order = store2.createOrder({ ...values, scope, category, description: $("#issue-text").value.trim(), appointment: date + " " + slot, urgent: slot.includes("\u52A0\u6025"), callConfirm, photos });
-      store2.saveDraft("repair", {});
-      store2.saveDraft("uploads-repair", []);
-      go2("/mobile/orders/" + order.id + "?submitted=1");
-    }, "\u786E\u8BA4\u63D0\u4EA4\u62A5\u4FEE");
-  });
-}
-function renderRepairCenter(ctx) {
-  const { state: state2, go: go2 } = ctx;
-  const snapshot = state2();
-  const ownerOrders = snapshot.orders.filter(
-    (order) => (!order.communityId || order.communityId === snapshot.user.communityId) && (order.room === snapshot.user.room || order.contact === snapshot.user.name || order.phone === snapshot.user.phone)
-  ).sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
-  const active2 = ownerOrders.filter((order) => !["completed", "closed", "cancelled"].includes(order.status));
-  const history2 = ownerOrders.filter((order) => ["completed", "closed", "cancelled"].includes(order.status));
-  const pendingReviews = history2.filter((order) => order.status === "completed" && !snapshot.reviews.some((review) => review.orderId === order.id));
-  const statusText = (order) => {
-    const review = snapshot.reviews.find((item) => item.orderId === order.id);
-    if (order.status === "completed" && !review) return "\u5DF2\u5B8C\u5DE5\uFF0C\u5F85\u8BC4\u4EF7";
-    return review ? `\u5DF2\u8BC4\u4EF7 ${review.rating} \u661F` : statuses[order.status];
-  };
-  const section = document.createElement("section");
-  section.id = "resident-repair-center";
-  section.className = "demo-repair-center";
-  section.innerHTML = `<div class="demo-repair-center-heading"><div><span class="material-symbols-outlined" aria-hidden="true">assignment_turned_in</span><div><h2>\u6211\u7684\u62A5\u4FEE</h2><p>\u63D0\u4EA4\u540E\u53EF\u5728\u8FD9\u91CC\u67E5\u770B\u8FDB\u5EA6\u3001\u5386\u53F2\u548C\u670D\u52A1\u8BC4\u4EF7</p></div></div><button class="demo-button secondary" data-repair-all>\u5168\u90E8\u8BB0\u5F55</button></div><div class="demo-repair-metrics"><span>\u8FDB\u884C\u4E2D ${active2.length}</span><span>\u5386\u53F2 ${history2.length}</span><span>\u5F85\u8BC4\u4EF7 ${pendingReviews.length}</span></div><div class="demo-repair-section"><h3>\u8FDB\u884C\u4E2D</h3>${active2.length ? active2.slice(0, 1).map((order) => `<button class="demo-repair-order" data-repair-detail="${escape(order.id)}"><div><strong>${escape(order.title)}</strong><small>${escape(order.id)} \xB7 ${escape(order.appointment)}</small></div><span class="demo-repair-status active">${escape(statusText(order))}</span></button>`).join("") : '<div class="demo-repair-empty">\u6682\u65E0\u8FDB\u884C\u4E2D\u7684\u62A5\u4FEE</div>'}</div><div class="demo-repair-section"><h3>\u5F85\u8BC4\u4EF7</h3>${pendingReviews.length ? pendingReviews.slice(0, 1).map((order) => `<article class="demo-repair-order"><div><strong>${escape(order.title)}</strong><small>${escape(order.technician || "\u7EF4\u4FEE\u5E08\u5085")}\u5DF2\u5B8C\u6210\u670D\u52A1</small></div><button class="demo-button" data-repair-review="${escape(order.id)}">\u7ACB\u5373\u8BC4\u4EF7 ${icon("arrow_forward")}</button></article>`).join("") : '<div class="demo-repair-empty">\u6682\u65E0\u5F85\u8BC4\u4EF7\u7684\u5B8C\u5DE5\u5DE5\u5355</div>'}</div><div class="demo-repair-section"><h3>\u5386\u53F2\u62A5\u4FEE</h3>${history2.length ? history2.slice(0, 1).map((order) => `<button class="demo-repair-order" data-repair-detail="${escape(order.id)}"><div><strong>${escape(order.title)}</strong><small>${escape(order.id)} \xB7 ${new Date(order.createdAt).toLocaleDateString("zh-CN")}</small></div><span class="demo-repair-status">${escape(statusText(order))}</span></button>`).join("") : '<div class="demo-repair-empty">\u6682\u65E0\u5386\u53F2\u62A5\u4FEE\u8BB0\u5F55</div>'}</div>`;
-  const anchor = $("#tab-private")?.closest("section");
-  anchor?.after(section);
-  $$("[data-repair-detail]", section).forEach((button) => bind(button, "\u67E5\u770B\u62A5\u4FEE\u8BE6\u60C5", () => go2("/mobile/orders/" + button.dataset.repairDetail)));
-  $$("[data-repair-review]", section).forEach((button) => bind(button, "\u8BC4\u4EF7\u5DF2\u5B8C\u5DE5\u62A5\u4FEE", () => go2("/mobile/review?id=" + button.dataset.repairReview)));
-  bind($("[data-repair-all]", section), "\u67E5\u770B\u5168\u90E8\u62A5\u4FEE\u8BB0\u5F55", () => go2("/mobile/profile?panel=orders"));
-}
-function reviewPage(ctx) {
-  const { state: state2, store: store2, qs: qs2, go: go2 } = ctx;
-  const orderId = qs2.get("id") || "BX202407220038";
-  const order = state2().orders.find((o) => o.id === orderId);
-  let rating = 5;
-  const subratings = { \u4E0A\u95E8\u51C6\u65F6\u6027: 5, \u6280\u672F\u4E13\u4E1A\u5EA6: 5, \u670D\u52A1\u6001\u5EA6: 5, \u73B0\u573A\u536B\u751F: 5 };
-  const stars = $$("#main-star-group button");
-  stars.forEach((btn, index) => bind(btn, `${index + 1}\u661F`, () => {
-    rating = index + 1;
-    stars.forEach((b, i) => {
-      $("span", b).style.fontVariationSettings = `'FILL' ${i <= index ? 1 : 0}`;
-      b.style.color = i <= index ? "#9d6300" : "#bdc9c0";
-      b.setAttribute("aria-pressed", String(i <= index));
-    });
-    $("#rating-text span:last-child").textContent = ["\u975E\u5E38\u4E0D\u6EE1\u610F\uFF0C\u6709\u5F85\u6539\u8FDB", "\u8F83\u4E0D\u6EE1\u610F\uFF0C\u4F53\u9A8C\u6B20\u4F73", "\u4E00\u822C\uFF0C\u57FA\u672C\u7B26\u5408\u9884\u671F", "\u6EE1\u610F\uFF0C\u5E08\u5085\u6280\u672F\u53EF\u9760", "\u975E\u5E38\u6EE1\u610F\uFF0C\u8D85\u51FA\u9884\u671F\uFF01"][index];
-  }));
-  $$(".tag-chip").forEach((btn) => bind(btn, label(btn), () => {
-    const selected = btn.dataset.selected !== "true";
-    btn.dataset.selected = String(selected);
-    btn.classList.toggle("demo-selected", selected);
-    btn.setAttribute("aria-pressed", String(selected));
-  }));
-  $$(".material-symbols-outlined").filter((e) => e.textContent.trim() === "star" && !e.closest("button") && e.closest("main")).forEach((star) => {
-    const row = star.parentElement.parentElement;
-    const all = $$(".material-symbols-outlined", star.parentElement).filter((e) => e.textContent === "star");
-    const key = Object.keys(subratings).find((k) => row.textContent.includes(k));
-    if (key) bind(star, key + "\u8BC4\u5206", () => {
-      subratings[key] = all.indexOf(star) + 1;
-      all.forEach((s, i) => s.style.fontVariationSettings = `'FILL' ${i < subratings[key] ? 1 : 0}`);
-    });
-  });
-  $("#comment-input").maxLength = 300;
-  $("#comment-input").addEventListener("input", (e) => $("#char-counter").textContent = `${e.target.value.length}/300`);
-  bind($("#voice-btn"), "\u8BED\u97F3\u586B\u5199\u8BC4\u4EF7", () => voiceInput(ctx, $("#comment-input")));
-  bind($("#submit-review-btn"), "\u63D0\u4EA4\u8BC4\u4EF7\u5E76\u9886\u53D6\u79EF\u5206", () => confirm("\u63D0\u4EA4\u670D\u52A1\u8BC4\u4EF7", `\u7EFC\u5408\u8BC4\u5206\uFF1A${rating}\u661F\u3002\u8BC4\u4EF7\u540E\u53D1\u653E20\u79EF\u5206\uFF0C\u6BCF\u4E2A\u5DE5\u5355\u4EC5\u4E00\u6B21\u3002`, () => store2.review(orderId, {
-    rating,
-    subratings,
-    comment: $("#comment-input").value,
-    tags: $$('.tag-chip[data-selected="true"]').map(label),
-    recommend: $$("main input[type=checkbox]")[0]?.checked || false,
-    anonymous: $$("main input[type=checkbox]")[1]?.checked || false,
-    photos: state2().drafts["uploads-review"] || []
-  }), { after: () => {
-    modal("\u8BC4\u4EF7\u5DF2\u63D0\u4EA4", "<p>\u611F\u8C22\u60A8\u7684\u771F\u5B9E\u53CD\u9988\uFF0C20\u79EF\u5206\u5DF2\u5165\u8D26\u3002</p>", [{ label: "\u67E5\u770B\u5DE5\u5355", run: () => go2("/mobile/orders/" + orderId) }, { label: "\u67E5\u770B\u79EF\u5206", secondary: true, run: () => go2("/mobile/points") }]);
-  } }));
-  if (!order || !["completed", "closed"].includes(order.status)) {
-    $("#submit-review-btn").disabled = true;
-    toast("\u8BE5\u5DE5\u5355\u4E0D\u5B58\u5728\u6216\u5C1A\u672A\u5B8C\u5DE5\uFF0C\u4E0D\u80FD\u8BC4\u4EF7", true);
-  } else {
-    const heading = $("main h2");
-    if (heading) heading.textContent = order.title;
-    if (state2().reviews.some((r) => r.orderId === orderId)) {
-      $("#submit-review-btn").disabled = true;
-      $("#submit-review-btn").textContent = "\u5DF2\u8BC4\u4EF7\uFF0C\u79EF\u5206\u5DF2\u5165\u8D26";
-    }
-  }
-}
-function billingPage(ctx) {
-  const { route: route2, state: state2, qs: qs2, store: store2, go: go2 } = ctx;
-  const book = route2.key === "bills" ? "legacy" : "current";
-  let tab = ["property", "parking", "others"].includes(qs2.get("tab")) ? qs2.get("tab") : "property";
-  const tabs = ["property", "parking", "others"];
-  const topAmount = $("#topTotalAmount") || $$("main span").find((e) => e.textContent.trim() === "983.20");
-  const topTitle = $("#totalTitleLabel");
-  const summary = $("#payAllBtn");
-  const update = () => {
-    const bills = state2().bills.filter((b) => b.book === book);
-    tabs.forEach((type) => {
-      const content = $("#content-" + type);
-      if (!content) return;
-      content.classList.toggle("hidden", type !== tab);
-      const bill = bills.find((b) => b.type === type);
-      if (bill && book === "current") {
-        const title = $("h2,h3,h4", content);
-        if (title) title.textContent = bill.title;
-      }
-      if (bill) {
-        const pendingLabel = $$("span", content).find((e) => /^待缴/.test(e.textContent.trim()) && e.children.length === 0);
-        if (pendingLabel) {
-          pendingLabel.textContent = bill.paid ? "\u5DF2\u7F34\u6E05" : "\u5F85\u7F34\u8D26\u5355";
-          pendingLabel.dataset.billState = "";
-        }
-        $$("[data-bill-pay]", content).forEach((btn) => {
-          btn.disabled = bill.paid;
-          if (bill.paid) btn.textContent = "\u5DF2\u7F34\u6E05";
-        });
-      }
-    });
-    active(tabs.map((t) => $("#tab-" + t)), $("#tab-" + tab));
-    const pending = bills.filter((b) => !b.paid && (book === "legacy" || b.type === tab));
-    if (topAmount) topAmount.textContent = money(pending.reduce((sum, b) => sum + b.amount, 0));
-    if (topTitle) topTitle.textContent = `\u5F53\u524D\u5F85\u7F34\u603B\u989D (${tab === "property" ? "\u7269\u4E1A\u670D\u52A1\u8D39" : tab === "parking" ? "\u8F66\u4F4D\u7BA1\u7406\u8D39" : "\u516C\u5171\u80FD\u8017\u4E0E\u7EF4\u4FEE\u8D39"})`;
-    summary.disabled = !pending.length;
-    const text = $("#payAllBtnText");
-    if (text) text.textContent = !pending.length ? "\u672C\u9879\u5DF2\u7F34\u6E05" : `\u7F34\u7EB3${tab === "property" ? "\u7269\u4E1A\u8D39" : tab === "parking" ? "\u505C\u8F66\u8D39" : "\u5176\u4ED6\u8D39\u7528"}`;
-    if (!pending.length && book === "legacy") summary.textContent = "\u8D26\u5355\u5DF2\u7F34\u6E05";
-    const repairBills = bills.filter((b) => b.orderId);
-    if (book === "current") {
-      let box = $("#repair-bills");
-      if (!box) {
-        box = document.createElement("div");
-        box.id = "repair-bills";
-        $("#content-others").prepend(box);
-      }
-      box.innerHTML = list(repairBills, (b) => `<article><strong>${escape(b.title)}</strong><p>\xA5${money(b.amount)} \xB7 ${b.paid ? "\u5DF2\u7F34\u6E05" : "\u5F85\u7F34\u8D39"}</p><button class="demo-button" data-repair-pay="${b.id}" ${b.paid ? "disabled" : ""}>\u7F34\u7EB3\u7EF4\u4FEE\u8D39</button></article>`);
-      $$("[data-repair-pay]", box).forEach((btn) => bind(btn, "\u7F34\u7EB3\u7EF4\u4FEE\u8D39", () => payDialog(ctx, [btn.dataset.repairPay], update)));
-    }
-  };
-  tabs.forEach((type) => bind($("#tab-" + type), "\u5207\u6362" + type + "\u8D26\u5355", () => {
-    tab = type;
-    const url = new URL(location.href);
-    url.searchParams.set("tab", tab);
-    history.replaceState(null, "", url);
-    update();
-  }));
-  bind(summary, "\u7F34\u7EB3\u5F53\u524D\u8D26\u5355", () => payDialog(ctx, state2().bills.filter((b) => b.book === book && !b.paid && (book === "legacy" || b.type === tab)).map((b) => b.id), update));
-  tabs.forEach((type) => {
-    const content = $("#content-" + type);
-    if (!content) return;
-    find(/立即缴费|缴车位费|缴纳停车费/, content).forEach((btn) => {
-      btn.dataset.billPay = type;
-      bind(btn, "\u7F34\u7EB3" + type + "\u8D26\u5355", () => payDialog(ctx, state2().bills.filter((b) => b.book === book && b.type === type && !b.paid && !b.orderId).map((b) => b.id), update));
-    });
-  });
-  bind($("#houseDropdownBtn"), "\u9009\u62E9\u7F34\u8D39\u623F\u4EA7", () => {
-    $("#houseDropdownMenu").classList.toggle("hidden");
-    $("#houseDropdownBtn").setAttribute("aria-expanded", String(!$("#houseDropdownMenu").classList.contains("hidden")));
-  });
-  $$("#houseDropdownMenu > div").forEach((row, i) => bind(row, i ? "\u9009\u62E9\u8F66\u4F4D\u8D26\u5355" : "\u9009\u62E9\u4F4F\u5B85\u8D26\u5355", () => {
-    tab = i ? "parking" : "property";
-    $("#houseDropdownMenu").classList.add("hidden");
-    update();
-  }));
-  on(/查看公示/, () => go2("/mobile/articles/garden"));
-  update();
-  window.addEventListener("demo:external", update);
-  if (qs2.get("bill") && state2().bills.some((b) => b.id === qs2.get("bill") && !b.paid)) payDialog(ctx, [qs2.get("bill")], update);
-}
-function payDialog(ctx, billIds, after) {
-  if (!billIds.length) return toast("\u5F53\u524D\u8D26\u5355\u5DF2\u7F34\u6E05");
-  const bills = ctx.state().bills.filter((b) => billIds.includes(b.id));
-  const amount = bills.reduce((sum, b) => sum + b.amount, 0);
-  const coupons = ctx.state().coupons.filter((c) => !c.used && bills.every((b) => b.type === c.type));
-  const couponField = field("coupon", "\u62B5\u6263\u5238", "", { required: false, choices: [["", "\u4E0D\u4F7F\u7528"], ...coupons.map((c) => [c.id, `\u62B5\u6263 \xA5${c.amount}`])] });
-  formModal("\u786E\u8BA4\u7F34\u8D39\uFF08\u6A21\u62DF\u652F\u4ED8\uFF09", list(bills, (b) => `<div>${escape(b.title)}<strong>\xA5${money(b.amount)}</strong></div>`) + `<p>\u8D26\u5355\u5408\u8BA1\uFF1A<strong>\xA5${money(amount)}</strong></p>` + couponField + field("result", "\u652F\u4ED8\u7ED3\u679C", "success", { choices: [["success", "\u6A21\u62DF\u652F\u4ED8\u6210\u529F"], ["failure", "\u6A21\u62DF\u652F\u4ED8\u5931\u8D25"]] }), (values) => {
-    if (values.result === "failure") throw new Error("\u6A21\u62DF\u652F\u4ED8\u5931\u8D25\uFF0C\u8D26\u5355\u672A\u6263\u6B3E\uFF0C\u53EF\u91CD\u65B0\u652F\u4ED8");
-    const payment = ctx.store.pay(billIds, values.coupon || void 0);
-    after();
-    modal("\u7F34\u8D39\u6210\u529F", `<p>\u5B9E\u4ED8 \xA5${money(payment.amount)}\uFF0C\u62B5\u6263 \xA5${money(payment.discount)}</p><p>\u4EA4\u6613\u53F7\uFF1A${escape(payment.id)}</p><p>\u5DF2\u83B7${Math.floor(payment.amount)}\u79EF\u5206\u3002</p>`, [
-      { label: "\u67E5\u770B\u7535\u5B50\u56DE\u5355", run: () => modal("\u7F34\u8D39\u7535\u5B50\u56DE\u5355\uFF08\u6F14\u793A\uFF09", `<p>\u4EA4\u6613\u53F7\uFF1A${payment.id}</p><p>\u5B9E\u4ED8\uFF1A\xA5${money(payment.amount)}</p><p>${new Date(payment.at).toLocaleString("zh-CN")}</p><p>\u672C\u51ED\u8BC1\u975E\u7A0E\u52A1\u53D1\u7968\u3002</p>`, [{ label: "\u4E0B\u8F7D\u56DE\u5355", run: () => download(payment.id + ".txt", JSON.stringify(payment, null, 2)) }]) },
-      { label: "\u8FD4\u56DE\u8D26\u5355", secondary: true, run: closeModal }
-    ]);
-    return false;
-  }, "\u786E\u8BA4\u6A21\u62DF\u652F\u4ED8");
-}
-function pointsPage(ctx) {
-  const { store: store2, state: state2, go: go2, requireAuth: requireAuth2 } = ctx;
-  const balance = $$("main span").find((e) => e.textContent.trim() === "2,480");
-  if (balance) {
-    balance.dataset.points = "";
-    balance.textContent = state2().user.points.toLocaleString("zh-CN");
-  }
-  const taskButtons = find(/做任务快速赚分/);
-  taskButtons.forEach((btn) => bind(btn, "\u67E5\u770B\u79EF\u5206\u4EFB\u52A1", () => $("#taskSection").scrollIntoView({ behavior: "smooth" })));
-  on(/去评价/, () => {
-    const order = state2().orders.find((o) => o.status === "completed" && !state2().reviews.some((r) => r.orderId === o.id));
-    if (!order) return modal("\u670D\u52A1\u8BC4\u4EF7", empty("\u6682\u65E0\u5F85\u8BC4\u4EF7\u5DE5\u5355"));
-    go2("/mobile/review?id=" + order.id);
-  });
-  on(/报名参与/, () => formModal("\u5468\u672B\u7EFF\u690D\u5171\u5EFA\u62A5\u540D", field("name", "\u53C2\u4E0E\u4EBA\u59D3\u540D", state2().user.name) + field("phone", "\u624B\u673A\u53F7\u7801", state2().user.phone, { type: "tel", pattern: "1[3-9][0-9]{9}" }) + field("count", "\u53C2\u52A0\u4EBA\u6570", "1", { type: "number", min: 1, max: 10 }), (values) => {
-    store2.change((s) => {
-      if (s.bookings.some((b) => b.productId === "garden-activity" && b.status !== "\u5DF2\u53D6\u6D88")) throw new Error("\u5DF2\u62A5\u540D\u672C\u671F\u6D3B\u52A8\uFF0C\u8BF7\u52FF\u91CD\u590D\u63D0\u4EA4");
-      s.bookings.unshift({ ...values, id: id("ACT"), productId: "garden-activity", title: "\u5468\u672B\u7EFF\u690D\u5171\u5EFA", date: "\u672C\u5468\u516D 09:00", status: "\u62A5\u540D\u6210\u529F\uFF0C\u5F85\u73B0\u573A\u7B7E\u5230", amount: 0, at: now() });
-    });
-    toast("\u62A5\u540D\u6210\u529F\uFF0C\u53C2\u4E0E\u6D3B\u52A8\u540E\u53D1\u653E50\u79EF\u5206");
-  }));
-  $$(".category-tab").forEach((btn) => bind(btn, "\u7B5B\u9009" + label(btn), () => {
-    const category = btn.dataset.originalOnclick.match(/filterTab\('([^']+)'/)?.[1] || "all";
-    active($$(".category-tab"), btn);
-    $$(".product-item").forEach((item) => item.hidden = category !== "all" && !item.classList.contains(category));
-  }));
-  $$(".product-item").forEach((item, index) => {
-    const reward = rewards[index];
-    if (!reward) return;
-    const btn = $("button", item);
-    bind(btn, "\u5151\u6362" + reward.name, () => {
-      const requestId2 = id("REQ");
-      const paymentField = reward.cash ? field("cashPayment", "\u652F\u4ED8\u7ED3\u679C", "success", { choices: [["success", "\u6A21\u62DF\u652F\u4ED8\u6210\u529F"], ["failure", "\u6A21\u62DF\u652F\u4ED8\u5931\u8D25"]] }) : "";
-      formModal("\u786E\u8BA4\u79EF\u5206\u5151\u6362", `<h3>${escape(reward.name)}</h3><p>\u6263\u9664 ${reward.points}\u79EF\u5206${reward.cash ? ` + \xA5${reward.cash}\uFF08\u6A21\u62DF\u652F\u4ED8\uFF09` : ""}\uFF0C\u5F53\u524D\u53EF\u7528 ${state2().user.points}\u79EF\u5206</p>` + field("delivery", "\u9886\u53D6\u65B9\u5F0F", "\u7269\u4E1A\u670D\u52A1\u4E2D\u5FC3\u81EA\u63D0", { choices: ["\u7269\u4E1A\u670D\u52A1\u4E2D\u5FC3\u81EA\u63D0", "\u914D\u9001\u81F3\u5DF2\u7ED1\u5B9A\u623F\u5C4B"] }) + paymentField, (values) => {
-        const result = store2.redeem(reward.id, values.delivery, requestId2, { cashPayment: values.cashPayment || "success" });
-        if (balance) balance.textContent = state2().user.points.toLocaleString("zh-CN");
-        const payment = result.paymentId && state2().payments.find((p) => p.id === result.paymentId);
-        modal("\u5151\u6362\u6210\u529F", `<p>${escape(result.name)}</p><h3>\u6838\u9500\u7801\uFF1A${result.code}</h3><p>${escape(result.delivery)}</p>${payment ? `<p>\u6A21\u62DF\u652F\u4ED8\uFF1A\xA5${money(payment.amount)} \xB7 \u4EA4\u6613\u53F7 ${escape(payment.id)}</p>` : ""}`, [
-          { label: "\u67E5\u770B\u5151\u6362\u8BB0\u5F55", run: () => redemptionHistory(ctx) },
-          { label: "\u8FD4\u56DE\u79EF\u5206\u4E2D\u5FC3", secondary: true, run: closeModal }
-        ]);
-        return false;
-      }, "\u786E\u8BA4\u5151\u6362");
-    });
-  });
-  let accumulated = Number(state2().drafts["listened-" + today()] || 0), previous = Date.now();
-  const radio = createRadio((audio, error) => {
-    if (error) return toast(error.message, true);
-    $("#radioIcon").textContent = audio.paused ? "play_arrow" : "pause";
-    $("#radioText").textContent = audio.paused ? "\u542C\u64AD\u8D5A\u5206" : "\u6536\u542C\u4E2D...";
-  });
-  radio.audio.loop = true;
-  const timer = setInterval(() => {
-    const elapsed = Math.min(1e3, Date.now() - previous);
-    previous = Date.now();
-    if (!radio.audio.paused && !radio.audio.seeking && radio.audio.readyState >= 3 && !document.hidden) {
-      accumulated += elapsed;
-      if (accumulated >= 12e4) {
-        store2.award(15, "\u6BCF\u65E5\u6536\u542C\u5E7F\u64AD", "radio-" + today());
-        $("#radioText").textContent = "\u4ECA\u65E5\u79EF\u5206\u5DF2\u5165\u8D26";
-        clearInterval(timer);
-      }
-      store2.saveDraft("listened-" + today(), accumulated);
-    }
-  }, 1e3);
-  window.addEventListener("pagehide", () => clearInterval(timer));
-  bind($("#radioPlayBtn"), "\u6536\u542C\u793E\u533A\u5E7F\u64AD\u8D5A\u79EF\u5206", radio.toggle);
-}
-function pointsHistory(ctx) {
-  modal("\u79EF\u5206\u660E\u7EC6", list(ctx.state().pointsLog, (p) => `<article><strong>${p.delta > 0 ? "+" : ""}${p.delta} \u5206 \xB7 ${escape(p.reason)}</strong><small>${new Date(p.at).toLocaleString("zh-CN")}</small></article>`));
-}
-function redemptionHistory(ctx) {
-  modal("\u5151\u6362\u8BB0\u5F55", list(ctx.state().redemptions, (r) => `<article><strong>${escape(r.name)}</strong><p>${r.points}\u79EF\u5206 \xB7 \u6838\u9500\u7801 ${r.code} \xB7 ${escape(r.status)}</p><small>${escape(r.delivery)} \xB7 ${new Date(r.at).toLocaleString("zh-CN")}</small></article>`));
-}
-function servicesPage(ctx) {
-  const { go: go2, qs: qs2 } = ctx;
-  const buttons3 = find(/立即拼团|预约排班|立即预订|^预约$|免押借|一键快捷预约|免费量尺预约|立即抢鲜|^联系$/);
-  const ids = ["ac-group", "waterproof", "vegetables", "dumplings", "computer", "stroller", "pet", "ac", "screen", "peach"];
-  buttons3.forEach((btn, i) => bind(btn, "\u67E5\u770B\u670D\u52A1\u8BE6\u60C5", () => go2("/mobile/services/" + ids[i])));
-  $$(".cursor-pointer").filter((e) => /全屋开荒|油烟机|墙面补漆|闲置代管|冷链到家|老人助餐/.test(e.textContent)).forEach((el, i) => bind(el, "\u67E5\u770B\u670D\u52A1\u5206\u7C7B", () => {
-    const choices = i === 0 ? [products[7]] : i === 1 ? [products[0], products[7]] : i === 2 ? [products[1], products[8]] : i === 3 ? [] : i === 4 ? [products[2], products[9]] : [products[6]];
-    const dlg = modal(label(el).split(" ")[0], list(choices, (p) => `<button data-product="${p.id}"><strong>${p.name}</strong><small>\xA5${money(p.price)}</small></button>`), choices.length ? [] : [{ label: "\u767B\u8BB0\u79DF\u552E\u9700\u6C42", run: () => formModal("\u8F66\u4F4D\u4E0E\u4ED3\u50A8\u9700\u6C42", field("description", "\u9700\u6C42\u8BF4\u660E", "", { type: "textarea" }), (v) => {
-      ctx.notify("\u79DF\u552E\u9700\u6C42\u5DF2\u767B\u8BB0", v.description);
-    }) }]);
-    $$("[data-product]", dlg).forEach((btn) => bind(btn, "\u670D\u52A1\u8BE6\u60C5", () => go2("/mobile/services/" + btn.dataset.product)));
-  }));
-  if (ctx.route.detail === "service") serviceDetail(ctx, decodeURIComponent(location.pathname.split("/").pop()));
-}
-function serviceDetail(ctx, productId) {
-  const product = products.find((p) => p.id === productId);
-  if (!product) return modal("\u670D\u52A1\u4E0D\u5B58\u5728", empty("\u8BE5\u670D\u52A1\u4E0D\u5B58\u5728\u6216\u5DF2\u4E0B\u67B6"), [{ label: "\u8FD4\u56DE\u670D\u52A1\u5217\u8868", run: () => ctx.go("/mobile/services") }]);
-  modal("\u670D\u52A1\u8BE6\u60C5", `<h3>${escape(product.name)}</h3><p>${escape(product.category)}</p><h3>\xA5${money(product.price)} / \u6B21\uFF08\u4EFD\uFF09</h3><p>\u7531\u7269\u4E1A\u670D\u52A1\u4E2D\u5FC3\u534F\u8C03\uFF0C\u63D0\u4EA4\u540E\u7BA1\u5BB6\u5C06\u786E\u8BA4\u65F6\u95F4\u53CA\u670D\u52A1\u8303\u56F4\u3002\u6750\u6599\u589E\u9879\u987B\u53E6\u884C\u786E\u8BA4\u3002</p>`, [
-    { label: "\u7ACB\u5373\u9884\u7EA6", run: () => ctx.requireAuth(() => {
-      const requestId2 = id("REQ");
-      formModal("\u786E\u8BA4\u9884\u7EA6", field("date", "\u9884\u7EA6\u65E5\u671F", today(), { type: "date", min: today() }) + field("time", "\u9884\u7EA6\u65F6\u6BB5", "14:00-16:30", { choices: ["09:00-11:30", "14:00-16:30", "17:30-19:30"] }) + field("quantity", "\u6570\u91CF", "1", { type: "number", min: 1, max: 99 }) + field("phone", "\u8054\u7CFB\u7535\u8BDD", ctx.state().user.phone, { type: "tel", pattern: "1[3-9][0-9]{9}" }) + field("address", "\u670D\u52A1/\u914D\u9001\u5730\u5740", ctx.state().user.room), (values) => {
-        const booking = ctx.store.book(productId, values, requestId2);
-        modal("\u9884\u7EA6\u6210\u529F", `<p>${escape(booking.title)}</p><p>${escape(booking.date)} \xB7 ${escape(booking.time)}</p><p>\u9884\u7EA6\u91D1\u989D \xA5${money(booking.amount)}\uFF0C\u5F85\u7BA1\u5BB6\u786E\u8BA4\u3002</p><small>${booking.id}</small>`, [
-          { label: "\u67E5\u770B\u9884\u7EA6\u8BB0\u5F55", run: () => ctx.panel("bookings") },
-          { label: "\u8FD4\u56DE\u670D\u52A1\u5217\u8868", secondary: true, run: () => ctx.go("/mobile/services") }
-        ]);
-        return false;
-      }, "\u63D0\u4EA4\u9884\u7EA6");
-    }) },
-    { label: ctx.state().favorites.includes(productId) ? "\u53D6\u6D88\u6536\u85CF" : "\u6536\u85CF\u670D\u52A1", secondary: true, run: () => {
-      ctx.store.toggle("favorites", productId);
-      serviceDetail(ctx, productId);
-    } }
-  ]);
-}
-function shopForm(ctx) {
-  formModal("\u90BB\u5C45\u95EA\u94FA\u5165\u9A7B\u7533\u8BF7", field("name", "\u5E97\u94FA\u540D\u79F0") + field("category", "\u7ECF\u8425\u7C7B\u76EE", "\u4FBF\u6C11\u670D\u52A1", { choices: ["\u4FBF\u6C11\u670D\u52A1", "\u624B\u4F5C\u98DF\u54C1", "\u7269\u54C1\u79DF\u8D41", "\u751F\u6D3B\u96F6\u552E"] }) + field("phone", "\u8054\u7CFB\u7535\u8BDD", ctx.state().user.phone, { type: "tel", pattern: "1[3-9][0-9]{9}" }) + field("description", "\u670D\u52A1\u7B80\u4ECB", "", { type: "textarea" }), (v) => {
-    ctx.store.change((s) => {
-      if (!s.user.verified) throw new Error("\u8BF7\u5148\u5B8C\u6210\u623F\u5C4B\u8BA4\u8BC1");
-      s.shops.unshift({ ...v, id: id("SHOP"), status: "\u5F85\u7269\u4E1A\u5BA1\u6838", at: now() });
-    });
-    toast("\u5165\u9A7B\u7533\u8BF7\u5DF2\u63D0\u4EA4\uFF0C\u5F85\u7269\u4E1A\u5BA1\u6838");
-  });
-}
-function postForm(ctx) {
-  formModal("\u53D1\u5E03\u90BB\u91CC\u52A8\u6001", field("body", "\u52A8\u6001\u5185\u5BB9", "", { type: "textarea", maxLength: 500 }), (v) => {
-    ctx.store.change((s) => s.posts.unshift({ id: id("POST"), body: v.body, author: s.user.name, likes: 0, at: now() }));
-    toast("\u52A8\u6001\u5DF2\u53D1\u5E03");
-    setTimeout(() => communityFeed(ctx), 0);
-  }, "\u53D1\u5E03");
-}
-function communityFeed(ctx) {
-  const dlg = modal("\u6211\u7684\u751F\u6D3B\u5708", list(ctx.state().posts, (p) => `<article><strong>${escape(p.author)}</strong><p>${escape(p.body)}</p><button class="demo-button secondary" data-like-post="${p.id}">${ctx.state().likes.includes(p.id) ? "\u53D6\u6D88\u70B9\u8D5E" : "\u70B9\u8D5E"} ${p.likes + (ctx.state().likes.includes(p.id) ? 1 : 0)}</button></article>`), [{ label: "\u53D1\u5E03\u52A8\u6001", run: () => ctx.requireAuth(() => postForm(ctx)) }]);
-  $$("[data-like-post]", dlg).forEach((btn) => bind(btn, "\u70B9\u8D5E\u52A8\u6001", () => {
-    ctx.store.toggle("likes", btn.dataset.likePost);
-    communityFeed(ctx);
-  }));
-}
-function voiceInput(ctx, target) {
-  const Recognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-  if (!Recognition) {
-    return formModal("\u8BED\u97F3\u8F93\u5165\u6682\u4E0D\u53EF\u7528", `<p>\u5F53\u524D\u6D4F\u89C8\u5668\u672A\u63D0\u4F9B\u8BED\u97F3\u8BC6\u522B\uFF0C\u53EF\u76F4\u63A5\u586B\u5199\u5185\u5BB9\u3002</p>` + field("text", "\u586B\u5199\u5185\u5BB9", target.value, { type: "textarea" }), (v) => {
-      target.value = v.text;
-      target.dispatchEvent(new Event("input"));
-    });
-  }
-  const recognition = new Recognition();
-  recognition.lang = "zh-CN";
-  recognition.interimResults = false;
-  recognition.onresult = (e) => {
-    target.value = (target.value + e.results[0][0].transcript).slice(0, target.maxLength > 0 ? target.maxLength : 1e3);
-    target.dispatchEvent(new Event("input"));
-    toast("\u8BED\u97F3\u8BC6\u522B\u5B8C\u6210");
-  };
-  recognition.onerror = (e) => toast(e.error === "not-allowed" ? "\u9EA6\u514B\u98CE\u6743\u9650\u672A\u83B7\u6388\u6743\uFF0C\u53EF\u76F4\u63A5\u8F93\u5165\u6587\u5B57" : "\u8BED\u97F3\u8BC6\u522B\u5931\u8D25\uFF0C\u8BF7\u91CD\u8BD5\u6216\u8F93\u5165\u6587\u5B57", true);
-  recognition.start();
-  toast("\u6B63\u5728\u6536\u542C\uFF0C\u8BF7\u8BF4\u51FA\u5185\u5BB9");
-}
+// src/app.js
+init_ui();
+init_resident();
 
 // src/pages/operations.js
+init_ui();
+init_store();
+init_seed();
 var buttons = (rx) => $$("button,a").filter((b) => rx.test(label(b)));
 var on2 = (rx, fn) => buttons(rx).forEach((b) => {
   if (!b.dataset.action) bind(b, label(b), () => fn(b));
@@ -2138,7 +2403,7 @@ function reviewDashboard(ctx) {
   return { render };
 }
 function orders(ctx) {
-  const { route: route2, state: state2, store: store2, go: go2 } = ctx;
+  const { route: route2, state: state2, store: store2, go: go3 } = ctx;
   const overview = route2.key === "overview";
   let page = 1, status = "", category = "", term = "", urgent = false, technician = "", day = "";
   const size = overview ? 3 : 4;
@@ -2187,8 +2452,8 @@ function orders(ctx) {
         queue.insertBefore(card, pagination);
       }
       const b = $("[data-dispatch]", card);
-      bind(b, o.status === "pending" ? "\u7ACB\u5373\u6307\u6D3E\u5E08\u5085" : "\u67E5\u770B\u5DE5\u5355\u8BE6\u60C5", () => o.status === "pending" ? orderAction(ctx, o) : go2("/web/orders/" + o.id));
-      bind(card, "\u6253\u5F00\u5DE5\u5355\u8BE6\u60C5", () => go2("/web/orders/" + o.id));
+      bind(b, o.status === "pending" ? "\u7ACB\u5373\u6307\u6D3E\u5E08\u5085" : "\u67E5\u770B\u5DE5\u5355\u8BE6\u60C5", () => o.status === "pending" ? orderAction(ctx, o) : go3("/web/orders/" + o.id));
+      bind(card, "\u6253\u5F00\u5DE5\u5355\u8BE6\u60C5", () => go3("/web/orders/" + o.id));
       cardKeys.push(o.id);
     }
     let emptyBox = $("#orders-empty");
@@ -2266,7 +2531,7 @@ function orders(ctx) {
     if (!order) return toast("\u5F53\u524D\u6CA1\u6709\u5F85\u6D3E\u5DE5\u5355");
     orderAction(ctx, order);
   });
-  on2(/进入财务对账专区/, () => go2("/web/finance"));
+  on2(/进入财务对账专区/, () => go3("/web/finance"));
   on2(/导出调度表/, () => csv("\u5DE5\u5355\u8C03\u5EA6\u8868.csv", [["\u5DE5\u5355\u53F7", "\u623F\u53F7", "\u5185\u5BB9", "\u72B6\u6001", "\u5E08\u5085"], ...state2().orders.map((o) => [o.id, o.room, o.title, statuses[o.status], o.technician])]));
   const refresh = () => {
     render();
@@ -2277,7 +2542,7 @@ function orders(ctx) {
   window.addEventListener("demo:external", refresh);
 }
 function tasks(ctx) {
-  const { state: state2, store: store2, go: go2, qs: qs2 } = ctx;
+  const { state: state2, store: store2, go: go3, qs: qs2 } = ctx;
   const current = state2().orders.find((o) => ["pending", "assigned"].includes(o.status));
   const initialCard = $("#acceptOrderBtn").closest("main > div > div.relative");
   const listSection = $$("main > div > div").find((s) => s.textContent.includes("\u5F85\u63A5\u666E\u901A\u4EFB\u52A1"));
@@ -2307,7 +2572,7 @@ function tasks(ctx) {
         const timing = mode === "pending" ? `\u63A5\u5355\u540E ${policy} \u5206\u949F\u5185\u5230\u5C97` : arrivalStatus(o).text;
         return `<article class="bg-surface-container-lowest rounded-xl p-card-padding mt-3 shadow-sm"><h3 class="text-headline-sm">${escape(o.title)}</h3><p>${escape(o.room)} \xB7 ${statuses[o.status]}</p><p class="text-label-sm">${escape(o.appointment)} \xB7 ${escape(timing)}</p><div class="flex gap-2 mt-3"><button class="demo-button secondary" data-task-detail="${o.id}">\u67E5\u770B\u8BE6\u60C5</button>${mode === "pending" ? `<button class="demo-button" data-task-accept="${o.id}" ${!state2().settings.listening ? "disabled" : ""}>\u62A2\u6B64\u5355</button>` : ""}</div></article>`;
       }).join("") : empty(orders2.length ? "\u6682\u65E0\u66F4\u591A\u4EFB\u52A1" : "\u5F53\u524D\u5206\u7C7B\u6CA1\u6709\u4EFB\u52A1"));
-      $$("[data-task-detail]", listSection).forEach((btn) => bind(btn, "\u67E5\u770B\u8BE6\u60C5", () => go2("/worker/orders/" + btn.dataset.taskDetail)));
+      $$("[data-task-detail]", listSection).forEach((btn) => bind(btn, "\u67E5\u770B\u8BE6\u60C5", () => go3("/worker/orders/" + btn.dataset.taskDetail)));
       $$("[data-task-accept]", listSection).forEach((btn) => bind(btn, "\u62A2\u6B64\u5355", () => accept(btn.dataset.taskAccept)));
       bind($("[data-task-sort]", listSection), "\u4EFB\u52A1\u6392\u5E8F", () => {
         store2.change((s) => s.orders.reverse());
@@ -2321,7 +2586,7 @@ function tasks(ctx) {
     if (!state2().settings.listening) throw new Error("\u542C\u5355\u5DF2\u6682\u505C\uFF0C\u8BF7\u5148\u5F00\u542F\u542C\u5355");
     const order = state2().orders.find((o) => o.id === orderId);
     const minutes = order?.sla?.arrivalMinutes || (order?.urgent ? arrivalPolicies.urgent.minutes : arrivalPolicies.standard.minutes);
-    confirm("\u786E\u8BA4\u63A5\u5355", `\u63A5\u5355\u540E\u5C06\u542F\u52A8\u5230\u5C97\u8BA1\u65F6\uFF0C\u8BF7\u5728 ${minutes} \u5206\u949F\u5185\u5B8C\u6210\u73B0\u573A\u6253\u5361\u3002`, () => store2.transition(orderId, "accepted", { technician: "\u5F20\u5EFA\u56FD" }), { after: () => go2("/worker/checkin?id=" + orderId) });
+    confirm("\u786E\u8BA4\u63A5\u5355", `\u63A5\u5355\u540E\u5C06\u542F\u52A8\u5230\u5C97\u8BA1\u65F6\uFF0C\u8BF7\u5728 ${minutes} \u5206\u949F\u5185\u5B8C\u6210\u73B0\u573A\u6253\u5361\u3002`, () => store2.transition(orderId, "accepted", { technician: "\u5F20\u5EFA\u56FD" }), { after: () => go3("/worker/checkin?id=" + orderId) });
   }
   tabButtons.forEach((btn, i) => bind(btn, label(btn), () => {
     mode = ["pending", "accepted", "completed"][i];
@@ -2332,7 +2597,7 @@ function tasks(ctx) {
   }));
   bind($("#acceptOrderBtn"), "\u7ACB\u5373\u63A5\u5355", () => {
     const orderId = initialCard.dataset.orderId;
-    return mode === "pending" ? accept(orderId) : go2("/worker/orders/" + orderId);
+    return mode === "pending" ? accept(orderId) : go3("/worker/orders/" + orderId);
   });
   bind($("#dispatchToggle"), "\u5207\u6362\u542C\u5355\u72B6\u6001", () => {
     store2.change((s) => s.settings.listening = !s.settings.listening);
@@ -2349,14 +2614,14 @@ function tasks(ctx) {
   window.addEventListener("pagehide", () => clearInterval(timer), { once: true });
 }
 function checkin(ctx) {
-  const { store: store2, state: state2, go: go2, qs: qs2 } = ctx;
+  const { store: store2, state: state2, go: go3, qs: qs2 } = ctx;
   const orderId = qs2.get("id") || state2().orders.find((o2) => ["accepted", "arrived", "processing"].includes(o2.status))?.id;
   const getOrder = () => state2().orders.find((o2) => o2.id === orderId);
   let payment = "online";
   const extras = [];
   const o = getOrder();
   if (!o) {
-    modal("\u672A\u627E\u5230\u8FDB\u884C\u4E2D\u5DE5\u5355", empty("\u8BF7\u5148\u63A5\u5355"), [{ label: "\u8FD4\u56DE\u4EFB\u52A1\u63A5\u5355", run: () => go2("/worker/tasks") }]);
+    modal("\u672A\u627E\u5230\u8FDB\u884C\u4E2D\u5DE5\u5355", empty("\u8BF7\u5148\u63A5\u5355"), [{ label: "\u8FD4\u56DE\u4EFB\u52A1\u63A5\u5355", run: () => go3("/worker/tasks") }]);
     return;
   }
   $("main h2").textContent = `${o.room} \xB7 ${o.title}`;
@@ -2431,7 +2696,7 @@ function checkin(ctx) {
       store2.transition(orderId, "completed", { photos, amount, payment, paid: payment !== "online", extras });
       if (payment === "public") store2.change((s) => s.expenses.unshift({ id: id("EX"), title: order.title, amount, dept: order.technician, status: "pending", fund: "maintenance", channel: "\u516C\u5171\u7EF4\u62A4\u8BB0\u8D26" }));
       if (payment === "offline") store2.record("\u7EF4\u4FEE\u7EBF\u4E0B\u6536\u6B3E", orderId);
-    }, { label: "\u786E\u8BA4\u5B8C\u5DE5", after: () => go2("/worker/orders/" + orderId) });
+    }, { label: "\u786E\u8BA4\u5B8C\u5DE5", after: () => go3("/worker/orders/" + orderId) });
   });
   if (["completed", "closed"].includes(o.status)) {
     submit.disabled = true;
@@ -2559,7 +2824,7 @@ function expenses(ctx) {
   window.addEventListener("demo:external", render);
 }
 function finance(ctx) {
-  const { state: state2, store: store2, go: go2 } = ctx;
+  const { state: state2, store: store2, go: go3 } = ctx;
   let tab = ctx.qs.get("tab") || "property";
   const keys = ["property", "parking", "other"];
   function changeTab(key) {
@@ -2621,7 +2886,7 @@ function finance(ctx) {
   window.addEventListener("demo:external", render);
 }
 function group(ctx) {
-  const { state: state2, store: store2, go: go2, qs: qs2 } = ctx;
+  const { state: state2, store: store2, go: go3, qs: qs2 } = ctx;
   const groupState = state2();
   const org = groupState.organization;
   const groupOverview = document.createElement("section");
@@ -2734,6 +2999,10 @@ function group(ctx) {
 }
 
 // src/pages/content.js
+init_ui();
+init_store();
+init_audio();
+init_seed();
 var buttons2 = (rx) => $$("button,a").filter((b) => rx.test(label(b)));
 var on3 = (rx, fn) => buttons2(rx).forEach((b) => {
   if (!b.dataset.action) bind(b, label(b), () => fn(b));
@@ -2746,7 +3015,7 @@ function initContent(ctx) {
   if (ctx.route.key === "media") media(ctx);
 }
 function weekly(ctx) {
-  const { route: route2, state: state2, store: store2, go: go2 } = ctx;
+  const { route: route2, state: state2, store: store2, go: go3 } = ctx;
   const propertyContext = state2().contexts.property;
   const currentCommunity = communityById(propertyContext.communityId, state2().organization);
   const scope = `${currentCommunity?.name || "\u5F53\u524D\u5C0F\u533A"}\u4E13\u5C5E\u5185\u5BB9`;
@@ -2783,7 +3052,7 @@ function weekly(ctx) {
     if (route2.key === "weekly" && !$$("main textarea")[1].value.trim()) throw new Error("\u8BF7\u586B\u5199\u4E0B\u5468\u5DE5\u4F5C\u8BA1\u5212");
     confirm("\u53D1\u5E03\u5DE5\u4F5C\u5468\u62A5", `\u5C06\u4EE5\u201C${scope}\u201D\u53D1\u5E03\u81F3\u5C45\u6C11\u7AEF\u58F0\u8FB9\u89C6\u542C\uFF0C\u5176\u4ED6\u5C0F\u533A\u5C45\u6C11\u4E0D\u53EF\u89C1\u3002`, () => {
       return store2.publishContent({ id: id("WEEK"), title: title?.value.trim() || "\u7269\u4E1A\u670D\u52A1\u5DE5\u4F5C\u5468\u62A5", body: text.value, plan: $$("main textarea")[1]?.value || "", kind: "article", author: "\u7269\u4E1A\u670D\u52A1\u4E2D\u5FC3", files: state2().drafts["uploads-" + route2.key] || [] });
-    }, { label: "\u786E\u8BA4\u53D1\u5E03", after: (article) => modal("\u53D1\u5E03\u6210\u529F", `<p>${escape(article.title)}</p><p>\u53D1\u5E03\u8303\u56F4\uFF1A${escape(contentAudienceText(article, state2().organization))}\u3002</p>`, [{ label: "\u67E5\u770B\u5C45\u6C11\u7AEF\u5185\u5BB9", run: () => go2("/mobile/articles/" + article.id) }, { label: "\u7EE7\u7EED\u91C7\u7F16", secondary: true, run: closeModal }]) });
+    }, { label: "\u786E\u8BA4\u53D1\u5E03", after: (article) => modal("\u53D1\u5E03\u6210\u529F", `<p>${escape(article.title)}</p><p>\u53D1\u5E03\u8303\u56F4\uFF1A${escape(contentAudienceText(article, state2().organization))}\u3002</p>`, [{ label: "\u67E5\u770B\u5C45\u6C11\u7AEF\u5185\u5BB9", run: () => go3("/mobile/articles/" + article.id) }, { label: "\u7EE7\u7EED\u91C7\u7F16", secondary: true, run: closeModal }]) });
   };
   on3(/提交并同步|提交发布/, publish);
   on3(/确认上传/, () => {
@@ -2929,17 +3198,17 @@ function broadcast(ctx) {
   window.addEventListener("demo:external", live);
 }
 function home(ctx) {
-  const { state: state2, go: go2, store: store2 } = ctx;
+  const { state: state2, go: go3, store: store2 } = ctx;
   const radio = $("#radioPlayBtn");
   bind(radio, "\u64AD\u653E\u793E\u533A\u5E7F\u64AD", () => ctx.speech(state2().notices.find((n) => n.active && isContentVisible(n, state2().user.communityId))?.body, radio));
   glyph("chevron_right").forEach((b) => bind(b, "\u67E5\u770B\u5E7F\u64AD\u5185\u5BB9", () => articleDetail(ctx, "radio")));
   const banner = $$("main div").find((e) => e.classList.contains("relative") && e.classList.contains("overflow-hidden") && e.textContent.includes("\u97F3\u4E50\u8282"));
-  if (banner) bind(banner, "\u67E5\u770B\u793E\u533A\u97F3\u4E50\u8282", () => go2("/mobile/articles/festival"));
+  if (banner) bind(banner, "\u67E5\u770B\u793E\u533A\u97F3\u4E50\u8282", () => go3("/mobile/articles/festival"));
   const names = ["garden", "elevator", "festival", "safety"];
   const ids = ["\u5C0F\u533A\u7EFF\u5316\u5347\u7EA7", "\u7535\u68AF\u7EF4\u4FDD\u6DF1\u5EA6", "\u672C\u5468\u516D\u9732\u5929", "\u751F\u6D3B\u8D34\u58EB"];
   ids.forEach((title, i) => {
     const node = $$("main h2,main h3,main h4,main p").find((e) => e.textContent.trim().startsWith(title));
-    if (node) bind(node.closest("article") || node.parentElement, "\u67E5\u770B" + node.textContent, () => go2("/mobile/articles/" + names[i]));
+    if (node) bind(node.closest("article") || node.parentElement, "\u67E5\u770B" + node.textContent, () => go3("/mobile/articles/" + names[i]));
   });
   const likes = glyph("favorite").concat(buttons2(/^\d+$/).filter((b) => $(".material-symbols-outlined", b)?.textContent === "favorite"));
   likes.forEach((b, i) => {
@@ -2958,7 +3227,7 @@ function home(ctx) {
     update();
   });
   const feed = $$("h2,h3").find((e) => e.textContent.trim() === "\u6211\u7684\u751F\u6D3B\u5708");
-  if (feed) bind(feed, "\u6253\u5F00\u751F\u6D3B\u5708", () => go2("/mobile/services?panel=community-feed"));
+  if (feed) bind(feed, "\u6253\u5F00\u751F\u6D3B\u5708", () => go3("/mobile/services?panel=community-feed"));
   on3(/^彭一小区/, () => ctx.panel("community"));
   const noticeBox = document.createElement("div");
   noticeBox.className = "bg-surface-container-lowest rounded-xl px-3 py-2 text-body-sm";
@@ -2974,7 +3243,7 @@ function home(ctx) {
   window.addEventListener("demo:external", render);
 }
 function media(ctx) {
-  const { state: state2, store: store2, go: go2, route: route2 } = ctx;
+  const { state: state2, store: store2, go: go3, route: route2 } = ctx;
   bind($("#favorite-btn"), "\u6536\u85CF\u793E\u533A\u7535\u53F0", () => {
     ctx.requireAuth(() => {
       const fav = store2.toggle("favorites", "radio");
@@ -3019,12 +3288,12 @@ function media(ctx) {
     } else articleList(ctx, visibleArticles().filter((a) => a.kind === ["all", "audio", "article", "video", "activity"][i]));
   }));
   on3(/全部专栏/, () => articleList(ctx, visibleArticles()));
-  on3(/进入微信阅读/, () => go2("/mobile/articles/storm"));
+  on3(/进入微信阅读/, () => go3("/mobile/articles/storm"));
   on3(/朗读全文/, (b) => ctx.speech(state2().articles.find((a) => a.id === "storm").body, b));
   const plants = $$("main h4,main h5").find((e) => e.textContent.includes("\u6625\u5B63\u7EFF\u5316"));
-  if (plants) bind(plants.parentElement.parentElement, "\u9605\u8BFB\u7EFF\u5316\u8BA1\u5212", () => go2("/mobile/articles/plants"));
+  if (plants) bind(plants.parentElement.parentElement, "\u9605\u8BFB\u7EFF\u5316\u8BA1\u5212", () => go3("/mobile/articles/plants"));
   const videoCards = $$(".cursor-pointer").filter((e) => /3分钟看懂|保安小哥/.test(e.textContent));
-  videoCards.forEach((card, i) => bind(card, "\u6253\u5F00\u5FAE\u7EAA\u5F55\u8BE6\u60C5", () => go2("/mobile/articles/" + (i === 0 ? "tank" : "security"))));
+  videoCards.forEach((card, i) => bind(card, "\u6253\u5F00\u5FAE\u7EAA\u5F55\u8BE6\u60C5", () => go3("/mobile/articles/" + (i === 0 ? "tank" : "security"))));
   bind($("#post-voice-btn"), "\u6295\u9012\u58F0\u97F3\u4F5C\u54C1", () => ctx.requireAuth(() => {
     formModal("\u6709\u58F0\u5171\u521B\u6295\u7A3F", field("title", "\u4F5C\u54C1\u6807\u9898") + field("body", "\u4F5C\u54C1\u7B80\u4ECB", "", { type: "textarea" }), (v) => {
       store2.change((s) => s.articles.unshift({ ...v, id: id("SUBMISSION"), kind: "audio", status: "\u5F85\u5BA1\u6838", at: now() }));
@@ -3037,7 +3306,7 @@ function media(ctx) {
     box.className = "demo-inline-section";
     box.innerHTML = `<h3 class="text-headline-sm">\u6700\u65B0\u7269\u4E1A\u5468\u62A5</h3>` + list(submissions, (a) => `<button data-new-article="${a.id}"><strong>${escape(a.title)}</strong><small>${new Date(a.at).toLocaleDateString("zh-CN")}</small></button>`);
     $("main > div").prepend(box);
-    $$("[data-new-article]", box).forEach((b) => bind(b, "\u67E5\u770B\u7269\u4E1A\u5468\u62A5", () => go2("/mobile/articles/" + b.dataset.newArticle)));
+    $$("[data-new-article]", box).forEach((b) => bind(b, "\u67E5\u770B\u7269\u4E1A\u5468\u62A5", () => go3("/mobile/articles/" + b.dataset.newArticle)));
   }
   if (route2.detail === "article") articleDetail(ctx, decodeURIComponent(location.pathname.split("/").pop()));
 }
@@ -3090,15 +3359,20 @@ var qs = new URLSearchParams(location.search);
 var role = route.key === "group" || route.key === "login" && qs.get("role") === "group" ? "group" : route.group === "web" ? "admin" : route.group === "worker" ? "worker" : "resident";
 var sessionKey = "shengbian-auth-" + role;
 var signedIn = () => sessionStorage.getItem(sessionKey) === "yes";
+window.addEventListener("shengbian:api-unauthorized", () => {
+  sessionStorage.removeItem("shengbian-api-auth-" + role);
+  sessionStorage.removeItem("shengbian-auth-" + role);
+  if (!location.pathname.endsWith("/login")) go2(`/${route.group}/login?next=${encodeURIComponent(location.pathname + location.search)}`);
+});
 function safeNext(next) {
   return typeof next === "string" && /^\/(mobile|web|worker)\//.test(next) && !next.includes("\\") ? next : "/mobile/home";
 }
-function go(url) {
+function go2(url) {
   location.assign(safeNext(url));
 }
 function login2() {
   const base = location.pathname === "/web/group" || role === "group" ? "/web/login?role=group&" : `/${route.group}/login?`;
-  go(base + `next=${encodeURIComponent(location.pathname + location.search)}`);
+  go2(base + `next=${encodeURIComponent(location.pathname + location.search)}`);
 }
 function requireAuth(fn) {
   if (!signedIn()) return login2();
@@ -3106,7 +3380,7 @@ function requireAuth(fn) {
 }
 function back() {
   if (document.referrer.startsWith(location.origin) && history.length > 1) history.back();
-  else go(route.group === "web" ? "/web/overview" : route.group === "worker" ? "/worker/tasks" : "/mobile/home");
+  else go2(route.group === "web" ? "/web/overview" : route.group === "worker" ? "/worker/tasks" : "/mobile/home");
 }
 function signOut() {
   confirm("\u9000\u51FA\u767B\u5F55", "\u786E\u8BA4\u9000\u51FA\u5F53\u524D\u6F14\u793A\u8D26\u53F7\uFF1F\u4E1A\u52A1\u8BB0\u5F55\u4F1A\u7EE7\u7EED\u4FDD\u5B58\u5728\u6B64\u6D4F\u89C8\u5668\u3002", () => {
@@ -3116,7 +3390,7 @@ function signOut() {
       sessionStorage.removeItem("shengbian-api-auth-" + role);
     }
     sessionStorage.removeItem(sessionKey);
-  }, { after: () => go(role === "group" ? "/web/login?role=group" : `/${route.group}/login`) });
+  }, { after: () => go2(role === "group" ? "/web/login?role=group" : `/${route.group}/login`) });
 }
 if (!route.public && !signedIn()) {
   login2();
@@ -3125,7 +3399,7 @@ if (!route.public && !signedIn()) {
 }
 function start() {
   document.title = `${route.name} | \u58F0\u8FB9\u7269\u4E1A`;
-  const ctx = { route, qs, role, source: source_default, store, state, go, back, login: login2, signedIn, requireAuth, panel, orderDetail, showOrders, upload, showFile, speech, share, contact, notify, signOut, safeNext };
+  const ctx = { route, qs, role, source: source_default, store, state, go: go2, back, login: login2, signedIn, requireAuth, panel, orderDetail, showOrders, upload, showFile, speech, share, contact, notify, signOut, safeNext };
   hydrateApiContext(role, store);
   if (!state().expenses.length && !state().logs.some((l) => l.action === "\u521D\u59CB\u5316\u652F\u51FA\u53F0\u8D26")) {
     store.change((s) => {
@@ -3153,7 +3427,7 @@ function start() {
       a.setAttribute("aria-current", "page");
       a.classList.add(a.closest("aside") ? "demo-selected" : "text-primary-container");
     }
-    bind(a, a.title || label(a), () => a.dataset.path === "login" ? signOut() : go(path));
+    bind(a, a.title || label(a), () => a.dataset.path === "login" ? signOut() : go2(path));
   });
   if (route.key === "group") {
     $$('a[data-path="converged-media"], a[data-path="capital-pool"]').forEach((a) => a.remove());
@@ -3195,7 +3469,7 @@ function start() {
         }
         after.after(a);
         after = a;
-        bind(a, text, () => go(href));
+        bind(a, text, () => go2(href));
       }
     }
     const webMenu = [
@@ -3221,7 +3495,7 @@ function start() {
       a.innerHTML = icon(glyph2) + escape(text);
       a.dataset.path = key;
       nav.append(a);
-      bind(a, text, () => go(href));
+      bind(a, text, () => go2(href));
     }
     const button = document.createElement("button");
     button.className = "demo-icon demo-mobile-only";
@@ -3391,6 +3665,9 @@ async function showFile(file) {
   dlg.addEventListener("close", () => URL.revokeObjectURL(url), { once: true });
 }
 function showOrders(filter) {
+  if (route.group === "mobile" && globalThis.__SHENGBIAN_API_BASE__ && sessionStorage.getItem("shengbian-api-auth-resident") === "yes") {
+    return Promise.resolve().then(() => (init_resident(), resident_exports)).then(({ renderResidentOrders: renderResidentOrders2 }) => renderResidentOrders2({ route, qs, role, store, state, go: go2, back, signedIn, requireAuth, panel, orderDetail, showOrders, upload, showFile, speech, share, contact, notify, signOut, safeNext }));
+  }
   const orders2 = state().orders.filter((o) => !filter || filter(o));
   const canReview = (o) => route.group === "mobile" && o.status === "completed" && !state().reviews.some((r) => r.orderId === o.id);
   const reviewFor = (order) => state().reviews.find((review) => review.orderId === order.id);
@@ -3400,23 +3677,26 @@ function showOrders(filter) {
     if (review) return `\u5DF2\u8BC4\u4EF7 \xB7 ${review.rating} \u661F`;
     return statuses[order.status];
   };
-  const dlg = modal("\u6211\u7684\u5DE5\u5355\u8BB0\u5F55", list(orders2, (o) => `<article><button data-order="${escape(o.id)}"><strong>${escape(o.title)}</strong><small>${escape(o.id)} \xB7 ${escape(o.room)} \xB7 ${escape(orderStatus(o))}</small></button>${canReview(o) ? `<button class="demo-button" data-review-order="${escape(o.id)}">\u8BC4\u4EF7\u670D\u52A1</button>` : ""}</article>`), [{ label: "\u65B0\u5EFA\u62A5\u4FEE", run: () => go("/mobile/repair") }]);
-  $$("[data-order]", dlg).forEach((btn) => bind(btn, "\u5DE5\u5355\u8BE6\u60C5", () => go(`/${route.group}/orders/${btn.dataset.order}`)));
-  $$("[data-review-order]", dlg).forEach((btn) => bind(btn, "\u8BC4\u4EF7\u7EF4\u4FEE\u670D\u52A1", () => go("/mobile/review?id=" + btn.dataset.reviewOrder)));
+  const dlg = modal("\u6211\u7684\u5DE5\u5355\u8BB0\u5F55", list(orders2, (o) => `<article><button data-order="${escape(o.id)}"><strong>${escape(o.title)}</strong><small>${escape(o.id)} \xB7 ${escape(o.room)} \xB7 ${escape(orderStatus(o))}</small></button>${canReview(o) ? `<button class="demo-button" data-review-order="${escape(o.id)}">\u8BC4\u4EF7\u670D\u52A1</button>` : ""}</article>`), [{ label: "\u65B0\u5EFA\u62A5\u4FEE", run: () => go2("/mobile/repair") }]);
+  $$("[data-order]", dlg).forEach((btn) => bind(btn, "\u5DE5\u5355\u8BE6\u60C5", () => go2(`/${route.group}/orders/${btn.dataset.order}`)));
+  $$("[data-review-order]", dlg).forEach((btn) => bind(btn, "\u8BC4\u4EF7\u7EF4\u4FEE\u670D\u52A1", () => go2("/mobile/review?id=" + btn.dataset.reviewOrder)));
 }
 function orderDetail(orderId) {
+  if (route.group === "mobile" && globalThis.__SHENGBIAN_API_BASE__ && sessionStorage.getItem("shengbian-api-auth-resident") === "yes") {
+    return renderResidentOrderDetail({ route, qs, role, store, state, go: go2, back, signedIn, requireAuth, panel, orderDetail, showOrders, upload, showFile, speech, share, contact, notify, signOut, safeNext }, orderId);
+  }
   const order = state().orders.find((o) => o.id === orderId);
-  if (!order) return modal("\u5DE5\u5355\u4E0D\u5B58\u5728", empty("\u672A\u627E\u5230\u8BE5\u5DE5\u5355\uFF0C\u8BF7\u8FD4\u56DE\u5DE5\u5355\u5217\u8868"), [{ label: "\u8FD4\u56DE\u5DE5\u5355\u5217\u8868", run: () => go(route.group === "web" ? "/web/work-orders" : route.group === "worker" ? "/worker/tasks" : "/mobile/profile?panel=orders") }]);
+  if (!order) return modal("\u5DE5\u5355\u4E0D\u5B58\u5728", empty("\u672A\u627E\u5230\u8BE5\u5DE5\u5355\uFF0C\u8BF7\u8FD4\u56DE\u5DE5\u5355\u5217\u8868"), [{ label: "\u8FD4\u56DE\u5DE5\u5355\u5217\u8868", run: () => go2(route.group === "web" ? "/web/work-orders" : route.group === "worker" ? "/worker/tasks" : "/mobile/profile?panel=orders") }]);
   const actions = [];
   if (route.group === "web" && ["pending", "accepted", "assigned"].includes(order.status)) actions.push({ label: "\u6307\u6D3E\u5E08\u5085", run: () => assign(order) });
   if (route.group === "worker" && ["pending", "assigned"].includes(order.status)) {
     const minutes = order.sla?.arrivalMinutes || (order.urgent ? 30 : 120);
-    actions.push({ label: "\u786E\u8BA4\u63A5\u5355", run: () => confirm("\u786E\u8BA4\u63A5\u5355", `${order.title}\u3002\u63A5\u5355\u540E\u8BF7\u5728 ${minutes} \u5206\u949F\u5185\u5B8C\u6210\u5230\u5C97\u6253\u5361\u3002`, () => store.transition(order.id, "accepted", { technician: "\u5F20\u5EFA\u56FD" }), { after: () => go(`/worker/checkin?id=${order.id}`) }) });
+    actions.push({ label: "\u786E\u8BA4\u63A5\u5355", run: () => confirm("\u786E\u8BA4\u63A5\u5355", `${order.title}\u3002\u63A5\u5355\u540E\u8BF7\u5728 ${minutes} \u5206\u949F\u5185\u5B8C\u6210\u5230\u5C97\u6253\u5361\u3002`, () => store.transition(order.id, "accepted", { technician: "\u5F20\u5EFA\u56FD" }), { after: () => go2(`/worker/checkin?id=${order.id}`) }) });
   }
-  if (route.group === "worker" && ["accepted", "arrived", "processing"].includes(order.status)) actions.push({ label: "\u524D\u5F80\u73B0\u573A\u6253\u5361", run: () => go(`/worker/checkin?id=${order.id}`) });
+  if (route.group === "worker" && ["accepted", "arrived", "processing"].includes(order.status)) actions.push({ label: "\u524D\u5F80\u73B0\u573A\u6253\u5361", run: () => go2(`/worker/checkin?id=${order.id}`) });
   if (route.group === "mobile" && order.status === "pending") actions.push({ label: "\u53D6\u6D88\u62A5\u4FEE", secondary: true, run: () => confirm("\u53D6\u6D88\u62A5\u4FEE", "\u786E\u8BA4\u53D6\u6D88\u5C1A\u672A\u6D3E\u53D1\u7684\u62A5\u4FEE\uFF1F", () => store.transition(order.id, "cancelled"), { after: () => orderDetail(order.id) }) });
-  if (route.group === "mobile" && ["completed", "closed"].includes(order.status) && !state().reviews.some((r) => r.orderId === order.id)) actions.push({ label: "\u8BC4\u4EF7\u670D\u52A1", run: () => go(`/mobile/review?id=${order.id}`) });
-  if (route.group === "mobile" && order.amount > 0 && !order.paid) actions.push({ label: "\u7F34\u7EB3\u7EF4\u4FEE\u8D39", run: () => go(`/mobile/billing?tab=others&bill=repair-${order.id}`) });
+  if (route.group === "mobile" && ["completed", "closed"].includes(order.status) && !state().reviews.some((r) => r.orderId === order.id)) actions.push({ label: "\u8BC4\u4EF7\u670D\u52A1", run: () => go2(`/mobile/review?id=${order.id}`) });
+  if (route.group === "mobile" && order.amount > 0 && !order.paid) actions.push({ label: "\u7F34\u7EB3\u7EF4\u4FEE\u8D39", run: () => go2(`/mobile/billing?tab=others&bill=repair-${order.id}`) });
   actions.push({ label: "\u8FD4\u56DE", secondary: true, run: back });
   const review = state().reviews.find((item) => item.orderId === order.id);
   const reviewStatus = ["completed", "closed"].includes(order.status) ? review ? `\u5DF2\u8BC4\u4EF7 \xB7 ${review.rating} \u661F` : "\u670D\u52A1\u5DF2\u5B8C\u6210\uFF0C\u5F85\u5C45\u6C11\u8BC4\u4EF7" : "\u5C1A\u672A\u8FDB\u5165\u8BC4\u4EF7\u9636\u6BB5";
@@ -3492,16 +3772,16 @@ function panel(name) {
 }
 function common(ctx) {
   const textRules = [
-    [/一键紧急广播/, () => go("/web/broadcast")],
+    [/一键紧急广播/, () => go2("/web/broadcast")],
     [/新建工单/, () => formModal("\u65B0\u5EFA\u5DE5\u5355", field("description", "\u6545\u969C\u63CF\u8FF0", "", { type: "textarea" }) + field("room", "\u62A5\u4FEE\u4F4D\u7F6E", state().user.room) + field("phone", "\u8054\u7CFB\u7535\u8BDD", state().user.phone) + field("appointment", "\u9884\u7EA6\u65F6\u95F4", now().slice(0, 10) + " \u4E0B\u5348") + field("category", "\u6545\u969C\u7C7B\u578B", "\u6C34\u6696\u536B\u6D74", { choices: ["\u6C34\u6696\u536B\u6D74", "\u5F3A\u5F31\u7535\u8DEF", "\u95E8\u7981\u5B89\u9632", "\u516C\u533A\u4FEE\u7F2E"] }), (v) => {
       const o = store.createOrder(v);
-      go("/web/orders/" + o.id);
+      go2("/web/orders/" + o.id);
     })],
-    [/我要缴费|我的缴费|在线缴物业费|^立即缴费$|去抵扣/, () => requireAuth(() => go("/mobile/billing"))],
-    [/我要报修/, () => requireAuth(() => go("/mobile/repair"))],
+    [/我要缴费|我的缴费|在线缴物业费|^立即缴费$|去抵扣/, () => requireAuth(() => go2("/mobile/billing"))],
+    [/我要报修/, () => requireAuth(() => go2("/mobile/repair"))],
     [/我的报修|进度实时查/, () => requireAuth(() => panel("orders"))],
-    [/我要服务|全部服务/, () => go("/mobile/services")],
-    [/我的积分/, () => requireAuth(() => go("/mobile/points"))],
+    [/我要服务|全部服务/, () => go2("/mobile/services")],
+    [/我的积分/, () => requireAuth(() => go2("/mobile/points"))],
     [/^(切换房屋|切换|home_pin)|选择房屋/, () => panel("house")],
     [/专属管家|金牌管家在岗|联系师傅|联系业主|电联业主|联系|财务咨询|客服|热线/, contact],
     [/消息通知/, () => panel("messages")],
@@ -3541,7 +3821,7 @@ function common(ctx) {
       if (document.fullscreenElement) await document.exitFullscreen();
       else await document.documentElement.requestFullscreen();
     },
-    mic: () => route.group === "web" ? go("/web/media") : contact(),
+    mic: () => route.group === "web" ? go2("/web/media") : contact(),
     hearing: () => speech(void 0),
     headset_mic: contact,
     support_agent: contact,
@@ -3554,8 +3834,8 @@ function common(ctx) {
     share: () => share(),
     qr_code_scanner: () => formModal("\u626B\u7801\u670D\u52A1", field("code", "\u95E8\u724C/\u5DE5\u5355\u7F16\u53F7", "16-2-502"), (v) => {
       const o = state().orders.find((o2) => o2.id === v.code);
-      if (o) go("/mobile/orders/" + o.id);
-      else if (v.code === state().user.room) go("/mobile/repair");
+      if (o) go2("/mobile/orders/" + o.id);
+      else if (v.code === state().user.room) go2("/mobile/repair");
       else throw new Error("\u672A\u8BC6\u522B\u5230\u623F\u53F7\u6216\u5DE5\u5355\uFF0C\u8BF7\u91CD\u65B0\u8F93\u5165");
     }),
     add_photo_alternate: (el) => upload(el),
@@ -3569,7 +3849,7 @@ function common(ctx) {
     print: (el) => receipt(el),
     zoom_in: (el) => previewImage(el),
     visibility: () => panel("logs"),
-    open_in_new: () => go("/web/finance"),
+    open_in_new: () => go2("/web/finance"),
     warning: () => panel("messages"),
     more_vert: (el) => contextMenu(el),
     more_horiz: (el) => contextMenu(el),
@@ -3601,7 +3881,7 @@ function common(ctx) {
     if (el.closest("button,a,[data-action]")) return;
     const glyph2 = el.textContent.trim();
     if (glyph2 === "person") bind(el.parentElement, "\u4E2A\u4EBA\u4E2D\u5FC3", () => requireAuth(() => panel("account")));
-    if (glyph2 === "graphic_eq") bind(el.parentElement.parentElement, "\u8FD4\u56DE\u9996\u9875", () => go(route.group === "web" ? "/web/overview" : "/mobile/home"));
+    if (glyph2 === "graphic_eq") bind(el.parentElement.parentElement, "\u8FD4\u56DE\u9996\u9875", () => go2(route.group === "web" ? "/web/overview" : "/mobile/home"));
     if (glyph2 === "location_city") bind(el.closest(".cursor-pointer") || el.parentElement, "\u9009\u62E9\u793E\u533A", () => panel("community"));
   });
   $$("header input").forEach((input) => {
@@ -3612,7 +3892,7 @@ function common(ctx) {
         const term = input.value.trim().toLowerCase();
         const orders2 = state().orders.filter((o) => JSON.stringify(o).toLowerCase().includes(term));
         const dlg = modal("\u641C\u7D22\u7ED3\u679C", list(orders2, (o) => `<button data-search-order="${o.id}"><strong>${escape(o.title)}</strong><small>${escape(o.room)} \xB7 ${o.id}</small></button>`));
-        $$("[data-search-order]", dlg).forEach((btn) => bind(btn, "\u6253\u5F00\u641C\u7D22\u7ED3\u679C", () => go(`/${route.group}/orders/${btn.dataset.searchOrder}`)));
+        $$("[data-search-order]", dlg).forEach((btn) => bind(btn, "\u6253\u5F00\u641C\u7D22\u7ED3\u679C", () => go2(`/${route.group}/orders/${btn.dataset.searchOrder}`)));
       }
     });
   });
@@ -3620,7 +3900,7 @@ function common(ctx) {
 function contextMenu(el) {
   const text = el.closest("tr,article")?.innerText || "";
   const o = state().orders.find((o2) => text.includes(o2.id)) || state().orders[0];
-  modal("\u5DE5\u5355\u64CD\u4F5C", `<p>${escape(o.title)}</p>`, [{ label: "\u67E5\u770B\u8BE6\u60C5", run: () => go(`/${route.group}/orders/${o.id}`) }, ...route.group === "web" && o.status === "pending" ? [{ label: "\u6D3E\u53D1\u5DE5\u5355", run: () => assign(o) }] : []]);
+  modal("\u5DE5\u5355\u64CD\u4F5C", `<p>${escape(o.title)}</p>`, [{ label: "\u67E5\u770B\u8BE6\u60C5", run: () => go2(`/${route.group}/orders/${o.id}`) }, ...route.group === "web" && o.status === "pending" ? [{ label: "\u6D3E\u53D1\u5DE5\u5355", run: () => assign(o) }] : []]);
 }
 function previewImage(el) {
   const img = el.tagName === "IMG" ? el : el.parentElement.querySelector("img");

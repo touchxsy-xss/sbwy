@@ -4,7 +4,7 @@ import { saveFile, readFile, deleteFile } from './services/files.js';
 import { statuses, arrivalStatus } from './data/seed.js';
 import source from './data/source.json';
 import { $, $$, bind, label, icon, escape, modal, closeModal, formModal, field, confirm, toast, busy, csv, download, list, empty } from './ui.js';
-import { initResident } from './pages/resident.js';
+import { initResident, renderResidentOrderDetail } from './pages/resident.js';
 import { initOperations } from './pages/operations.js';
 import { initContent } from './pages/content.js';
 import { currentUser } from './api/auth.js';
@@ -19,6 +19,11 @@ const qs = new URLSearchParams(location.search);
 const role = route.key === 'group' || (route.key === 'login' && qs.get('role') === 'group') ? 'group' : route.group === 'web' ? 'admin' : route.group === 'worker' ? 'worker' : 'resident';
 const sessionKey = 'shengbian-auth-' + role;
 const signedIn = () => sessionStorage.getItem(sessionKey) === 'yes';
+window.addEventListener('shengbian:api-unauthorized', () => {
+  sessionStorage.removeItem('shengbian-api-auth-' + role);
+  sessionStorage.removeItem('shengbian-auth-' + role);
+  if (!location.pathname.endsWith('/login')) go(`/${route.group}/login?next=${encodeURIComponent(location.pathname + location.search)}`);
+});
 function safeNext(next) { return typeof next === 'string' && /^\/(mobile|web|worker)\//.test(next) && !next.includes('\\') ? next : '/mobile/home'; }
 function go(url) { location.assign(safeNext(url)); }
 function login() {
@@ -283,6 +288,9 @@ async function showFile(file) {
 }
 
 function showOrders(filter) {
+  if (route.group === 'mobile' && globalThis.__SHENGBIAN_API_BASE__ && sessionStorage.getItem('shengbian-api-auth-resident') === 'yes') {
+    return import('./pages/resident.js').then(({ renderResidentOrders }) => renderResidentOrders({ route, qs, role, store, state, go, back, signedIn, requireAuth, panel, orderDetail, showOrders, upload, showFile, speech, share, contact, notify, signOut, safeNext }));
+  }
   const orders = state().orders.filter(o => !filter || filter(o));
   const canReview = o => route.group === 'mobile' && o.status === 'completed' && !state().reviews.some(r => r.orderId === o.id);
   const reviewFor = order => state().reviews.find(review => review.orderId === order.id);
@@ -298,6 +306,9 @@ function showOrders(filter) {
 }
 
 function orderDetail(orderId) {
+  if (route.group === 'mobile' && globalThis.__SHENGBIAN_API_BASE__ && sessionStorage.getItem('shengbian-api-auth-resident') === 'yes') {
+    return renderResidentOrderDetail({ route, qs, role, store, state, go, back, signedIn, requireAuth, panel, orderDetail, showOrders, upload, showFile, speech, share, contact, notify, signOut, safeNext }, orderId);
+  }
   const order = state().orders.find(o => o.id === orderId);
   if (!order) return modal('工单不存在', empty('未找到该工单，请返回工单列表'), [{ label: '返回工单列表', run: () => go(route.group === 'web' ? '/web/work-orders' : route.group === 'worker' ? '/worker/tasks' : '/mobile/profile?panel=orders') }]);
   const actions = [];

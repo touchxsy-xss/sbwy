@@ -63,6 +63,19 @@ pnpm build
 pnpm start
 ```
 
+### 连接 Fastify API（Phase 2B.2）
+
+根目录 `.env.example` 记录前端连接 Fastify API 所需的变量。开发时优先使用
+同源代理，确保 opaque session 与 CSRF cookie 不会因跨端口而丢失：
+
+```bash
+SHENGBIAN_API_PROXY_TARGET=http://127.0.0.1:3001 pnpm start
+```
+
+`SHENGBIAN_API_BASE` 仅用于已正确配置 CORS、SameSite/Secure cookie 和
+`server/.env` 中 `APP_ORIGIN` 的跨域环境。它不是 tenant 或身份参数；当前
+tenant/community 仍完全来自服务器会话。
+
 默认服务地址为 `http://localhost:5173`。如果端口已被占用，服务会自动尝试下一个端口。开发时可以使用：
 
 ```bash
