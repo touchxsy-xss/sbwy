@@ -42,7 +42,7 @@ describe('Phase 2B work order PostgreSQL integration', { skip: !enabled }, () =>
   it('creates a private work order with formal references and masked response', async () => {
     const admin = await login('13800000001', env.SEED_ADMIN_PASSWORD!);
     const result = await request('/api/v1/work-orders', body({ scope: 'PRIVATE', houseId: fx.aNoUnitHouse.id, requesterPersonId: fx.a1CurrentPerson.id, requesterRelationshipId: (await db.select().from(housePersonRelationships).where(and(eq(housePersonRelationships.houseId, fx.aNoUnitHouse.id), eq(housePersonRelationships.personId, fx.a1CurrentPerson.id))))[0].id, category: '水暖', title: '厨房漏水', description: '水槽下方持续漏水' }), admin);
-    assert.equal(result.response.status, 200); assert.equal(result.body.data.status, 'PENDING_DISPATCH'); assert.equal(result.body.data.contactSnapshot.maskedPhone, '133****6789'); assert.equal(result.body.data.contactSnapshot.phone, '13312345678'); assert.ok(result.body.data.locationSnapshot.address);
+    assert.equal(result.response.status, 200); assert.equal(result.body.data.status, 'PENDING_DISPATCH'); assert.equal(result.body.data.contactSnapshot.maskedPhone, '133****5678'); assert.equal(result.body.data.contactSnapshot.phone, '13312345678'); assert.ok(result.body.data.locationSnapshot.address);
   });
 
   it('enforces assignment, state machine, events, and community scope', async () => {
@@ -63,6 +63,44 @@ describe('Phase 2B work order PostgreSQL integration', { skip: !enabled }, () =>
     const admin = await login('13800000001', env.SEED_ADMIN_PASSWORD!);
     const result = await request('/api/v1/work-orders', body({ scope: 'PRIVATE', houseId: fx.aHouse.id, requesterPersonId: fx.historyPerson.id, requesterRelationshipId: '00000000-0000-0000-0000-000000000000', category: '其他', title: '历史住户报修', description: '不应创建' }), admin);
     assert.equal(result.response.status, 403);
+  });
+
+  it('rejects pending directly to completed', async () => {
+    const admin = await login('13800000001', env.SEED_ADMIN_PASSWORD!);
+    const rel = (await db.select().from(housePersonRelationships).where(and(eq(housePersonRelationships.houseId, fx.aNoUnitHouse.id), eq(housePersonRelationships.personId, fx.a1CurrentPerson.id))))[0];
+    const created = await request('/api/v1/work-orders', body({ scope: 'PRIVATE', houseId: fx.aNoUnitHouse.id, requesterPersonId: fx.a1CurrentPerson.id, requesterRelationshipId: rel.id, category: '状态', title: '待派工越级流转', description: '不应直接完工' }), admin);
+    assert.equal(created.response.status, 200);
+    const result = await request(`/api/v1/work-orders/${created.body.data.id}/transition`, body({ toStatus: 'COMPLETED' }), admin);
+    assert.equal(result.response.status, 409);
+  });
+
+  it('rejects assigned directly to completed', async () => {
+    const admin = await login('13800000001', env.SEED_ADMIN_PASSWORD!);
+    const manager = await login('13800000002', env.SEED_MANAGER_PASSWORD!);
+    const engineer = await login('13800000003', env.SEED_ENGINEER_PASSWORD!);
+    const engineerMe = await request('/api/v1/auth/me', {}, engineer);
+    const rel = (await db.select().from(housePersonRelationships).where(and(eq(housePersonRelationships.houseId, fx.aNoUnitHouse.id), eq(housePersonRelationships.personId, fx.a1CurrentPerson.id))))[0];
+    const created = await request('/api/v1/work-orders', body({ scope: 'PRIVATE', houseId: fx.aNoUnitHouse.id, requesterPersonId: fx.a1CurrentPerson.id, requesterRelationshipId: rel.id, category: '状态', title: '已派工越级流转', description: '不应直接完工' }), admin);
+    assert.equal(created.response.status, 200);
+    const assigned = await request(`/api/v1/work-orders/${created.body.data.id}/assign`, body({ assignedUserId: engineerMe.body.data.user.id }), manager);
+    assert.equal(assigned.response.status, 200);
+    const result = await request(`/api/v1/work-orders/${created.body.data.id}/transition`, body({ toStatus: 'COMPLETED' }), manager);
+    assert.equal(result.response.status, 409);
+  });
+
+  it('keeps contact and location snapshots immutable after source changes', async () => {
+    const admin = await login('13800000001', env.SEED_ADMIN_PASSWORD!);
+    const rel = (await db.select().from(housePersonRelationships).where(and(eq(housePersonRelationships.houseId, fx.aNoUnitHouse.id), eq(housePersonRelationships.personId, fx.a1CurrentPerson.id))))[0];
+    const created = await request('/api/v1/work-orders', body({ scope: 'PRIVATE', houseId: fx.aNoUnitHouse.id, requesterPersonId: fx.a1CurrentPerson.id, requesterRelationshipId: rel.id, category: '快照', title: '快照不可变', description: '源数据变更后仍保留创建时信息' }), admin);
+    assert.equal(created.response.status, 200);
+    const orderId = created.body.data.id;
+    const updated = await request(`/api/v1/people/${fx.a1CurrentPerson.id}`, { method: 'PATCH', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ name: '变更后住户', phone: '+86 139 5555 6666' }) }, admin);
+    assert.equal(updated.response.status, 200);
+    const detail = await request(`/api/v1/work-orders/${orderId}`, {}, admin);
+    assert.equal(detail.response.status, 200);
+    assert.equal(detail.body.data.contactSnapshot.name, 'A1 当前住户');
+    assert.equal(detail.body.data.contactSnapshot.phone, '13312345678');
+    assert.match(detail.body.data.locationSnapshot.address, /1201/);
   });
 
   it('rolls back work order and event when mandatory audit fails', async () => {

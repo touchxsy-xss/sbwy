@@ -43,9 +43,14 @@ Store remain unchanged.
 | Drizzle schema check | PASS |
 | Existing frontend tests | PASS (8/8) |
 | Existing frontend build | PASS |
-| PostgreSQL Phase 1/2A/2B integration | NOT RUN: no local PostgreSQL or Docker daemon available in this environment |
-| Fresh migration and upgrade migration | NOT RUN: requires PostgreSQL |
-| Raspberry Pi database verification | NOT RUN: no remote database execution was available |
+| PostgreSQL Phase 1 regression | PASS (1/1 on Raspberry Pi PostgreSQL 16) |
+| PostgreSQL Phase 2A regression | PASS (48/48 on Raspberry Pi PostgreSQL 16) |
+| PostgreSQL Phase 2B integration | PASS (7/7 on fresh and Phase 2A-upgrade databases) |
+| Fresh migration and upgrade migration | PASS (0000-0003 from zero; 0003 upgrade from Phase 2A) |
+| Raspberry Pi database verification | PASS (PostgreSQL 16.14, cold start, health HTTP 200) |
+
+The complete evidence and release decision are in
+`docs/phase2b-final-release-gate.md`.
 
 The PostgreSQL suite is intentionally not reported as passing until it has
 been run against PostgreSQL 16 with migrations applied from zero and from the
