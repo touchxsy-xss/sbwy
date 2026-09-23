@@ -12,7 +12,7 @@ export const personStatusEnum = pgEnum('person_status', ['ACTIVE', 'DISABLED']);
 export const genderEnum = pgEnum('person_gender', ['MALE', 'FEMALE', 'OTHER', 'UNKNOWN']);
 export const relationshipTypeEnum = pgEnum('house_relationship_type', ['OWNER', 'TENANT', 'FAMILY_MEMBER', 'OCCUPANT']);
 export const verificationStatusEnum = pgEnum('relationship_verification_status', ['UNVERIFIED', 'PENDING', 'VERIFIED', 'REJECTED']);
-export const workOrderStatusEnum = pgEnum('work_order_status', ['PENDING_DISPATCH', 'ASSIGNED', 'ACCEPTED', 'ARRIVED', 'COMPLETED', 'ARCHIVED', 'CANCELLED']);
+export const workOrderStatusEnum = pgEnum('work_order_status', ['PENDING_DISPATCH', 'ASSIGNED', 'ACCEPTED', 'ARRIVED', 'COMPLETED', 'REWORK_REQUIRED', 'ARCHIVED', 'CANCELLED']);
 export const workOrderScopeEnum = pgEnum('work_order_scope', ['PRIVATE', 'PUBLIC']);
 export const workOrderPriorityEnum = pgEnum('work_order_priority', ['ROUTINE', 'NORMAL', 'URGENT']);
 
@@ -248,6 +248,8 @@ export const workOrders = pgTable('work_orders', {
   acceptedAt: timestamp('accepted_at', { withTimezone: true }),
   arrivedAt: timestamp('arrived_at', { withTimezone: true }),
   completedAt: timestamp('completed_at', { withTimezone: true }),
+  residentConfirmedAt: timestamp('resident_confirmed_at', { withTimezone: true }),
+  residentConfirmedByPersonId: uuid('resident_confirmed_by_person_id').references(() => people.id),
   archivedAt: timestamp('archived_at', { withTimezone: true }),
   cancelledAt: timestamp('cancelled_at', { withTimezone: true }),
   ...timestamps
@@ -279,9 +281,26 @@ export const workOrderEvents = pgTable('work_order_events', {
   tenantIndex: index('work_order_events_tenant_idx').on(table.propertyCompanyId, table.communityId)
 }));
 
+export const workOrderReviews = pgTable('work_order_reviews', {
+  id: uuid('id').defaultRandom().primaryKey(),
+  propertyCompanyId: uuid('property_company_id').notNull().references(() => propertyCompanies.id),
+  workOrderId: uuid('work_order_id').notNull().references(() => workOrders.id),
+  reviewerPersonId: uuid('reviewer_person_id').notNull().references(() => people.id),
+  rating: integer('rating').notNull(),
+  comment: text('comment'),
+  createdAt: timestamp('created_at', { withTimezone: true }).defaultNow().notNull(),
+  updatedAt: timestamp('updated_at', { withTimezone: true }).defaultNow().notNull()
+}, table => ({
+  workOrderUnique: uniqueIndex('work_order_reviews_work_order_uq').on(table.workOrderId),
+  tenantIndex: index('work_order_reviews_tenant_idx').on(table.propertyCompanyId),
+  reviewerIndex: index('work_order_reviews_reviewer_idx').on(table.reviewerPersonId),
+  ratingCheck: check('work_order_reviews_rating_check', sql`${table.rating} >= 1 AND ${table.rating} <= 5`),
+  commentLengthCheck: check('work_order_reviews_comment_length_check', sql`${table.comment} IS NULL OR char_length(${table.comment}) <= 2000`)
+}));
+
 export const usersRelations = relations(users, ({ many }) => ({ memberships: many(companyMemberships), sessions: many(sessions), roleAssignments: many(userRoleAssignments) }));
 export const propertyCompaniesRelations = relations(propertyCompanies, ({ many }) => ({ communities: many(communities), memberships: many(companyMemberships), sessions: many(sessions) }));
 export const communitiesRelations = relations(communities, ({ one, many }) => ({ company: one(propertyCompanies, { fields: [communities.propertyCompanyId], references: [propertyCompanies.id] }), roleAssignments: many(userRoleAssignments) }));
 export const companyMembershipsRelations = relations(companyMemberships, ({ one }) => ({ user: one(users, { fields: [companyMemberships.userId], references: [users.id] }), company: one(propertyCompanies, { fields: [companyMemberships.propertyCompanyId], references: [propertyCompanies.id] }) }));
 
-export const schema = { propertyCompanies, communities, users, companyMemberships, employeeProfiles, roles, permissions, rolePermissions, userRoleAssignments, sessions, auditLogs, buildings, buildingUnits, houses, people, housePersonRelationships, workOrders, workOrderEvents };
+export const schema = { propertyCompanies, communities, users, companyMemberships, employeeProfiles, roles, permissions, rolePermissions, userRoleAssignments, sessions, auditLogs, buildings, buildingUnits, houses, people, housePersonRelationships, workOrders, workOrderEvents, workOrderReviews };

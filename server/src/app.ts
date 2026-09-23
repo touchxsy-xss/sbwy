@@ -34,9 +34,11 @@ const relationPatchSchema = relationSchema.omit({ personId: true }).partial().re
 const verifyRelationSchema = z.object({ status: z.enum(['VERIFIED', 'REJECTED']), note: z.string().trim().max(500).optional().nullable() });
 const assignmentSchema = z.object({ userId: z.string().uuid(), roleId: z.string().uuid(), propertyCompanyId: z.string().uuid().optional().nullable(), communityId: z.string().uuid().optional().nullable() });
 const workOrderSchema = z.object({ scope: z.enum(['PRIVATE', 'PUBLIC']), communityId: z.string().uuid().optional().nullable(), houseId: z.string().uuid().optional().nullable(), requesterPersonId: z.string().uuid(), requesterRelationshipId: z.string().uuid().optional().nullable(), category: z.string().trim().min(1).max(80), priority: z.enum(['ROUTINE', 'NORMAL', 'URGENT']).default('NORMAL'), title: z.string().trim().min(2).max(160), description: z.string().trim().min(2).max(4000), location: z.string().trim().max(240).optional().nullable() }).superRefine((input, ctx) => { if (input.scope === 'PRIVATE' && (!input.houseId || !input.requesterRelationshipId)) ctx.addIssue({ code: z.ZodIssueCode.custom, message: '室内报修必须提供房屋和有效房屋关系', path: ['houseId'] }); if (input.scope === 'PUBLIC' && !input.communityId) ctx.addIssue({ code: z.ZodIssueCode.custom, message: '公共区域报修必须提供小区', path: ['communityId'] }); });
-const workOrderQuerySchema = z.object({ page: z.coerce.number().int().min(1).default(1), pageSize: z.coerce.number().int().min(1).max(100).default(20), communityId: z.string().uuid().optional(), houseId: z.string().uuid().optional(), status: z.enum(['PENDING_DISPATCH', 'ASSIGNED', 'ACCEPTED', 'ARRIVED', 'COMPLETED', 'ARCHIVED', 'CANCELLED']).optional(), assignedUserId: z.string().uuid().optional(), keyword: z.string().trim().min(1).max(120).optional() });
+const workOrderQuerySchema = z.object({ page: z.coerce.number().int().min(1).default(1), pageSize: z.coerce.number().int().min(1).max(100).default(20), communityId: z.string().uuid().optional(), houseId: z.string().uuid().optional(), status: z.enum(['PENDING_DISPATCH', 'ASSIGNED', 'ACCEPTED', 'ARRIVED', 'COMPLETED', 'REWORK_REQUIRED', 'ARCHIVED', 'CANCELLED']).optional(), assignedUserId: z.string().uuid().optional(), keyword: z.string().trim().min(1).max(120).optional() });
 const workOrderAssignSchema = z.object({ assignedUserId: z.string().uuid(), note: z.string().trim().max(500).optional().nullable() });
 const workOrderTransitionSchema = z.object({ toStatus: z.enum(['ACCEPTED', 'ARRIVED', 'COMPLETED', 'ARCHIVED', 'CANCELLED']), note: z.string().trim().max(500).optional().nullable() });
+const workOrderReworkSchema = z.object({ reason: z.string().trim().min(1).max(2000) });
+const workOrderReviewSchema = z.object({ rating: z.number().int().min(1).max(5), comment: z.string().trim().max(2000).optional().nullable() });
 const employeeOpenApiBody = {
   type: 'object',
   required: ['companyId', 'name', 'phone', 'password', 'employeeNo'],
@@ -316,6 +318,28 @@ export async function buildApp(options: AppOptions): Promise<FastifyInstance> {
     const auth = requireAuth(request); requirePermission(auth.scope, 'work_order:transition');
     const row = await repository.transitionWorkOrder(pathId(request), 'CANCELLED', auth.user.id, auth.scope, '用户取消工单', request.id);
     if (!row) throw notFound(); return ok(reply, await repository.getWorkOrder(row.id, auth.scope));
+  });
+  app.post('/api/v1/work-orders/:id/confirm-completion', async (request, reply) => {
+    const auth = requireAuth(request);
+    const row = await repository.confirmWorkOrderCompletion(pathId(request), auth.scope, request.id);
+    if (!row) throw notFound(); return ok(reply, row);
+  });
+  app.post('/api/v1/work-orders/:id/request-rework', async (request, reply) => {
+    const auth = requireAuth(request);
+    const input = parse(workOrderReworkSchema, request.body);
+    const row = await repository.requestWorkOrderRework(pathId(request), input.reason, auth.scope, request.id);
+    if (!row) throw notFound(); return ok(reply, row);
+  });
+  app.post('/api/v1/work-orders/:id/review', async (request, reply) => {
+    const auth = requireAuth(request);
+    const input = parse(workOrderReviewSchema, request.body);
+    const row = await repository.createWorkOrderReview(pathId(request), input.rating, input.comment || null, auth.scope, request.id);
+    if (!row) throw notFound(); return ok(reply, row);
+  });
+  app.get('/api/v1/work-orders/:id/review', async (request, reply) => {
+    const auth = requireAuth(request);
+    const row = await repository.getWorkOrderReview(pathId(request), auth.scope);
+    if (!row) throw notFound(); return ok(reply, row);
   });
   app.get('/api/v1/work-orders/:id/events', async (request, reply) => {
     const auth = requireAuth(request); requirePermission(auth.scope, 'work_order:read');

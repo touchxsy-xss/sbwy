@@ -2,8 +2,8 @@ import { randomUUID } from 'node:crypto';
 import { and, desc, eq, exists, gte, inArray, isNull, lte, ne, or, sql } from 'drizzle-orm';
 import type { AppDb } from './client.js';
 import { AppError } from '../shared/errors.js';
-import { auditLogs, buildingUnits, buildings, communities, companyMemberships, employeeProfiles, housePersonRelationships, houses, people, permissions, propertyCompanies, rolePermissions, roles, sessions, userRoleAssignments, users, workOrderEvents, workOrders } from './schema/index.js';
-import type { AssignmentRecord, AuditInput, BuildingDto, BuildingRecord, BuildingUnitRecord, CommunityRecord, CompanyRecord, EmployeeRecord, HouseDto, HouseRecord, HouseRelationshipRecord, MembershipRecord, PermissionRecord, PersonDto, PersonRecord, Repository, RoleRecord, Scope, SessionRecord, Status, UserRecord, WorkOrderDto, WorkOrderEventRecord, WorkOrderFilters, WorkOrderRecord, WorkOrderSnapshot, WorkOrderStatus } from '../shared/types.js';
+import { auditLogs, buildingUnits, buildings, communities, companyMemberships, employeeProfiles, housePersonRelationships, houses, people, permissions, propertyCompanies, rolePermissions, roles, sessions, userRoleAssignments, users, workOrderEvents, workOrderReviews, workOrders } from './schema/index.js';
+import type { AssignmentRecord, AuditInput, BuildingDto, BuildingRecord, BuildingUnitRecord, CommunityRecord, CompanyRecord, EmployeeRecord, HouseDto, HouseRecord, HouseRelationshipRecord, MembershipRecord, PermissionRecord, PersonDto, PersonRecord, Repository, RoleRecord, Scope, SessionRecord, Status, UserRecord, WorkOrderDto, WorkOrderEventRecord, WorkOrderFilters, WorkOrderRecord, WorkOrderReviewRecord, WorkOrderSnapshot, WorkOrderStatus } from '../shared/types.js';
 
 const userMap = (row: any): UserRecord => ({ id: row.id, name: row.name, phone: row.phone, email: row.email, passwordHash: row.passwordHash, status: row.status, lastLoginAt: row.lastLoginAt, disabledAt: row.disabledAt, createdAt: row.createdAt, updatedAt: row.updatedAt });
 const companyMap = (row: any): CompanyRecord => ({ id: row.id, code: row.code, name: row.name, status: row.status, disabledAt: row.disabledAt, createdAt: row.createdAt, updatedAt: row.updatedAt });
@@ -17,8 +17,9 @@ const unitMap = (row: any): BuildingUnitRecord => ({ id: row.id, buildingId: row
 const houseMap = (row: any): HouseRecord => ({ id: row.id, buildingId: row.buildingId, buildingUnitId: row.buildingUnitId, code: row.code, floor: row.floor, buildingArea: row.buildingArea, usableArea: row.usableArea, displayName: row.displayName, legacyCode: row.legacyCode, status: row.status, disabledAt: row.disabledAt, createdAt: row.createdAt, updatedAt: row.updatedAt, communityId: row.communityId, propertyCompanyId: row.propertyCompanyId });
 const personMap = (row: any): PersonRecord => ({ id: row.id, propertyCompanyId: row.propertyCompanyId, userId: row.userId, name: row.name, phone: row.phone, gender: row.gender, status: row.status, disabledAt: row.disabledAt, createdAt: row.createdAt, updatedAt: row.updatedAt });
 const relationshipMap = (row: any): any => ({ id: row.id, houseId: row.houseId, personId: row.personId, relationshipType: row.relationshipType, ownershipShare: row.ownershipShare, isPrimaryContact: row.isPrimaryContact, startDate: row.startDate, endDate: row.endDate, verificationStatus: row.verificationStatus, reviewedAt: row.reviewedAt, reviewedByUserId: row.reviewedByUserId, verificationNote: row.verificationNote, createdAt: row.createdAt, updatedAt: row.updatedAt });
-const workOrderMap = (row: any): WorkOrderRecord => ({ id: row.id, propertyCompanyId: row.propertyCompanyId, communityId: row.communityId, houseId: row.houseId, requesterPersonId: row.requesterPersonId, requesterUserId: row.requesterUserId, requesterRelationshipId: row.requesterRelationshipId, assignedUserId: row.assignedUserId, orderNo: row.orderNo, scope: row.scope, category: row.category, priority: row.priority, title: row.title, description: row.description, status: row.status, contactSnapshot: row.contactSnapshot as WorkOrderSnapshot, locationSnapshot: row.locationSnapshot as WorkOrderSnapshot, assignedAt: row.assignedAt, acceptedAt: row.acceptedAt, arrivedAt: row.arrivedAt, completedAt: row.completedAt, archivedAt: row.archivedAt, cancelledAt: row.cancelledAt, createdAt: row.createdAt, updatedAt: row.updatedAt });
+const workOrderMap = (row: any): WorkOrderRecord => ({ id: row.id, propertyCompanyId: row.propertyCompanyId, communityId: row.communityId, houseId: row.houseId, requesterPersonId: row.requesterPersonId, requesterUserId: row.requesterUserId, requesterRelationshipId: row.requesterRelationshipId, assignedUserId: row.assignedUserId, orderNo: row.orderNo, scope: row.scope, category: row.category, priority: row.priority, title: row.title, description: row.description, status: row.status, contactSnapshot: row.contactSnapshot as WorkOrderSnapshot, locationSnapshot: row.locationSnapshot as WorkOrderSnapshot, assignedAt: row.assignedAt, acceptedAt: row.acceptedAt, arrivedAt: row.arrivedAt, completedAt: row.completedAt, residentConfirmedAt: row.residentConfirmedAt, residentConfirmedByPersonId: row.residentConfirmedByPersonId, archivedAt: row.archivedAt, cancelledAt: row.cancelledAt, createdAt: row.createdAt, updatedAt: row.updatedAt });
 const workOrderEventMap = (row: any): WorkOrderEventRecord => ({ id: row.id, workOrderId: row.workOrderId, propertyCompanyId: row.propertyCompanyId, communityId: row.communityId, actorUserId: row.actorUserId, fromStatus: row.fromStatus, toStatus: row.toStatus, action: row.action, note: row.note, metadata: row.metadata, createdAt: row.createdAt });
+const workOrderReviewMap = (row: any): WorkOrderReviewRecord => ({ id: row.id, propertyCompanyId: row.propertyCompanyId, workOrderId: row.workOrderId, reviewerPersonId: row.reviewerPersonId, rating: row.rating, comment: row.comment, createdAt: row.createdAt, updatedAt: row.updatedAt });
 const normalizePhone = (value: string | null | undefined) => {
   if (!value) return value ?? null;
   const digits = value.replace(/[\s-]/g, '');
@@ -27,9 +28,12 @@ const normalizePhone = (value: string | null | undefined) => {
 };
 const maskPhone = (phone: string | null) => phone ? `${phone.slice(0, 3)}****${phone.slice(-4)}` : null;
 const personDto = (person: PersonRecord): PersonDto => { const { phone, ...rest } = person; return { ...rest, maskedPhone: maskPhone(phone) }; };
-const workOrderDto = (order: WorkOrderRecord, revealPhone = false): WorkOrderDto => {
+const workOrderDto = (order: WorkOrderRecord, revealPhone = false, review: WorkOrderReviewRecord | null = null, resident = false): WorkOrderDto => {
   const { phone, ...contact } = order.contactSnapshot || {};
-  return { ...order, contactSnapshot: { ...contact, maskedPhone: maskPhone(phone || null), ...(revealPhone ? { phone: phone || null } : {}) }, locationSnapshot: order.locationSnapshot };
+  const allowedActions: WorkOrderDto['allowedActions'] = [];
+  if (resident && order.status === 'COMPLETED') allowedActions.push('CONFIRM_COMPLETION', 'REQUEST_REWORK');
+  if (resident && order.status === 'ARCHIVED' && !review) allowedActions.push('SUBMIT_REVIEW');
+  return { ...order, contactSnapshot: { ...contact, maskedPhone: maskPhone(phone || null), ...(revealPhone ? { phone: phone || null } : {}) }, locationSnapshot: order.locationSnapshot, allowedActions, review };
 };
 const currentOrFuture = (column: any) => or(isNull(column), sql`${column} >= CURRENT_DATE`);
 const workOrderTransitions: Record<WorkOrderStatus, WorkOrderStatus[]> = {
@@ -38,6 +42,7 @@ const workOrderTransitions: Record<WorkOrderStatus, WorkOrderStatus[]> = {
   ACCEPTED: ['ARRIVED'],
   ARRIVED: ['COMPLETED'],
   COMPLETED: ['ARCHIVED'],
+  REWORK_REQUIRED: ['ASSIGNED'],
   ARCHIVED: [],
   CANCELLED: []
 };
@@ -70,16 +75,20 @@ export function createDrizzleRepository(db: AppDb): Repository {
   };
   const workOrderScopeCondition = (scope: Scope) => {
     const company = scope.platform ? undefined : (scope.companyIds.length ? inArray(workOrders.propertyCompanyId, scope.companyIds) : eq(workOrders.propertyCompanyId, '00000000-0000-0000-0000-000000000000'));
+    const resident = exists(db.select({ id: people.id }).from(people).where(and(eq(people.id, workOrders.requesterPersonId), eq(people.userId, scope.userId), eq(people.propertyCompanyId, workOrders.propertyCompanyId), scope.communityIds.length ? inArray(workOrders.communityId, scope.communityIds) : eq(workOrders.communityId, '00000000-0000-0000-0000-000000000000'))));
     if (scope.platform || scope.companyWide) return company;
     const community = scope.communityIds.length ? inArray(workOrders.communityId, scope.communityIds) : eq(workOrders.communityId, '00000000-0000-0000-0000-000000000000');
     const scoped = company ? and(company, community) : community;
-    return scope.roles.includes('ENGINEER') ? and(scoped, eq(workOrders.assignedUserId, scope.userId)) : scoped;
+    if (scope.roles.includes('ENGINEER')) return or(and(scoped, eq(workOrders.assignedUserId, scope.userId)), resident);
+    return or(scoped, resident);
   };
   const workOrderEventScopeCondition = (scope: Scope) => {
     const company = scope.platform ? undefined : (scope.companyIds.length ? inArray(workOrderEvents.propertyCompanyId, scope.companyIds) : eq(workOrderEvents.propertyCompanyId, '00000000-0000-0000-0000-000000000000'));
+    const residentCommunity = scope.communityIds.length ? inArray(workOrderEvents.communityId, scope.communityIds) : eq(workOrderEvents.communityId, '00000000-0000-0000-0000-000000000000');
+    const resident = exists(db.select({ id: people.id }).from(people).innerJoin(workOrders, eq(workOrderEvents.workOrderId, workOrders.id)).where(and(eq(people.id, workOrders.requesterPersonId), eq(people.userId, scope.userId), eq(people.propertyCompanyId, workOrderEvents.propertyCompanyId), residentCommunity)));
     if (scope.platform || scope.companyWide) return company;
     const community = scope.communityIds.length ? inArray(workOrderEvents.communityId, scope.communityIds) : eq(workOrderEvents.communityId, '00000000-0000-0000-0000-000000000000');
-    return company ? and(company, community) : community;
+    return or(company ? and(company, community) : community, resident);
   };
   const repository: Repository = {
     async transaction<T>(callback: (transactionRepository: Repository) => Promise<T>) {
@@ -253,12 +262,22 @@ export function createDrizzleRepository(db: AppDb): Repository {
       const [totalRow] = await db.select({ total: sql<number>`count(*)` }).from(workOrders).where(where);
       const rows = await db.select().from(workOrders).where(where).orderBy(desc(workOrders.createdAt), desc(workOrders.id)).limit(pageSize).offset((page - 1) * pageSize);
       const revealPhone = scope.permissions.includes('work_order:contact:read');
-      return { items: rows.map(row => workOrderDto(workOrderMap(row), revealPhone)), page, pageSize, total: Number(totalRow?.total || 0) };
+      const items = await Promise.all(rows.map(async row => {
+        const order = workOrderMap(row);
+        const [review] = await db.select().from(workOrderReviews).where(eq(workOrderReviews.workOrderId, order.id)).limit(1);
+        const [requester] = await db.select({ userId: people.userId }).from(people).where(eq(people.id, order.requesterPersonId)).limit(1);
+        return workOrderDto(order, revealPhone, review ? workOrderReviewMap(review) : null, requester?.userId === scope.userId);
+      }));
+      return { items, page, pageSize, total: Number(totalRow?.total || 0) };
     },
     async getWorkOrder(id, scope) {
       const scoped = workOrderScopeCondition(scope); const where = scoped ? and(eq(workOrders.id, id), scoped) : eq(workOrders.id, id);
       const [row] = await db.select().from(workOrders).where(where).limit(1);
-      return row ? workOrderDto(workOrderMap(row), scope.permissions.includes('work_order:contact:read')) : null;
+      if (!row) return null;
+      const order = workOrderMap(row);
+      const [review] = await db.select().from(workOrderReviews).where(eq(workOrderReviews.workOrderId, order.id)).limit(1);
+      const [requester] = await db.select({ userId: people.userId }).from(people).where(eq(people.id, order.requesterPersonId)).limit(1);
+      return workOrderDto(order, scope.permissions.includes('work_order:contact:read'), review ? workOrderReviewMap(review) : null, requester?.userId === scope.userId);
     },
     async createWorkOrder(input) {
       const orderNo = `WO-${new Date().toISOString().slice(0, 10).replaceAll('-', '')}-${randomUUID().slice(0, 8).toUpperCase()}`;
@@ -270,7 +289,7 @@ export function createDrizzleRepository(db: AppDb): Repository {
       return db.transaction(async rawTx => {
         const tx = createDrizzleRepository(rawTx as unknown as AppDb);
         const current = await tx.getWorkOrder(id, scope); if (!current) return null;
-        if (current.status !== 'PENDING_DISPATCH') throw new AppError(409, 'INVALID_WORK_ORDER_STATE', '只有待派工工单可以派工');
+        if (!['PENDING_DISPATCH', 'REWORK_REQUIRED'].includes(current.status)) throw new AppError(409, 'INVALID_WORK_ORDER_STATE', '只有待派工或返工工单可以派工');
         const assigneeConditions: any[] = [eq(users.id, assignedUserId), eq(companyMemberships.propertyCompanyId, current.propertyCompanyId), eq(users.status, 'ACTIVE'), eq(companyMemberships.status, 'ACTIVE'), eq(roles.code, 'ENGINEER'), isNull(userRoleAssignments.revokedAt)];
         if (current.communityId) assigneeConditions.push(eq(userRoleAssignments.communityId, current.communityId));
         const [assignee] = await rawTx.select({ user: users, membership: companyMemberships }).from(users).innerJoin(companyMemberships, eq(companyMemberships.userId, users.id)).innerJoin(userRoleAssignments, eq(userRoleAssignments.userId, users.id)).innerJoin(roles, eq(userRoleAssignments.roleId, roles.id)).where(and(...assigneeConditions)).limit(1);
@@ -294,12 +313,67 @@ export function createDrizzleRepository(db: AppDb): Repository {
         if (toStatus === 'ACCEPTED') values.acceptedAt = now;
         if (toStatus === 'ARRIVED') values.arrivedAt = now;
         if (toStatus === 'COMPLETED') values.completedAt = now;
-        if (toStatus === 'ARCHIVED') values.archivedAt = now;
         if (toStatus === 'CANCELLED') values.cancelledAt = now;
         const [row] = await rawTx.update(workOrders).set(values as any).where(eq(workOrders.id, id)).returning();
         await rawTx.insert(workOrderEvents).values({ workOrderId: id, propertyCompanyId: current.propertyCompanyId, communityId: current.communityId, actorUserId, fromStatus: current.status, toStatus, action: 'TRANSITION', note });
         await tx.audit({ action: `WORK_ORDER_${toStatus}`, actorUserId, propertyCompanyId: current.propertyCompanyId, communityId: current.communityId, resourceType: 'work_order', resourceId: id, afterData: { fromStatus: current.status, toStatus, note }, requestId });
         return workOrderMap(row);
+      });
+    },
+    async confirmWorkOrderCompletion(id, scope, requestId) {
+      return db.transaction(async rawTx => {
+        const tx = createDrizzleRepository(rawTx as unknown as AppDb);
+        const current = await tx.getWorkOrder(id, scope); if (!current) return null;
+        const [locked] = await rawTx.select().from(workOrders).where(eq(workOrders.id, id)).for('update').limit(1);
+        if (!locked) return null;
+        if (locked.status !== 'COMPLETED') throw new AppError(409, 'INVALID_WORK_ORDER_TRANSITION', '只有已提交完成的工单可以确认');
+        const [resident] = await rawTx.select({ id: people.id }).from(people).where(and(eq(people.id, locked.requesterPersonId), eq(people.userId, scope.userId), eq(people.propertyCompanyId, locked.propertyCompanyId))).limit(1);
+        if (!resident) throw new AppError(403, 'FORBIDDEN', '只有该工单居民可以确认完成');
+        const now = new Date();
+        const [row] = await rawTx.update(workOrders).set({ status: 'ARCHIVED', residentConfirmedAt: now, residentConfirmedByPersonId: resident.id, archivedAt: now, updatedAt: now }).where(eq(workOrders.id, id)).returning();
+        await rawTx.insert(workOrderEvents).values({ workOrderId: id, propertyCompanyId: locked.propertyCompanyId, communityId: locked.communityId, actorUserId: scope.userId, fromStatus: 'COMPLETED', toStatus: 'ARCHIVED', action: 'RESIDENT_CONFIRMED_COMPLETION', note: null });
+        await tx.audit({ action: 'CONFIRM_WORK_ORDER_COMPLETION', actorUserId: scope.userId, propertyCompanyId: locked.propertyCompanyId, communityId: locked.communityId, resourceType: 'work_order', resourceId: id, requestId, afterData: { fromStatus: 'COMPLETED', toStatus: 'ARCHIVED', residentPersonId: resident.id } });
+        return tx.getWorkOrder(row.id, scope);
+      });
+    },
+    async requestWorkOrderRework(id, reason, scope, requestId) {
+      return db.transaction(async rawTx => {
+        const tx = createDrizzleRepository(rawTx as unknown as AppDb);
+        const current = await tx.getWorkOrder(id, scope); if (!current) return null;
+        const [locked] = await rawTx.select().from(workOrders).where(eq(workOrders.id, id)).for('update').limit(1);
+        if (!locked) return null;
+        if (locked.status !== 'COMPLETED') throw new AppError(409, 'INVALID_WORK_ORDER_TRANSITION', '只有已提交完成的工单可以申请返工');
+        const [resident] = await rawTx.select({ id: people.id }).from(people).where(and(eq(people.id, locked.requesterPersonId), eq(people.userId, scope.userId), eq(people.propertyCompanyId, locked.propertyCompanyId))).limit(1);
+        if (!resident) throw new AppError(403, 'FORBIDDEN', '只有该工单居民可以申请返工');
+        const [row] = await rawTx.update(workOrders).set({ status: 'REWORK_REQUIRED', updatedAt: new Date() }).where(eq(workOrders.id, id)).returning();
+        await rawTx.insert(workOrderEvents).values({ workOrderId: id, propertyCompanyId: locked.propertyCompanyId, communityId: locked.communityId, actorUserId: scope.userId, fromStatus: 'COMPLETED', toStatus: 'REWORK_REQUIRED', action: 'REWORK_REQUESTED', note: reason });
+        await tx.audit({ action: 'REQUEST_WORK_ORDER_REWORK', actorUserId: scope.userId, propertyCompanyId: locked.propertyCompanyId, communityId: locked.communityId, resourceType: 'work_order', resourceId: id, requestId, afterData: { fromStatus: 'COMPLETED', toStatus: 'REWORK_REQUIRED', reason } });
+        return tx.getWorkOrder(row.id, scope);
+      });
+    },
+    async getWorkOrderReview(id, scope) {
+      const order = await repository.getWorkOrder(id, scope); if (!order) return null;
+      const [row] = await db.select().from(workOrderReviews).where(and(eq(workOrderReviews.workOrderId, id), eq(workOrderReviews.propertyCompanyId, order.propertyCompanyId))).limit(1);
+      return row ? workOrderReviewMap(row) : null;
+    },
+    async createWorkOrderReview(id, rating, comment, scope, requestId) {
+      return db.transaction(async rawTx => {
+        const tx = createDrizzleRepository(rawTx as unknown as AppDb);
+        const current = await tx.getWorkOrder(id, scope); if (!current) return null;
+        const [locked] = await rawTx.select().from(workOrders).where(eq(workOrders.id, id)).for('update').limit(1);
+        if (!locked) return null;
+        if (locked.status !== 'ARCHIVED') throw new AppError(409, 'WORK_ORDER_NOT_ARCHIVED', '只有已归档工单可以评价');
+        const [resident] = await rawTx.select({ id: people.id }).from(people).where(and(eq(people.id, locked.requesterPersonId), eq(people.userId, scope.userId), eq(people.propertyCompanyId, locked.propertyCompanyId))).limit(1);
+        if (!resident) throw new AppError(403, 'FORBIDDEN', '只有该工单居民可以评价');
+        try {
+          const [row] = await rawTx.insert(workOrderReviews).values({ propertyCompanyId: locked.propertyCompanyId, workOrderId: id, reviewerPersonId: resident.id, rating, comment }).returning();
+          await rawTx.insert(workOrderEvents).values({ workOrderId: id, propertyCompanyId: locked.propertyCompanyId, communityId: locked.communityId, actorUserId: scope.userId, fromStatus: 'ARCHIVED', toStatus: 'ARCHIVED', action: 'REVIEW_SUBMITTED', note: null, metadata: { rating } });
+          await tx.audit({ action: 'SUBMIT_WORK_ORDER_REVIEW', actorUserId: scope.userId, propertyCompanyId: locked.propertyCompanyId, communityId: locked.communityId, resourceType: 'work_order_review', resourceId: row.id, requestId, afterData: { workOrderId: id, rating } });
+          return workOrderReviewMap(row);
+        } catch (error: any) {
+          if (error?.code === '23505') throw new AppError(409, 'WORK_ORDER_REVIEW_EXISTS', '该工单已经评价');
+          throw error;
+        }
       });
     },
     async listWorkOrderEvents(id, scope) {
