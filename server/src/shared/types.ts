@@ -32,6 +32,7 @@ export type BuildingUnitDto = BuildingUnitRecord;
 export type HouseDto = HouseRecord & { displayCode: string; displayAddress: string };
 export type PersonDto = Omit<PersonRecord, 'phone'> & { maskedPhone: string | null };
 export type PersonContactDto = Pick<PersonRecord, 'id' | 'name' | 'phone'>;
+export type PaginatedResult<T> = { items: T[]; page: number; pageSize: number; total: number };
 export type RelationshipFilters = { includeHistory?: boolean; houseId?: string; personId?: string };
 export type PropertyFilters = { page?: number; pageSize?: number; communityId?: string; buildingId?: string; unitId?: string; houseId?: string; keyword?: string; relationshipType?: HouseRelationshipRecord['relationshipType']; status?: string };
 
@@ -102,12 +103,12 @@ export interface Repository {
   createBuildingUnit(input: { buildingId: string; code: string; name: string; displayName?: string | null }): Promise<BuildingUnitRecord>;
   updateBuildingUnit(id: string, input: Partial<Pick<BuildingUnitRecord, 'code' | 'name' | 'displayName'>>, scope: Scope): Promise<BuildingUnitRecord | null>;
   disableBuildingUnit(id: string, scope: Scope): Promise<BuildingUnitRecord | null>;
-  listHouses(scope: Scope, filters?: PropertyFilters): Promise<HouseDto[]>;
+  listHouses(scope: Scope, filters?: PropertyFilters): Promise<PaginatedResult<HouseDto>>;
   getHouse(id: string, scope: Scope): Promise<HouseDto | null>;
   createHouse(input: { buildingId: string; buildingUnitId?: string | null; code: string; floor?: number | null; buildingArea?: string | null; usableArea?: string | null; displayName?: string | null; legacyCode?: string | null }): Promise<HouseRecord>;
   updateHouse(id: string, input: Partial<Pick<HouseRecord, 'buildingUnitId' | 'code' | 'floor' | 'buildingArea' | 'usableArea' | 'displayName' | 'legacyCode' | 'status'>>, scope: Scope): Promise<HouseRecord | null>;
   disableHouse(id: string, scope: Scope): Promise<HouseRecord | null>;
-  listPeople(scope: Scope, filters?: PropertyFilters): Promise<PersonDto[]>;
+  listPeople(scope: Scope, filters?: PropertyFilters): Promise<PaginatedResult<PersonDto>>;
   getPerson(id: string, scope: Scope, options?: { includeHistory?: boolean }): Promise<PersonDto | null>;
   createPerson(input: { propertyCompanyId: string; userId?: string | null; name: string; phone?: string | null; gender?: PersonRecord['gender'] }): Promise<PersonRecord>;
   updatePerson(id: string, input: Partial<Pick<PersonRecord, 'name' | 'userId' | 'phone' | 'gender'>>, scope: Scope): Promise<PersonRecord | null>;

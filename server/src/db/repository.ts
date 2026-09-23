@@ -133,8 +133,11 @@ export function createDrizzleRepository(db: AppDb): Repository {
       if (filters.unitId) conditions.push(eq(houses.buildingUnitId, filters.unitId));
       if (filters.status) conditions.push(eq(houses.status, filters.status as any));
       if (filters.keyword) conditions.push(or(sql`${houses.code} ILIKE ${`%${filters.keyword}%`}`, sql`${houses.legacyCode} ILIKE ${`%${filters.keyword}%`}`));
-      const rows = await db.select({ house: houses, building: buildings, unit: buildingUnits, community: communities }).from(houses).innerJoin(buildings, eq(houses.buildingId, buildings.id)).leftJoin(buildingUnits, eq(houses.buildingUnitId, buildingUnits.id)).innerJoin(communities, eq(buildings.communityId, communities.id)).where(conditions.length ? and(...conditions) : undefined).orderBy(buildings.code, houses.code);
-      return rows.map(houseDto);
+      const where = conditions.length ? and(...conditions) : undefined;
+      const page = filters.page || 1; const pageSize = filters.pageSize || 20;
+      const [totalRow] = await db.select({ total: sql<number>`count(*)` }).from(houses).innerJoin(buildings, eq(houses.buildingId, buildings.id)).innerJoin(communities, eq(buildings.communityId, communities.id)).where(where);
+      const rows = await db.select({ house: houses, building: buildings, unit: buildingUnits, community: communities }).from(houses).innerJoin(buildings, eq(houses.buildingId, buildings.id)).leftJoin(buildingUnits, eq(houses.buildingUnitId, buildingUnits.id)).innerJoin(communities, eq(buildings.communityId, communities.id)).where(where).orderBy(buildings.code, houses.code).limit(pageSize).offset((page - 1) * pageSize);
+      return { items: rows.map(houseDto), page, pageSize, total: Number(totalRow?.total || 0) };
     },
     async getHouse(id, scope) { const scoped = scopedCommunities(scope); const conditions = scoped ? and(eq(houses.id, id), scoped) : eq(houses.id, id); const [row] = await db.select({ house: houses, building: buildings, unit: buildingUnits, community: communities }).from(houses).innerJoin(buildings, eq(houses.buildingId, buildings.id)).leftJoin(buildingUnits, eq(houses.buildingUnitId, buildingUnits.id)).innerJoin(communities, eq(buildings.communityId, communities.id)).where(conditions).limit(1); return row ? houseDto(row) : null; },
     async createHouse(input) { const [row] = await db.insert(houses).values(input).returning(); return houseMap(row); },
@@ -154,13 +157,16 @@ export function createDrizzleRepository(db: AppDb): Repository {
         relation.push(currentOrFuture(housePersonRelationships.endDate));
         conditions.push(exists(db.select({ id: housePersonRelationships.id }).from(housePersonRelationships).innerJoin(houses, eq(housePersonRelationships.houseId, houses.id)).innerJoin(buildings, eq(houses.buildingId, buildings.id)).innerJoin(communities, eq(buildings.communityId, communities.id)).where(and(...relation))));
       }
-      const rows = await db.select().from(people).where(conditions.length ? and(...conditions) : undefined).orderBy(people.name).limit(Math.min(filters.pageSize || 50, 100)).offset(((filters.page || 1) - 1) * Math.min(filters.pageSize || 50, 100));
-      return rows.map(row => personDto(personMap(row)));
+      const where = conditions.length ? and(...conditions) : undefined;
+      const page = filters.page || 1; const pageSize = filters.pageSize || 20;
+      const [totalRow] = await db.select({ total: sql<number>`count(*)` }).from(people).where(where);
+      const rows = await db.select().from(people).where(where).orderBy(people.name).limit(pageSize).offset((page - 1) * pageSize);
+      return { items: rows.map(row => personDto(personMap(row))), page, pageSize, total: Number(totalRow?.total || 0) };
     },
     async getPerson(id, scope, options = {}) { const scoped = personScopeCondition(scope, options.includeHistory ?? false); const conditions = scoped ? and(eq(people.id, id), scoped) : eq(people.id, id); const [row] = await db.select().from(people).where(conditions).limit(1); return row ? personDto(personMap(row)) : null; },
     async createPerson(input) { const phone = normalizePhone(input.phone); if (input.phone && !phone) throw new Error('手机号格式不正确'); const [row] = await db.insert(people).values({ ...input, phone }).returning(); return personMap(row); },
-    async updatePerson(id, input, scope) { if (!(await repository.getPerson(id, scope, { includeHistory: true }))) return null; const values: any = { ...input, updatedAt: new Date() }; if (input.phone !== undefined) { values.phone = normalizePhone(input.phone); if (input.phone && !values.phone) throw new Error('手机号格式不正确'); } const [row] = await db.update(people).set(values).where(eq(people.id, id)).returning(); return row ? personMap(row) : null; },
-    async disablePerson(id, scope) { if (!(await repository.getPerson(id, scope, { includeHistory: true }))) return null; const [row] = await db.update(people).set({ status: 'DISABLED', disabledAt: new Date(), updatedAt: new Date() }).where(eq(people.id, id)).returning(); return row ? personMap(row) : null; },
+    async updatePerson(id, input, scope) { if (!(await repository.getPerson(id, scope))) return null; const values: any = { ...input, updatedAt: new Date() }; if (input.phone !== undefined) { values.phone = normalizePhone(input.phone); if (input.phone && !values.phone) throw new Error('手机号格式不正确'); } const [row] = await db.update(people).set(values).where(eq(people.id, id)).returning(); return row ? personMap(row) : null; },
+    async disablePerson(id, scope) { if (!(await repository.getPerson(id, scope))) return null; const [row] = await db.update(people).set({ status: 'DISABLED', disabledAt: new Date(), updatedAt: new Date() }).where(eq(people.id, id)).returning(); return row ? personMap(row) : null; },
     async getPersonContact(id, scope) { const person = await repository.getPerson(id, scope); return person ? { id: person.id, name: person.name, phone: (await db.select({ phone: people.phone }).from(people).where(eq(people.id, id)).limit(1))[0]?.phone || null } : null; },
     async listHouseRelationships(houseId, scope, includeHistory = true) {
       if (!(await repository.getHouse(houseId, scope))) return [];
@@ -190,10 +196,12 @@ export function createDrizzleRepository(db: AppDb): Repository {
         const [lockedHouse] = await tx.select({ houseId: houses.id, propertyCompanyId: communities.propertyCompanyId, communityId: communities.id }).from(houses).innerJoin(buildings, eq(houses.buildingId, buildings.id)).innerJoin(communities, eq(buildings.communityId, communities.id)).where(eq(houses.id, input.houseId)).for('update').limit(1);
         if (!lockedHouse || lockedHouse.propertyCompanyId !== house.propertyCompanyId) throw new Error('房屋租户范围已变化');
         let person: PersonRecord;
+        let createdPerson = false;
         if (input.existingPersonId) { const [row] = await tx.select().from(people).where(eq(people.id, input.existingPersonId)).limit(1); if (!row || row.propertyCompanyId !== house.propertyCompanyId) throw new Error('客户不属于当前物业公司'); person = personMap(row); }
-        else { if (!input.newPerson) throw new Error('缺少新客户信息'); const phone = normalizePhone(input.newPerson.phone); if (input.newPerson.phone && !phone) throw new Error('手机号格式不正确'); const [row] = await tx.insert(people).values({ propertyCompanyId: house.propertyCompanyId!, name: input.newPerson.name, phone, gender: input.newPerson.gender || null }).returning(); person = personMap(row); }
+        else { if (!input.newPerson) throw new Error('缺少新客户信息'); const phone = normalizePhone(input.newPerson.phone); if (input.newPerson.phone && !phone) throw new Error('手机号格式不正确'); const [row] = await tx.insert(people).values({ propertyCompanyId: house.propertyCompanyId!, name: input.newPerson.name, phone, gender: input.newPerson.gender || null }).returning(); person = personMap(row); createdPerson = true; }
         const [row] = await tx.insert(housePersonRelationships).values({ houseId: input.houseId, personId: person.id, ...input.relationship } as any).returning();
         if (input.actorUserId) {
+          if (createdPerson) await tx.insert(auditLogs).values({ action: 'PERSON_CREATED', actorUserId: input.actorUserId, propertyCompanyId: lockedHouse.propertyCompanyId, communityId: lockedHouse.communityId, resourceType: 'person', resourceId: person.id, requestId: input.requestId, afterData: { name: person.name, phone: person.phone ? 'REDACTED' : null } });
           await tx.insert(auditLogs).values({ action: 'HOUSE_RELATION_CREATED', actorUserId: input.actorUserId, propertyCompanyId: lockedHouse.propertyCompanyId, communityId: lockedHouse.communityId, resourceType: 'house_relationship', resourceId: row.id, requestId: input.requestId, afterData: { personId: person.id, houseId: input.houseId, relationshipType: input.relationship.relationshipType } });
         }
         return { person, relationship: relationshipMap(row) as HouseRelationshipRecord };

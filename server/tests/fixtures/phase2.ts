@@ -1,6 +1,8 @@
-import { eq, inArray } from 'drizzle-orm';
+import { and, eq, isNull } from 'drizzle-orm';
 import type { AppDb } from '../../src/db/client.js';
-import { buildingUnits, buildings, communities, housePersonRelationships, houses, people, propertyCompanies, users } from '../../src/db/schema/index.js';
+import { buildingUnits, buildings, communities, housePersonRelationships, people, propertyCompanies, roles, userRoleAssignments, users } from '../../src/db/schema/index.js';
+import { houses } from '../../src/db/schema/index.js';
+import { hashPassword } from '../../src/modules/auth/service.js';
 
 /** Creates only Phase 2 property data; the regular Phase 1 seed remains untouched. */
 export async function createPhase2Fixture(db: AppDb) {
@@ -26,20 +28,31 @@ export async function createPhase2Fixture(db: AppDb) {
     const [aNoUnitHouse] = await tx.insert(houses).values({ buildingId: aNoUnitBuilding.id, code: '1201', floor: 12 }).returning();
     const [a2House] = await tx.insert(houses).values({ buildingId: a2Building.id, code: '101' }).returning();
     const [bHouse] = await tx.insert(houses).values({ buildingId: bBuilding.id, code: '101' }).returning();
-    const [aUser] = await tx.select().from(users).where(eq(users.phone, '13800000002')).limit(1);
-    const [bUser] = await tx.select().from(users).where(eq(users.phone, '13800000004')).limit(1);
-    const [personA] = await tx.insert(people).values({ propertyCompanyId: companyA.id, userId: aUser?.id, name: 'A1 业主', phone: '13812345678' }).returning();
-    const [personB] = await tx.insert(people).values({ propertyCompanyId: companyB.id, userId: bUser?.id, name: 'B1 业主', phone: '13912345678' }).returning();
+    const [sameUser] = await tx.select().from(users).where(eq(users.phone, '13800000002')).limit(1);
+    if (!sameUser) throw new Error('Phase 1 A1 manager is required for cross-tenant User fixture');
+    const [existingA2Manager] = await tx.select().from(users).where(eq(users.phone, '13800000005')).limit(1);
+    const [a2Manager] = existingA2Manager ? [existingA2Manager] : await tx.insert(users).values({ name: '物业公司 A A2 项目经理', phone: '13800000005', email: 'a2-manager@shengbian.local', passwordHash: await hashPassword('Phase2A2Manager-2026!'), status: 'ACTIVE' }).returning();
+    const [managerRole] = await tx.select().from(roles).where(eq(roles.code, 'COMMUNITY_MANAGER')).limit(1);
+    if (!managerRole) throw new Error('COMMUNITY_MANAGER role is required for Phase 2 fixture');
+    const [existingA2Assignment] = await tx.select().from(userRoleAssignments).where(and(eq(userRoleAssignments.userId, a2Manager.id), eq(userRoleAssignments.roleId, managerRole.id), eq(userRoleAssignments.communityId, a2.id), isNull(userRoleAssignments.revokedAt))).limit(1);
+    if (!existingA2Assignment) await tx.insert(userRoleAssignments).values({ userId: a2Manager.id, roleId: managerRole.id, propertyCompanyId: companyA.id, communityId: a2.id });
+    const [personA] = await tx.insert(people).values({ propertyCompanyId: companyA.id, userId: sameUser.id, name: 'A1 业主', phone: '13812345678' }).returning();
+    const [personB] = await tx.insert(people).values({ propertyCompanyId: companyB.id, userId: sameUser.id, name: 'B1 业主', phone: '13912345678' }).returning();
     const [unbound] = await tx.insert(people).values({ propertyCompanyId: companyA.id, name: '待分配客户', phone: '13712345678' }).returning();
     const [a2Person] = await tx.insert(people).values({ propertyCompanyId: companyA.id, name: 'A2 住户', phone: '13612345678' }).returning();
     const [historyPerson] = await tx.insert(people).values({ propertyCompanyId: companyA.id, name: '历史租户', phone: '13512345678' }).returning();
+    const [crossScopePerson] = await tx.insert(people).values({ propertyCompanyId: companyA.id, name: '跨小区历史与当前住户', phone: '13500001111' }).returning();
+    const [a1CurrentPerson] = await tx.insert(people).values({ propertyCompanyId: companyA.id, name: 'A1 当前住户', phone: '13312345678' }).returning();
     await tx.insert(housePersonRelationships).values([
       { houseId: aHouse.id, personId: personA.id, relationshipType: 'OWNER', ownershipShare: '60', isPrimaryContact: true, startDate: '2020-01-01', verificationStatus: 'UNVERIFIED' },
       { houseId: aHouse.id, personId: historyPerson.id, relationshipType: 'TENANT', startDate: '2020-01-01', endDate: '2022-01-01', verificationStatus: 'UNVERIFIED' },
       { houseId: a2House.id, personId: a2Person.id, relationshipType: 'TENANT', startDate: '2024-01-01', verificationStatus: 'UNVERIFIED' },
-      { houseId: bHouse.id, personId: personB.id, relationshipType: 'OWNER', startDate: '2020-01-01', verificationStatus: 'UNVERIFIED' }
+      { houseId: bHouse.id, personId: personB.id, relationshipType: 'OWNER', startDate: '2020-01-01', verificationStatus: 'UNVERIFIED' },
+      { houseId: aHouse.id, personId: crossScopePerson.id, relationshipType: 'TENANT', startDate: '2020-01-01', endDate: '2022-01-01', verificationStatus: 'UNVERIFIED' },
+      { houseId: a2House.id, personId: crossScopePerson.id, relationshipType: 'TENANT', startDate: '2024-01-01', verificationStatus: 'UNVERIFIED' },
+      { houseId: aNoUnitHouse.id, personId: a1CurrentPerson.id, relationshipType: 'FAMILY_MEMBER', startDate: '2024-01-01', verificationStatus: 'UNVERIFIED' }
     ]);
-    return { companyA, companyB, a1, a2, b1, aBuilding, aNoUnitBuilding, a2Building, bBuilding, unit, aHouse, aNoUnitHouse, a2House, bHouse, personA, personB, unbound, a2Person, historyPerson };
+    return { companyA, companyB, a1, a2, b1, aBuilding, aNoUnitBuilding, a2Building, bBuilding, unit, aHouse, aNoUnitHouse, a2House, bHouse, sameUser, a2Manager, personA, personB, unbound, a2Person, historyPerson, crossScopePerson, a1CurrentPerson };
   });
 }
 
