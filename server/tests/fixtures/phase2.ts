@@ -11,6 +11,12 @@ export async function createPhase2Fixture(db: AppDb) {
   const [b1] = await db.select().from(communities).where(eq(communities.code, 'community-b1')).limit(1);
   if (!companyA || !companyB || !a1 || !a2 || !b1) throw new Error('Phase 1 seed must run before Phase 2 fixture');
   return db.transaction(async tx => {
+    // This helper is only used with the dedicated shengbian_test database.
+    await tx.delete(housePersonRelationships);
+    await tx.delete(people);
+    await tx.delete(houses);
+    await tx.delete(buildingUnits);
+    await tx.delete(buildings);
     const [aBuilding] = await tx.insert(buildings).values({ communityId: a1.id, code: 'A1-01', name: 'A1 一号楼' }).returning();
     const [aNoUnitBuilding] = await tx.insert(buildings).values({ communityId: a1.id, code: 'A1-03', name: 'A1 三号楼' }).returning();
     const [a2Building] = await tx.insert(buildings).values({ communityId: a2.id, code: 'A2-01', name: 'A2 一号楼' }).returning();
