@@ -55,11 +55,10 @@ Backend schema, migration metadata, Repository, shared types, Fastify routes, pe
 
 1. The integration suite is intentionally opt-in with `RUN_POSTGRES_INTEGRATION=1`; on a developer machine without PostgreSQL it is skipped rather than faked.
 2. The Mac workspace did not have a local Docker daemon; Raspberry Pi was therefore the authoritative real PostgreSQL execution environment.
-3. The final direct Fastify health probe command on the Pi was interrupted by a shell quoting error; API behavior itself was exercised through the real HTTP integration suite.
-4. No resident-facing frontend migration was attempted by design.
+3. No resident-facing frontend migration was attempted by design.
 
 ## Final Conclusion
 
-**CONDITIONAL PASS**
+**PASS**
 
-The approved Phase 2A backend scope is implemented and verified against real PostgreSQL on the Raspberry Pi, with 30/30 Phase 2A scenarios and the existing Phase 1 PostgreSQL suite passing. The result remains conditional because the final standalone health probe command was not completed and no browser-facing frontend migration was in scope.
+The approved Phase 2A backend scope is implemented and verified against real PostgreSQL on the Raspberry Pi, with 30/30 Phase 2A scenarios and the existing Phase 1 PostgreSQL suite passing. A standalone Fastify instance also returned a successful local `GET /api/v1/health` response on the Raspberry Pi. Resident-facing frontend migration was intentionally excluded from Phase 2A.
